@@ -1,0 +1,48 @@
+import { Injectable, LoggerService as NestLoggerService, Scope } from '@nestjs/common';
+import pino from 'pino';
+
+@Injectable({ scope: Scope.TRANSIENT })
+export class LoggerService implements NestLoggerService {
+  private readonly logger: pino.Logger;
+
+  constructor() {
+    this.logger = pino({
+      level: process.env.LOG_LEVEL || 'info',
+      transport:
+        process.env.NODE_ENV === 'development'
+          ? {
+              target: 'pino-pretty',
+              options: {
+                colorize: true,
+                translateTime: 'HH:MM:ss Z',
+                ignore: 'pid,hostname',
+              },
+            }
+          : undefined,
+    });
+  }
+
+  log(message: any, context?: string): void {
+    this.logger.info({ context }, message);
+  }
+
+  error(message: any, trace?: string, context?: string): void {
+    this.logger.error({ context, trace }, message);
+  }
+
+  warn(message: any, context?: string): void {
+    this.logger.warn({ context }, message);
+  }
+
+  debug(message: any, context?: string): void {
+    this.logger.debug({ context }, message);
+  }
+
+  verbose(message: any, context?: string): void {
+    this.logger.trace({ context }, message);
+  }
+
+  setContext(context: string): void {
+    this.logger = pino({ context }) as any;
+  }
+}

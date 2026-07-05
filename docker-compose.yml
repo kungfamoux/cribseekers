@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: cribseekers-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cribseekers
+      POSTGRES_PASSWORD: cribseekers_password
+      POSTGRES_DB: cribseekers
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - cribseekers-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: cribseekers-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - cribseekers-network
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: cribseekers-api
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://cribseekers:cribseekers_password@postgres:5432/cribseekers
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: your_jwt_secret_here
+      JWT_EXPIRES_IN: 7d
+      PORT: 3001
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - cribseekers-network
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: cribseekers-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: http://localhost:3001/api/v1
+    depends_on:
+      - api
+    networks:
+      - cribseekers-network
+
+  admin:
+    build:
+      context: .
+      dockerfile: apps/admin/Dockerfile
+    container_name: cribseekers-admin
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: http://localhost:3001/api/v1
+    depends_on:
+      - api
+    networks:
+      - cribseekers-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  cribseekers-network:
+    driver: bridge

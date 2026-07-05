@@ -1,0 +1,306 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  phoneNumber   String?   @unique
+  password      String
+  firstName     String
+  lastName      String
+  role          UserRole  @default(TENANT)
+  emailVerified Boolean   @default(false)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  profile       UserProfile?
+  agentProfile  AgentProfile?
+  landlordProfile LandlordProfile?
+  properties    Property[]
+  inspections   Inspection[]
+  reviews       Review[]  @relation("UserReviews")
+  givenReviews  Review[]  @relation("GivenReviews")
+  notifications Notification[]
+  messages      Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+  wallet        Wallet?
+  transactions  Transaction[]
+
+  @@map("users")
+}
+
+model UserProfile {
+  id           String   @id @default(uuid())
+  userId       String   @unique
+  dateOfBirth  DateTime?
+  address      String?
+  city         String?
+  state        String?
+  country      String   @default("Nigeria")
+  preferences  Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+model AgentProfile {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  licenseNumber   String   @unique
+  licenseExpiry   DateTime
+  agencyName      String?
+  agencyAddress   String?
+  yearsExperience Int?
+  specializations String[]
+  isVerified      Boolean  @default(false)
+  rating          Float    @default(0)
+  totalReviews    Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("agent_profiles")
+}
+
+model LandlordProfile {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  businessName    String?
+  businessAddress String?
+  yearsInBusiness Int?
+  isVerified      Boolean  @default(false)
+  rating          Float    @default(0)
+  totalReviews    Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("landlord_profiles")
+}
+
+model Property {
+  id              String        @id @default(uuid())
+  title           String
+  description     String
+  type            PropertyType
+  listingType     ListingType
+  furnishingType  FurnishingType
+  price           Float
+  currency        String        @default("NGN")
+  bedrooms        Int?
+  bathrooms       Int?
+  squareFeet      Float?
+  address         String
+  city            String
+  state           String
+  country         String        @default("Nigeria")
+  latitude        Float?
+  longitude       Float?
+  amenities       String[]
+  images          String[]
+  status          PropertyStatus @default(AVAILABLE)
+  ownerId         String
+  agentId         String?
+  featured        Boolean       @default(false)
+  views           Int           @default(0)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  deletedAt       DateTime?
+
+  owner       User         @relation(fields: [ownerId], references: [id])
+  agent       AgentProfile?
+  inspections Inspection[]
+  reviews     Review[]
+
+  @@map("properties")
+}
+
+model Inspection {
+  id          String           @id @default(uuid())
+  propertyId  String
+  userId      String
+  scheduledAt DateTime
+  status      InspectionStatus @default(PENDING)
+  notes       String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  property Property @relation(fields: [propertyId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+
+  @@map("inspections")
+}
+
+model Review {
+  id          String   @id @default(uuid())
+  propertyId  String
+  reviewerId  String
+  subjectId   String
+  rating      Int
+  comment     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  property Property @relation(fields: [propertyId], references: [id])
+  reviewer User    @relation("GivenReviews", fields: [reviewerId], references: [id])
+  subject  User    @relation("UserReviews", fields: [subjectId], references: [id])
+
+  @@map("reviews")
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  data      Json?
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
+
+model Conversation {
+  id         String   @id @default(uuid())
+  participant1 String
+  participant2 String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  messages Message[]
+
+  @@unique([participant1, participant2])
+  @@map("conversations")
+}
+
+model Message {
+  id             String   @id @default(uuid())
+  conversationId String
+  senderId       String
+  receiverId     String
+  content        String
+  isRead         Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+  sender         User         @relation("SentMessages", fields: [senderId], references: [id])
+  receiver       User         @relation("ReceivedMessages", fields: [receiverId], references: [id])
+
+  @@map("messages")
+}
+
+model Wallet {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  balance   Float    @default(0)
+  currency String   @default("NGN")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user         User         @relation(fields: [userId], references: [id])
+  transactions Transaction[]
+
+  @@map("wallets")
+}
+
+model Transaction {
+  id          String        @id @default(uuid())
+  walletId    String
+  type        TransactionType
+  amount      Float
+  description String
+  reference   String       @unique
+  status      PaymentStatus @default(PENDING)
+  metadata    Json?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  wallet Wallet @relation(fields: [walletId], references: [id])
+
+  @@map("transactions")
+}
+
+enum UserRole {
+  TENANT
+  AGENT
+  LANDLORD
+  ADMIN
+}
+
+enum PropertyType {
+  APARTMENT
+  HOUSE
+  CONDO
+  STUDIO
+  DUPLEX
+  TERRACE
+  OFFICE
+  SHOP
+  LAND
+}
+
+enum ListingType {
+  RENT
+  SALE
+}
+
+enum FurnishingType {
+  FURNISHED
+  SEMI_FURNISHED
+  UNFURNISHED
+}
+
+enum PropertyStatus {
+  AVAILABLE
+  RENTED
+  SOLD
+  PENDING
+  INACTIVE
+}
+
+enum InspectionStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum NotificationType {
+  INSPECTION_SCHEDULED
+  INSPECTION_REMINDER
+  INSPECTION_COMPLETED
+  PROPERTY_AVAILABLE
+  PAYMENT_RECEIVED
+  REVIEW_RECEIVED
+  MESSAGE_RECEIVED
+  SYSTEM
+}
+
+enum TransactionType {
+  CREDIT
+  DEBIT
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
