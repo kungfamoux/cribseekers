@@ -1,0 +1,40 @@
+import { PropertyStatus, PropertyVisibility, ListingType, PropertyCondition, PricePeriod } from '@prisma/client';
+
+export class PropertyResponseDto {
+  id: string;
+  title: string;
+  description: string;
+  categoryId: string;
+  typeId: string;
+  purposeId: string;
+  listingType: ListingType;
+  condition?: PropertyCondition;
+  price: number;
+  currency: string;
+  pricePeriod: PricePeriod;
+  bedrooms?: number;
+  bathrooms?: number;
+  squareFeet?: number;
+  squareMeters?: number;
+  lotSize?: number;
+  yearBuilt?: number;
+  parkingSpaces?: number;
+  floors?: number;
+  locationId: string;
+  status: PropertyStatus;
+  visibility: PropertyVisibility;
+  featured: boolean;
+  featuredUntil?: Date;
+  views: number;
+  inquiries: number;
+  publishedAt?: Date;
+  expiresAt?: Date;
+  ownerId: string;
+  verifiedAt?: Date;
+  verifiedBy?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt?: Date;
+  createdBy?: string;
+  updatedBy?: string;
+}

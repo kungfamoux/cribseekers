@@ -18,6 +18,8 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const logger = app.get(LoggerService);
 
+  app.enableShutdownHooks();
+
   const port = configService.get<number>('port') || 3001;
   const apiPrefix = configService.get<string>('apiPrefix') || 'api';
   const apiVersion = configService.get<string>('apiVersion') || '1';

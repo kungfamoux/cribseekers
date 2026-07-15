@@ -1,3 +1,0 @@
-{
-  "extends": ["@cribseekers/eslint-config", "next/core-web-vitals"]
-}

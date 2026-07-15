@@ -6,7 +6,6 @@
   "files": [
     "index.json",
     "base.json",
-    "nextjs.json",
     "nestjs.json"
   ]
 }

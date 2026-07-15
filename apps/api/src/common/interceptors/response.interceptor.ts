@@ -12,7 +12,6 @@ import { ApiResponse, ApiMeta } from '@cribseekers/types';
 export class ResponseInterceptor<T> implements NestInterceptor<T, ApiResponse<T>> {
   intercept(context: ExecutionContext, next: CallHandler): Observable<ApiResponse<T>> {
     const request = context.switchToHttp().getRequest();
-    const response = context.switchToHttp().getResponse();
 
     return next.handle().pipe(
       map((data) => {

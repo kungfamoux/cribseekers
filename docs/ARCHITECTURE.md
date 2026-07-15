@@ -2,7 +2,7 @@
 
 ## Overview
 
-CribSeekers is a monorepo built with Turborepo and pnpm workspaces, consisting of a NestJS backend API, Next.js web application, Next.js admin portal, and shared packages.
+CribSeekers is a monorepo built with Turborepo and npm workspaces, consisting of a NestJS backend API, Next.js web application, Next.js admin portal, and shared packages.
 
 ## Monorepo Structure
 

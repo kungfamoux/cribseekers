@@ -8,22 +8,26 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ApiError } from '@cribseekers/types';
+import { mapPrismaException } from '../../database/database-exception.util';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
   constructor(private readonly logger: LoggerService) {}
 
   catch(exception: unknown, host: ArgumentsHost): void {
+    const mappedException = mapPrismaException(exception);
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
     const status =
-      exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
+      mappedException instanceof HttpException
+        ? mappedException.getStatus()
+        : HttpStatus.INTERNAL_SERVER_ERROR;
 
     const message =
-      exception instanceof HttpException
-        ? exception.message
+      mappedException instanceof HttpException
+        ? mappedException.message
         : 'Internal server error';
 
     const errorResponse: ApiError = {
@@ -33,8 +37,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       path: request.url,
     };
 
-    if (exception instanceof HttpException) {
-      const exceptionResponse = exception.getResponse();
+    if (mappedException instanceof HttpException) {
+      const exceptionResponse = mappedException.getResponse();
       if (typeof exceptionResponse === 'object' && 'message' in exceptionResponse) {
         errorResponse.details = exceptionResponse;
       }
@@ -42,7 +46,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     this.logger.error(
       `${request.method} ${request.url}`,
-      exception instanceof Error ? exception.stack : 'Unknown error',
+      mappedException instanceof Error ? mappedException.stack : 'Unknown error',
       'GlobalExceptionFilter',
     );
 

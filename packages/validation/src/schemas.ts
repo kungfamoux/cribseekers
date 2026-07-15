@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { emailSchema, phoneSchema, passwordSchema, nameSchema, addressSchema } from './common';
+import { emailSchema, phoneSchema, passwordSchema, nameSchema } from './common';
 import { paginationParamsSchema } from './pagination';
 
 export const registerSchema = z.object({

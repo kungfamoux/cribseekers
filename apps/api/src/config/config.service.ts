@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService as NestConfigService } from '@nestjs/config';
 
+export type PrismaLogLevel = 'query' | 'info' | 'warn' | 'error';
+
 @Injectable()
 export class ConfigService {
   constructor(private readonly configService: NestConfigService) {}
 
   get<T = any>(key: string): T {
-    return this.configService.get<T>(key);
+    return this.configService.get<T>(key) as T;
   }
 
   get nodeEnv(): string {
@@ -27,6 +29,35 @@ export class ConfigService {
 
   get databaseUrl(): string {
     return this.configService.get<string>('DATABASE_URL') || '';
+  }
+
+  get databasePoolSize(): number | undefined {
+    return this.getOptionalNumber('DATABASE_POOL_SIZE');
+  }
+
+  get databasePoolTimeout(): number | undefined {
+    return this.getOptionalNumber('DATABASE_POOL_TIMEOUT');
+  }
+
+  get databaseHealthTimeout(): number {
+    return this.getOptionalNumber('DATABASE_HEALTH_TIMEOUT_MS') || 3000;
+  }
+
+  get prismaLogLevels(): PrismaLogLevel[] {
+    const raw = this.configService.get<string>('PRISMA_LOG_LEVELS');
+
+    if (!raw) {
+      return this.isDevelopment
+        ? ['query', 'info', 'warn', 'error']
+        : ['warn', 'error'];
+    }
+
+    return raw
+      .split(',')
+      .map((level) => level.trim())
+      .filter((level): level is PrismaLogLevel =>
+        ['query', 'info', 'warn', 'error'].includes(level),
+      );
   }
 
   get redisHost(): string {
@@ -63,5 +94,17 @@ export class ConfigService {
 
   get isTest(): boolean {
     return this.nodeEnv === 'test';
+  }
+
+  private getOptionalNumber(key: string): number | undefined {
+    const value = this.configService.get<string | number>(key);
+
+    if (value === undefined || value === null || value === '') {
+      return undefined;
+    }
+
+    const parsed = Number(value);
+
+    return Number.isFinite(parsed) ? parsed : undefined;
   }
 }

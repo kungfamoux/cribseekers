@@ -7,7 +7,7 @@ This guide will help you set up the CribSeekers development environment.
 Before you begin, ensure you have the following installed:
 
 - **Node.js** >= 18.0.0 ([Download](https://nodejs.org/))
-- **pnpm** >= 8.0.0 ([Installation Guide](https://pnpm.io/installation))
+- **npm** >= 9.0.0 (comes with Node.js)
 - **PostgreSQL** >= 15 ([Download](https://www.postgresql.org/download/))
 - **Redis** >= 7 ([Download](https://redis.io/download))
 
@@ -23,7 +23,7 @@ cd cribseekers
 ### 2. Install Dependencies
 
 ```bash
-pnpm install
+npm install
 ```
 
 This will install all dependencies for the monorepo, including all packages and applications.
@@ -65,13 +65,13 @@ Generate Prisma client and push the schema to your database:
 
 ```bash
 # Generate Prisma client
-pnpm --filter @cribseekers/api prisma generate
+npm run db:generate
 
 # Push schema to database
-pnpm --filter @cribseekers/api prisma db push
+npm run db:push
 
 # (Optional) Seed the database
-pnpm --filter @cribseekers/api prisma db seed
+npm run db:seed
 ```
 
 ### 5. Start Development Servers
@@ -79,7 +79,7 @@ pnpm --filter @cribseekers/api prisma db seed
 Start all applications in development mode:
 
 ```bash
-pnpm dev
+npm run dev
 ```
 
 This will start:

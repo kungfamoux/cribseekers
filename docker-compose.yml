@@ -49,38 +49,6 @@ services:
     networks:
       - cribseekers-network
 
-  web:
-    build:
-      context: .
-      dockerfile: apps/web/Dockerfile
-    container_name: cribseekers-web
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    environment:
-      NODE_ENV: production
-      NEXT_PUBLIC_API_URL: http://localhost:3001/api/v1
-    depends_on:
-      - api
-    networks:
-      - cribseekers-network
-
-  admin:
-    build:
-      context: .
-      dockerfile: apps/admin/Dockerfile
-    container_name: cribseekers-admin
-    restart: unless-stopped
-    ports:
-      - "3002:3002"
-    environment:
-      NODE_ENV: production
-      NEXT_PUBLIC_API_URL: http://localhost:3001/api/v1
-    depends_on:
-      - api
-    networks:
-      - cribseekers-network
-
 volumes:
   postgres_data:
   redis_data:

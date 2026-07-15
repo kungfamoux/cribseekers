@@ -6,7 +6,7 @@ Modern Nigerian real estate platform connecting property seekers, landlords, age
 
 ### Monorepo
 - Turborepo
-- pnpm Workspace
+- npm Workspaces
 
 ### Backend
 - NestJS
@@ -49,14 +49,9 @@ cribseekers/
 │   ├── validation/   # Shared Zod schemas
 │   ├── config/       # Shared configuration
 │   └── api-client/   # Shared API client
-├── database/
-│   ├── prisma/
-│   ├── migrations/
-│   └── seed/
-├── docker/
+├── docker-compose.yml
 ├── docs/
-├── scripts/
-└── .github/
+└── package.json
 ```
 
 ## Getting Started
@@ -64,7 +59,7 @@ cribseekers/
 ### Prerequisites
 
 - Node.js >= 18.0.0
-- pnpm >= 8.0.0
+- npm >= 9.0.0
 - PostgreSQL
 - Redis
 
@@ -72,34 +67,34 @@ cribseekers/
 
 ```bash
 # Install dependencies
-pnpm install
+npm install
 
 # Copy environment variables
 cp .env.example .env
 
 # Setup database
-pnpm db:push
+npm run db:push
 
 # Run development
-pnpm dev
+npm run dev
 ```
 
 ### Available Scripts
 
-- `pnpm build` - Build all packages and applications
-- `pnpm dev` - Start development servers
-- `pnpm lint` - Lint all packages
-- `pnpm format` - Format all packages
-- `pnpm typecheck` - Type check all packages
-- `pnpm test` - Run all tests
-- `pnpm clean` - Clean all build artifacts
+- `npm run build` - Build all packages and applications
+- `npm run dev` - Start development servers
+- `npm run lint` - Lint all packages
+- `npm run format` - Format all packages
+- `npm run typecheck` - Type check all packages
+- `npm run test` - Run all tests
+- `npm run clean` - Clean all build artifacts
 
 ### Database Commands
 
-- `pnpm db:generate` - Generate Prisma client
-- `pnpm db:migrate` - Run database migrations
-- `pnpm db:push` - Push schema changes to database
-- `pnpm db:studio` - Open Prisma Studio
+- `npm run db:generate` - Generate Prisma client
+- `npm run db:migrate` - Run database migrations
+- `npm run db:push` - Push schema changes to database
+- `npm run db:studio` - Open Prisma Studio
 
 ## Development
 
@@ -112,6 +107,16 @@ pnpm dev
 
 ### Admin Portal
 - URL: http://localhost:3002
+
+## Docker
+
+```bash
+# Start all services
+docker-compose up -d
+
+# Stop services
+docker-compose down
+```
 
 ## Documentation
 

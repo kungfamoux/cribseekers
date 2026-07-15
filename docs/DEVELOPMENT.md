@@ -42,61 +42,61 @@ chore: update dependencies
 
 ```bash
 # API only
-pnpm --filter @cribseekers/api dev
+cd apps/api && npm run dev
 
 # Web only
-pnpm --filter @cribseekers/web dev
+cd apps/web && npm run dev
 
 # Admin only
-pnpm --filter @cribseekers/admin dev
+cd apps/admin && npm run dev
 ```
 
 ### Database Development
 
 ```bash
 # Generate Prisma client
-pnpm --filter @cribseekers/api prisma generate
+npm run db:generate
 
 # Open Prisma Studio
-pnpm --filter @cribseekers/api prisma studio
+npm run db:studio
 
 # Create migration
-pnpm --filter @cribseekers/api prisma migrate dev --name migration_name
+cd apps/api && npx prisma migrate dev --name migration_name
 
 # Reset database (development only)
-pnpm --filter @cribseekers/api prisma migrate reset
+cd apps/api && npx prisma migrate reset
 ```
 
 ### Testing
 
 ```bash
 # Run all tests
-pnpm test
+npm test
 
 # Run tests for specific package
-pnpm --filter @cribseekers/api test
+cd apps/api && npm test
 
 # Run tests in watch mode
-pnpm --filter @cribseekers/api test --watch
+cd apps/api && npm test --watch
 
 # Run tests with coverage
-pnpm --filter @cribseekers/api test --coverage
+cd apps/api && npm test --coverage
 ```
 
 ### Linting and Formatting
 
 ```bash
 # Lint all packages
-pnpm lint
+npm run lint
 
 # Format all packages
-pnpm format
+npm run format
 
 # Type check all packages
-pnpm typecheck
+npm run typecheck
 
 # Fix linting issues
-pnpm lint --fix
+npm run lint --fix
 ```
 
 ## Code Style
@@ -131,9 +131,10 @@ pnpm lint --fix
 
 1. Create a new module:
 ```bash
-pnpm --filter @cribseekers/api nest g module modules/feature
-pnpm --filter @cribseekers/api nest g service modules/feature
-pnpm --filter @cribseekers/api nest g controller modules/feature
+cd apps/api
+npx @nestjs/cli g module modules/feature
+npx @nestjs/cli g service modules/feature
+npx @nestjs/cli g controller modules/feature
 ```
 
 2. Define DTOs with validation
@@ -188,17 +189,17 @@ pnpm --filter @cribseekers/api nest g controller modules/feature
 ### Common Issues
 
 **Module not found**
-- Run `pnpm install`
+- Run `npm install`
 - Check workspace configuration
 - Verify package exports
 
 **Type errors**
-- Run `pnpm typecheck`
+- Run `npm run typecheck`
 - Check TypeScript configuration
 - Verify shared package types
 
 **Build failures**
-- Clean build artifacts: `pnpm clean`
+- Clean build artifacts: `npm run clean`
 - Check for circular dependencies
 - Verify environment variables
 
@@ -248,4 +249,4 @@ docker-compose logs -f
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Prisma Documentation](https://www.prisma.io/docs)
 - [Turborepo Documentation](https://turbo.build/repo/docs)
-- [pnpm Documentation](https://pnpm.io/)
+- [npm Documentation](https://docs.npmjs.com/)

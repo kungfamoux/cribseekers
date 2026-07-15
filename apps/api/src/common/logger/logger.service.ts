@@ -3,7 +3,7 @@ import pino from 'pino';
 
 @Injectable({ scope: Scope.TRANSIENT })
 export class LoggerService implements NestLoggerService {
-  private readonly logger: pino.Logger;
+  private logger: pino.Logger;
 
   constructor() {
     this.logger = pino({
@@ -42,7 +42,7 @@ export class LoggerService implements NestLoggerService {
     this.logger.trace({ context }, message);
   }
 
-  setContext(context: string): void {
-    this.logger = pino({ context }) as any;
+  setContext(): void {
+    // Context is handled per-log call in other methods
   }
 }

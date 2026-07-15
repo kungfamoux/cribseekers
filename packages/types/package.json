@@ -11,8 +11,8 @@
     "clean": "rm -rf dist"
   },
   "devDependencies": {
-    "@cribseekers/eslint-config": "workspace:*",
-    "@cribseekers/tsconfig": "workspace:*",
+    "@cribseekers/eslint-config": "1.0.0",
+    "@cribseekers/tsconfig": "1.0.0",
     "typescript": "^5.3.3"
   }
 }

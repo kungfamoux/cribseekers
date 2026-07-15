@@ -2,10 +2,14 @@
   "name": "cribseekers",
   "version": "1.0.0",
   "private": true,
-  "description": "Modern Nigerian real estate platform connecting property seekers, landlords, agencies, and verified agents",
+  "description": "Backend API for the CribSeekers real estate platform",
   "workspaces": [
-    "apps/*",
-    "packages/*"
+    "apps/api",
+    "packages/config",
+    "packages/eslint-config",
+    "packages/tsconfig",
+    "packages/types",
+    "packages/validation"
   ],
   "scripts": {
     "build": "turbo run build",
@@ -15,25 +19,21 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "clean": "turbo run clean",
-    "db:generate": "cd apps/api && pnpm prisma generate",
-    "db:migrate": "cd apps/api && pnpm prisma migrate dev",
-    "db:push": "cd apps/api && pnpm prisma db push",
-    "db:studio": "cd apps/api && pnpm prisma studio",
-    "prepare": "husky install"
+    "db:generate": "cd apps/api && npx prisma generate",
+    "db:migrate": "cd apps/api && npx prisma migrate dev",
+    "db:migrate:deploy": "cd apps/api && npx prisma migrate deploy",
+    "db:migrate:status": "cd apps/api && npx prisma migrate status",
+    "db:push": "cd apps/api && npx prisma db push",
+    "db:seed": "cd apps/api && npx prisma db seed",
+    "db:studio": "cd apps/api && npx prisma studio"
   },
   "devDependencies": {
-    "@commitlint/cli": "^18.6.0",
-    "@commitlint/config-conventional": "^18.6.0",
     "eslint": "^8.56.0",
-    "husky": "^8.0.3",
-    "lint-staged": "^15.2.0",
     "prettier": "^3.1.1",
     "turbo": "^1.11.3",
     "typescript": "^5.3.3"
   },
   "engines": {
-    "node": ">=18.0.0",
-    "pnpm": ">=8.0.0"
-  },
-  "packageManager": "pnpm@8.14.0"
+    "node": ">=18.0.0"
+  }
 }
