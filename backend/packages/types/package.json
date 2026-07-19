@@ -1,0 +1,19 @@
+{
+  "name": "@cribseekers/types",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write \"**/*.ts\"",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "@cribseekers/eslint-config": "1.0.0",
+    "@cribseekers/tsconfig": "1.0.0",
+    "typescript": "^5.3.3"
+  }
+}

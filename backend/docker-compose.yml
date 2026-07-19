@@ -1,0 +1,98 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: cribseekers-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cribseekers
+      POSTGRES_PASSWORD: cribseekers_password
+      POSTGRES_DB: cribseekers
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - cribseekers-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cribseekers"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: cribseekers-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - cribseekers-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: cribseekers-api
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+      - "3002:3002"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://cribseekers:cribseekers_password@postgres:5432/cribseekers
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: your_jwt_secret_here
+      JWT_REFRESH_SECRET: your_jwt_refresh_secret_here
+      JWT_EXPIRES_IN: 7d
+      JWT_REFRESH_EXPIRES_IN: 30d
+      PORT: 3001
+      SOCKET_PORT: 3002
+      API_PREFIX: api/v1
+      LOG_LEVEL: info
+      LOG_FORMAT: json
+      LOG_TO_FILE: "true"
+      LOG_DIR: /app/logs
+      ENABLE_CACHING: "true"
+      ENABLE_RATE_LIMITING: "true"
+      ENABLE_METRICS: "true"
+      ENABLE_WEBSOCKET: "true"
+      ENABLE_AI_RECOMMENDATIONS: "true"
+      ENABLE_GEO_SEARCH: "true"
+      ENABLE_SCHEDULED_JOBS: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - api_logs:/app/logs
+      - api_uploads:/app/uploads
+    networks:
+      - cribseekers-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health/live', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  postgres_data:
+  redis_data:
+  api_logs:
+  api_uploads:
+
+networks:
+  cribseekers-network:
+    driver: bridge

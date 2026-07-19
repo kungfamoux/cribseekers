@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cribseekers-worker
+  namespace: cribseekers
+  labels:
+    app: cribseekers-worker
+    version: v1
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: cribseekers-worker
+  template:
+    metadata:
+      labels:
+        app: cribseekers-worker
+        version: v1
+    spec:
+      containers:
+      - name: worker
+        image: cribseekers/api:latest
+        imagePullPolicy: Always
+        command: ["node", "dist/workers/main"]
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: cribseekers-secrets
+              key: database-url
+        - name: REDIS_HOST
+          value: "redis-service"
+        - name: REDIS_PORT
+          value: "6379"
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: cribseekers-secrets
+              key: jwt-secret
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          exec:
+            command:
+            - node
+            - -e
+            - "require('ioredis').createClient({host:'redis-service',port:6379}).ping().then(()=>process.exit(0)).catch(()=>process.exit(1))"
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
