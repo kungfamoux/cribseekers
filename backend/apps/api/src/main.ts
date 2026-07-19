@@ -114,14 +114,14 @@ async function bootstrap() {
   if (enableSwagger) {
     try {
       const document = SwaggerModule.createDocument(app, config);
-      SwaggerModule.setup(`${apiPrefix}/docs`, app, document, {
+      SwaggerModule.setup(`${apiPrefix}/v${apiVersion}/docs`, app, document, {
         swaggerOptions: {
           persistAuthorization: true,
           tagsSorter: 'alpha',
           operationsSorter: 'alpha',
         },
       });
-      logger.log(`Swagger documentation: http://localhost:${port}/${apiPrefix}/docs`);
+      logger.log(`Swagger documentation: http://localhost:${port}/${apiPrefix}/v${apiVersion}/docs`);
     } catch (error) {
       logger.error('Failed to setup Swagger:', String(error));
     }
