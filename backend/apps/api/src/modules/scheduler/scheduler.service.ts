@@ -1,7 +1,6 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { PrismaService } from '../../database/prisma.service';
-import { RedisService } from '../../database/redis.service';
 import { ConfigService } from '../../config/config.service';
 
 @Injectable()
@@ -11,7 +10,6 @@ export class SchedulerService implements OnModuleInit {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly redis: RedisService,
     private readonly config: ConfigService,
     private readonly schedulerRegistry: SchedulerRegistry,
   ) {
@@ -188,14 +186,8 @@ export class SchedulerService implements OnModuleInit {
     try {
       this.logger.log('Starting expired signed URL cleanup');
       
-      // Clean up from Redis
-      const pattern = 'signed_url:*';
-      const keys = await this.redis.keys(pattern);
-      
-      if (keys.length > 0) {
-        await this.redis.getClient().del(...keys);
-        this.logger.log(`Cleaned up ${keys.length} expired signed URLs from Redis`);
-      }
+      // No-op for MVP - Redis not available
+      this.logger.log('Signed URL cleanup skipped (Redis not available)');
     } catch (error) {
       this.logger.error('Error cleaning up expired signed URLs:', error);
     }
@@ -209,14 +201,8 @@ export class SchedulerService implements OnModuleInit {
     try {
       this.logger.log('Starting recommendation cache refresh');
       
-      // Invalidate recommendation cache
-      const pattern = 'cache:*:recommendations*';
-      const keys = await this.redis.keys(pattern);
-      
-      if (keys.length > 0) {
-        await this.redis.getClient().del(...keys);
-        this.logger.log(`Invalidated ${keys.length} recommendation cache entries`);
-      }
+      // No-op for MVP - Redis not available
+      this.logger.log('Recommendation cache refresh skipped (Redis not available)');
     } catch (error) {
       this.logger.error('Error refreshing recommendation cache:', error);
     }

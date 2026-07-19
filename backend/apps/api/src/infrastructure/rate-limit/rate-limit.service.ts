@@ -1,13 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { RedisService } from '../../database/redis.service';
 import { RateLimitOptions, RateLimitResult, RateLimitInfo } from './interfaces/rate-limit.interface';
 import { RATE_LIMIT_PREFIX, RateLimitScopes, RateLimitPresets } from './rate-limit.constants';
 
 @Injectable()
 export class RateLimitService {
   private readonly logger = new Logger(RateLimitService.name);
-
-  constructor(private readonly redisService: RedisService) {}
+  private rateLimits = new Map<string, { count: number; resetTime: number }>();
 
   async checkRateLimit(
     identifier: string,
@@ -21,15 +19,21 @@ export class RateLimitService {
     const key = this.buildKey(identifier, scope, options?.keyPrefix);
 
     try {
-      const current = await this.redisService.incr(key);
-
-      if (current === 1) {
-        await this.redisService.expire(key, ttl);
+      const now = Date.now();
+      const existing = this.rateLimits.get(key);
+      
+      // Reset if expired
+      if (existing && now > existing.resetTime) {
+        this.rateLimits.delete(key);
       }
+
+      const current = existing ? existing.count + 1 : 1;
+      const reset = now + (ttl * 1000);
+      
+      this.rateLimits.set(key, { count: current, resetTime: reset });
 
       const remaining = Math.max(0, limit - current);
       const allowed = current <= limit;
-      const reset = Math.floor(Date.now() / 1000) + ttl;
 
       if (!allowed) {
         this.logger.warn(`Rate limit exceeded for ${key}: ${current}/${limit}`);
@@ -38,12 +42,12 @@ export class RateLimitService {
       return {
         allowed,
         remaining,
-        reset,
+        reset: Math.floor(reset / 1000),
         limit,
       };
     } catch (error) {
       this.logger.error(`Rate limit check error for ${key}:`, error);
-      // Fail open - allow request if Redis is down
+      // Fail open - allow request if error occurs
       return {
         allowed: true,
         remaining: limit,
@@ -65,17 +69,23 @@ export class RateLimitService {
     const key = this.buildKey(identifier, scope, options?.keyPrefix);
 
     try {
-      const current = await this.redisService.get(key);
-      const currentNum = current ? parseInt(current, 10) : 0;
-      const remaining = Math.max(0, limit - currentNum);
-      const redisTtl = await this.redisService.ttl(key);
-      const reset = redisTtl > 0 ? Math.floor(Date.now() / 1000) + redisTtl : Math.floor(Date.now() / 1000) + ttl;
+      const now = Date.now();
+      const existing = this.rateLimits.get(key);
+      
+      // Reset if expired
+      if (existing && now > existing.resetTime) {
+        this.rateLimits.delete(key);
+      }
+
+      const current = existing ? existing.count : 0;
+      const remaining = Math.max(0, limit - current);
+      const reset = existing ? Math.floor(existing.resetTime / 1000) : Math.floor(now / 1000) + ttl;
 
       return {
         key,
         ttl,
         limit,
-        current: currentNum,
+        current,
         remaining,
         reset,
       };
@@ -98,41 +108,27 @@ export class RateLimitService {
     options?: RateLimitOptions,
   ): Promise<void> {
     const key = this.buildKey(identifier, scope, options?.keyPrefix);
-
-    try {
-      await this.redisService.del(key);
-      this.logger.debug(`Rate limit reset for ${key}`);
-    } catch (error) {
-      this.logger.error(`Rate limit reset error for ${key}:`, error);
-    }
+    this.rateLimits.delete(key);
+    this.logger.debug(`Rate limit reset for ${key}`);
   }
 
   async resetRateLimitByScope(scope: string): Promise<void> {
     try {
       const pattern = `${RATE_LIMIT_PREFIX}:${scope}:*`;
-      const keys = await this.redisService.keys(pattern);
-
-      if (keys.length > 0) {
-        await this.redisService.getClient().del(...keys);
-        this.logger.debug(`Reset ${keys.length} rate limit keys for scope ${scope}`);
+      for (const key of this.rateLimits.keys()) {
+        if (key.startsWith(pattern.replace('*', ''))) {
+          this.rateLimits.delete(key);
+        }
       }
+      this.logger.debug(`Reset rate limit keys for scope ${scope}`);
     } catch (error) {
       this.logger.error(`Rate limit reset by scope error for ${scope}:`, error);
     }
   }
 
   async resetAllRateLimits(): Promise<void> {
-    try {
-      const pattern = `${RATE_LIMIT_PREFIX}:*`;
-      const keys = await this.redisService.keys(pattern);
-
-      if (keys.length > 0) {
-        await this.redisService.getClient().del(...keys);
-        this.logger.debug(`Reset all ${keys.length} rate limit keys`);
-      }
-    } catch (error) {
-      this.logger.error('Reset all rate limits error:', error);
-    }
+    this.rateLimits.clear();
+    this.logger.debug('Reset all rate limit keys');
   }
 
   private buildKey(identifier: string, scope: string, keyPrefix?: string): string {
@@ -142,15 +138,12 @@ export class RateLimitService {
 
   async getStats(): Promise<any> {
     try {
-      const pattern = `${RATE_LIMIT_PREFIX}:*`;
-      const keys = await this.redisService.keys(pattern);
-
       const stats = {
-        totalKeys: keys.length,
+        totalKeys: this.rateLimits.size,
         scopes: {} as Record<string, number>,
       };
 
-      for (const key of keys) {
+      for (const key of this.rateLimits.keys()) {
         const parts = key.split(':');
         if (parts.length >= 3) {
           const scope = parts[2];
