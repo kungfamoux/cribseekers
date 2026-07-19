@@ -40,6 +40,11 @@ async function bootstrap() {
   app.use(helmet());
   app.use(compression());
 
+  // Trust proxy for Render (behind load balancer)
+  if (process.env.TRUST_PROXY === 'true') {
+    app.getHttpAdapter().getInstance().set('trust proxy', true);
+  }
+
   app.setGlobalPrefix(apiPrefix);
   app.enableVersioning({
     type: VersioningType.URI,
