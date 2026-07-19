@@ -45,11 +45,11 @@ export const envValidationSchema = {
   },
   REDIS_HOST: {
     type: 'string',
-    default: 'localhost',
+    optional: true,
   },
   REDIS_PORT: {
     type: 'number',
-    default: 6379,
+    optional: true,
   },
   REDIS_PASSWORD: {
     type: 'string',

@@ -6,7 +6,6 @@ import { HealthModule } from './modules/health/health.module';
 import { DatabaseModule } from './database/database.module';
 import { ConfigModule as AppConfigModule } from './config/config.module';
 import { CommonModule } from './common/common.module';
-import { WorkersModule } from './modules/workers/workers.module';
 import { IdentityModule } from './modules/identity/identity.module';
 import { PropertyModule } from './modules/property/property.module';
 import { PropertyVerificationModule } from './modules/property-verification/property-verification.module';
@@ -41,8 +40,8 @@ import { AppController } from './app.controller';
     DatabaseModule,
     AppConfigModule,
     CommonModule,
+    CacheModule,
     HealthModule,
-    WorkersModule,
     IdentityModule,
     PropertyModule,
     PropertyVerificationModule,
@@ -55,7 +54,6 @@ import { AppController } from './app.controller';
     RecommendationModule,
     SearchModule,
     TracingModule,
-    CacheModule,
     RateLimitModule,
     MetricsModule,
     SchedulerModule,

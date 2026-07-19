@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from '../../database/prisma.module';
+import { CacheModule } from '../../infrastructure/cache/cache.module';
 
 // Controllers
 import { PropertyController } from './controllers/property.controller';
@@ -19,7 +20,7 @@ import { TypeRepository } from './repository/type.repository';
 import { PurposeRepository } from './repository/purpose.repository';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, CacheModule],
   controllers: [
     PropertyController,
     PropertiesController,
