@@ -54,6 +54,7 @@ prisma/migrations/
 
 # OS
 Thumbs.db
+nul
 
 # Misc
 .cache
