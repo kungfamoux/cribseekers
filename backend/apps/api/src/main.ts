@@ -110,7 +110,7 @@ async function bootstrap() {
     .build();
 
   // Enable Swagger only in non-production or when explicitly enabled
-  const enableSwagger = process.env.NODE_ENV !== 'production' || process.env.ENABLE_SWAGGER === 'true';
+  const enableSwagger = true; // Temporarily always enable for testing
   if (enableSwagger) {
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup(`${apiPrefix}/docs`, app, document, {
