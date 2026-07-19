@@ -112,15 +112,19 @@ async function bootstrap() {
   // Enable Swagger only in non-production or when explicitly enabled
   const enableSwagger = true; // Temporarily always enable for testing
   if (enableSwagger) {
-    const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup(`${apiPrefix}/docs`, app, document, {
-      swaggerOptions: {
-        persistAuthorization: true,
-        tagsSorter: 'alpha',
-        operationsSorter: 'alpha',
-      },
-    });
-    logger.log(`Swagger documentation: http://localhost:${port}/${apiPrefix}/docs`);
+    try {
+      const document = SwaggerModule.createDocument(app, config);
+      SwaggerModule.setup(`${apiPrefix}/docs`, app, document, {
+        swaggerOptions: {
+          persistAuthorization: true,
+          tagsSorter: 'alpha',
+          operationsSorter: 'alpha',
+        },
+      });
+      logger.log(`Swagger documentation: http://localhost:${port}/${apiPrefix}/docs`);
+    } catch (error) {
+      logger.error('Failed to setup Swagger:', String(error));
+    }
   }
 
   await app.listen(port);
