@@ -1,10 +1,7 @@
-import {
-  Controller,
-  Get,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, Query, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { SearchService } from '../service/search.service';
+import { PostHogService } from '../../../posthog/posthog.service';
 import { PropertySearchDto } from '../dto/property-search.dto';
 import { SearchResponseDto, SearchSuggestionDto } from '../dto/search-response.dto';
 import { PaginationDto } from '../dto/pagination.dto';
@@ -13,7 +10,10 @@ import { SortDto } from '../dto/sort.dto';
 @ApiTags('Search')
 @Controller('search')
 export class SearchController {
-  constructor(private readonly searchService: SearchService) {}
+  constructor(
+    private readonly searchService: SearchService,
+    private readonly posthog: PostHogService
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'Global property search' })
@@ -24,7 +24,7 @@ export class SearchController {
   async globalSearch(
     @Query() filter?: PropertySearchDto,
     @Query() pagination?: PaginationDto,
-    @Query() sort?: SortDto,
+    @Query() sort?: SortDto
   ): Promise<{ data: SearchResponseDto[]; meta: any }> {
     return this.searchService.globalSearch(filter || {}, pagination, sort);
   }
@@ -39,8 +39,19 @@ export class SearchController {
     @Query('keyword') keyword: string,
     @Query() pagination?: PaginationDto,
     @Query() sort?: SortDto,
+    @Req() req?: any
   ): Promise<{ data: SearchResponseDto[]; meta: any }> {
-    return this.searchService.keywordSearch(keyword, pagination, sort);
+    const results = await this.searchService.keywordSearch(keyword, pagination, sort);
+    const distinctId = req?.user?.id || 'anonymous';
+    await this.posthog.capture({
+      distinctId,
+      event: 'property_search_performed',
+      properties: {
+        keyword,
+        result_count: results.meta?.total,
+      },
+    });
+    return results;
   }
 
   @Get('state/:state')
@@ -51,7 +62,7 @@ export class SearchController {
   async stateSearch(
     @Query('state') state: string,
     @Query() pagination?: PaginationDto,
-    @Query() sort?: SortDto,
+    @Query() sort?: SortDto
   ): Promise<{ data: SearchResponseDto[]; meta: any }> {
     return this.searchService.stateSearch(state, pagination, sort);
   }
@@ -64,7 +75,7 @@ export class SearchController {
   async citySearch(
     @Query('city') city: string,
     @Query() pagination?: PaginationDto,
-    @Query() sort?: SortDto,
+    @Query() sort?: SortDto
   ): Promise<{ data: SearchResponseDto[]; meta: any }> {
     return this.searchService.citySearch(city, pagination, sort);
   }
@@ -77,7 +88,7 @@ export class SearchController {
   async lgaSearch(
     @Query('lga') lga: string,
     @Query() pagination?: PaginationDto,
-    @Query() sort?: SortDto,
+    @Query() sort?: SortDto
   ): Promise<{ data: SearchResponseDto[]; meta: any }> {
     return this.searchService.lgaSearch(lga, pagination, sort);
   }
@@ -90,7 +101,7 @@ export class SearchController {
   async estateSearch(
     @Query('estate') estate: string,
     @Query() pagination?: PaginationDto,
-    @Query() sort?: SortDto,
+    @Query() sort?: SortDto
   ): Promise<{ data: SearchResponseDto[]; meta: any }> {
     return this.searchService.estateSearch(estate, pagination, sort);
   }
@@ -103,7 +114,7 @@ export class SearchController {
   async categorySearch(
     @Query('categoryId') categoryId: string,
     @Query() pagination?: PaginationDto,
-    @Query() sort?: SortDto,
+    @Query() sort?: SortDto
   ): Promise<{ data: SearchResponseDto[]; meta: any }> {
     return this.searchService.categorySearch(categoryId, pagination, sort);
   }
@@ -116,7 +127,7 @@ export class SearchController {
   async typeSearch(
     @Query('typeId') typeId: string,
     @Query() pagination?: PaginationDto,
-    @Query() sort?: SortDto,
+    @Query() sort?: SortDto
   ): Promise<{ data: SearchResponseDto[]; meta: any }> {
     return this.searchService.typeSearch(typeId, pagination, sort);
   }
@@ -129,7 +140,7 @@ export class SearchController {
   async purposeSearch(
     @Query('purposeId') purposeId: string,
     @Query() pagination?: PaginationDto,
-    @Query() sort?: SortDto,
+    @Query() sort?: SortDto
   ): Promise<{ data: SearchResponseDto[]; meta: any }> {
     return this.searchService.purposeSearch(purposeId, pagination, sort);
   }
@@ -138,7 +149,9 @@ export class SearchController {
   @ApiOperation({ summary: 'Get featured properties' })
   @ApiResponse({ status: 200, description: 'Featured properties retrieved successfully' })
   @ApiQuery({ type: PaginationDto, required: false })
-  async featuredSearch(@Query() pagination?: PaginationDto): Promise<{ data: SearchResponseDto[]; meta: any }> {
+  async featuredSearch(
+    @Query() pagination?: PaginationDto
+  ): Promise<{ data: SearchResponseDto[]; meta: any }> {
     return this.searchService.featuredSearch(pagination);
   }
 
@@ -146,7 +159,9 @@ export class SearchController {
   @ApiOperation({ summary: 'Get recent properties' })
   @ApiResponse({ status: 200, description: 'Recent properties retrieved successfully' })
   @ApiQuery({ type: PaginationDto, required: false })
-  async recentSearch(@Query() pagination?: PaginationDto): Promise<{ data: SearchResponseDto[]; meta: any }> {
+  async recentSearch(
+    @Query() pagination?: PaginationDto
+  ): Promise<{ data: SearchResponseDto[]; meta: any }> {
     return this.searchService.recentSearch(pagination);
   }
 
@@ -154,7 +169,9 @@ export class SearchController {
   @ApiOperation({ summary: 'Get popular properties' })
   @ApiResponse({ status: 200, description: 'Popular properties retrieved successfully' })
   @ApiQuery({ type: PaginationDto, required: false })
-  async popularSearch(@Query() pagination?: PaginationDto): Promise<{ data: SearchResponseDto[]; meta: any }> {
+  async popularSearch(
+    @Query() pagination?: PaginationDto
+  ): Promise<{ data: SearchResponseDto[]; meta: any }> {
     return this.searchService.popularSearch(pagination);
   }
 

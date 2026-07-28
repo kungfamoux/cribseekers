@@ -9,9 +9,18 @@ import {
   Query,
   HttpCode,
   HttpStatus,
+  Req,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { ConversationService } from '../service/conversation.service';
+import { PostHogService } from '../../../posthog/posthog.service';
 import { CreateConversationDto } from '../dto/create-conversation.dto';
 import { UpdateConversationDto } from '../dto/update-conversation.dto';
 import { ConversationResponseDto } from '../dto/conversation-response.dto';
@@ -23,16 +32,36 @@ import { PaginationOptions, SortOptions } from '../../../common/types/pagination
 @Controller('communication/conversations')
 @ApiBearerAuth()
 export class ConversationController {
-  constructor(private readonly conversationService: ConversationService) {}
+  constructor(
+    private readonly conversationService: ConversationService,
+    private readonly posthog: PostHogService
+  ) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new conversation' })
-  @ApiResponse({ status: 201, description: 'Conversation created successfully', type: ConversationResponseDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Conversation created successfully',
+    type: ConversationResponseDto,
+  })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 409, description: 'Conversation already exists' })
-  async create(@Body() dto: CreateConversationDto): Promise<ConversationResponseDto> {
-    return this.conversationService.create(dto, 'current-user-id');
+  async create(
+    @Body() dto: CreateConversationDto,
+    @Req() req: any
+  ): Promise<ConversationResponseDto> {
+    const conversation = await this.conversationService.create(dto, 'current-user-id');
+    const distinctId = req.user?.id || 'anonymous';
+    await this.posthog.capture({
+      distinctId,
+      event: 'conversation_started',
+      properties: {
+        conversation_id: conversation.id,
+        property_id: dto.propertyId,
+      },
+    });
+    return conversation;
   }
 
   @Get()
@@ -42,7 +71,7 @@ export class ConversationController {
   async findAll(
     @Query() filter?: ConversationFilterDto,
     @Query() pagination?: PaginationOptions,
-    @Query() sort?: SortOptions,
+    @Query() sort?: SortOptions
   ): Promise<{ data: ConversationSummaryDto[]; meta: any }> {
     return this.conversationService.findAll('current-user-id', filter, pagination, sort);
   }
@@ -53,14 +82,18 @@ export class ConversationController {
   @ApiQuery({ name: 'query', description: 'Search query' })
   async search(
     @Query('query') query: string,
-    @Query() pagination?: PaginationOptions,
+    @Query() pagination?: PaginationOptions
   ): Promise<{ data: ConversationSummaryDto[]; meta: any }> {
     return this.conversationService.search(query, 'current-user-id', pagination);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get conversation by ID' })
-  @ApiResponse({ status: 200, description: 'Conversation retrieved successfully', type: ConversationResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Conversation retrieved successfully',
+    type: ConversationResponseDto,
+  })
   @ApiResponse({ status: 404, description: 'Conversation not found' })
   @ApiResponse({ status: 403, description: 'Access denied' })
   @ApiParam({ name: 'id', description: 'Conversation ID' })
@@ -70,7 +103,11 @@ export class ConversationController {
 
   @Get(':id/summary')
   @ApiOperation({ summary: 'Get conversation summary by ID' })
-  @ApiResponse({ status: 200, description: 'Conversation summary retrieved successfully', type: ConversationSummaryDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Conversation summary retrieved successfully',
+    type: ConversationSummaryDto,
+  })
   @ApiResponse({ status: 404, description: 'Conversation not found' })
   @ApiResponse({ status: 403, description: 'Access denied' })
   @ApiParam({ name: 'id', description: 'Conversation ID' })
@@ -80,14 +117,18 @@ export class ConversationController {
 
   @Put(':id')
   @ApiOperation({ summary: 'Update conversation' })
-  @ApiResponse({ status: 200, description: 'Conversation updated successfully', type: ConversationResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Conversation updated successfully',
+    type: ConversationResponseDto,
+  })
   @ApiResponse({ status: 404, description: 'Conversation not found' })
   @ApiResponse({ status: 403, description: 'Access denied' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiParam({ name: 'id', description: 'Conversation ID' })
   async update(
     @Param('id') id: string,
-    @Body() dto: UpdateConversationDto,
+    @Body() dto: UpdateConversationDto
   ): Promise<ConversationResponseDto> {
     return this.conversationService.update(id, dto, 'current-user-id');
   }
@@ -95,7 +136,11 @@ export class ConversationController {
   @Post(':id/archive')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Archive conversation' })
-  @ApiResponse({ status: 200, description: 'Conversation archived successfully', type: ConversationResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Conversation archived successfully',
+    type: ConversationResponseDto,
+  })
   @ApiResponse({ status: 404, description: 'Conversation not found' })
   @ApiResponse({ status: 403, description: 'Access denied' })
   @ApiParam({ name: 'id', description: 'Conversation ID' })
@@ -106,7 +151,11 @@ export class ConversationController {
   @Post(':id/unarchive')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Unarchive conversation' })
-  @ApiResponse({ status: 200, description: 'Conversation unarchived successfully', type: ConversationResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Conversation unarchived successfully',
+    type: ConversationResponseDto,
+  })
   @ApiResponse({ status: 404, description: 'Conversation not found' })
   @ApiResponse({ status: 403, description: 'Access denied' })
   @ApiParam({ name: 'id', description: 'Conversation ID' })

@@ -9,9 +9,18 @@ import {
   Query,
   HttpCode,
   HttpStatus,
+  Req,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { PropertyService } from '../service/property.service';
+import { PostHogService } from '../../../posthog/posthog.service';
 import { CreatePropertyDto } from '../dto/create-property.dto';
 import { UpdatePropertyDto } from '../dto/update-property.dto';
 import { PropertyResponseDto } from '../dto/property-response.dto';
@@ -24,17 +33,33 @@ import { PaginationDto } from '../dto/pagination.dto';
 @ApiTags('Properties')
 @Controller('properties')
 export class PropertyController {
-  constructor(private readonly propertyService: PropertyService) {}
+  constructor(
+    private readonly propertyService: PropertyService,
+    private readonly posthog: PostHogService
+  ) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new property' })
-  @ApiResponse({ status: 201, description: 'Property created successfully', type: PropertyResponseDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Property created successfully',
+    type: PropertyResponseDto,
+  })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 409, description: 'Property already exists' })
   @ApiBearerAuth()
-  async create(@Body() dto: CreatePropertyDto): Promise<PropertyResponseDto> {
-    return this.propertyService.create(dto, 'current-user-id');
+  async create(@Body() dto: CreatePropertyDto, @Req() req: any): Promise<PropertyResponseDto> {
+    const property = await this.propertyService.create(dto, 'current-user-id');
+    const distinctId = req.user?.id || 'anonymous';
+    await this.posthog.capture({
+      distinctId,
+      event: 'property_created',
+      properties: {
+        property_id: property.id,
+      },
+    });
+    return property;
   }
 
   @Get()
@@ -46,7 +71,7 @@ export class PropertyController {
   async findAll(
     @Query() filter?: PropertyFilterDto,
     @Query() pagination?: PaginationDto,
-    @Query() sort?: PropertySortDto,
+    @Query() sort?: PropertySortDto
   ): Promise<{ data: PropertySummaryDto[]; meta: any }> {
     return this.propertyService.findAll(filter, pagination, sort);
   }
@@ -55,7 +80,9 @@ export class PropertyController {
   @ApiOperation({ summary: 'Search properties' })
   @ApiResponse({ status: 200, description: 'Search results retrieved successfully' })
   @ApiQuery({ type: PropertySearchDto })
-  async search(@Query() dto: PropertySearchDto): Promise<{ data: PropertySummaryDto[]; meta: any }> {
+  async search(
+    @Query() dto: PropertySearchDto
+  ): Promise<{ data: PropertySummaryDto[]; meta: any }> {
     return this.propertyService.search(dto);
   }
 
@@ -63,7 +90,9 @@ export class PropertyController {
   @ApiOperation({ summary: 'Get featured properties' })
   @ApiResponse({ status: 200, description: 'Featured properties retrieved successfully' })
   @ApiQuery({ type: PaginationDto, required: false })
-  async findFeatured(@Query() pagination?: PaginationDto): Promise<{ data: PropertySummaryDto[]; meta: any }> {
+  async findFeatured(
+    @Query() pagination?: PaginationDto
+  ): Promise<{ data: PropertySummaryDto[]; meta: any }> {
     return this.propertyService.findFeatured(pagination);
   }
 
@@ -71,13 +100,19 @@ export class PropertyController {
   @ApiOperation({ summary: 'Get published properties' })
   @ApiResponse({ status: 200, description: 'Published properties retrieved successfully' })
   @ApiQuery({ type: PaginationDto, required: false })
-  async findPublished(@Query() pagination?: PaginationDto): Promise<{ data: PropertySummaryDto[]; meta: any }> {
+  async findPublished(
+    @Query() pagination?: PaginationDto
+  ): Promise<{ data: PropertySummaryDto[]; meta: any }> {
     return this.propertyService.findPublished(pagination);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get property by ID' })
-  @ApiResponse({ status: 200, description: 'Property retrieved successfully', type: PropertyResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Property retrieved successfully',
+    type: PropertyResponseDto,
+  })
   @ApiResponse({ status: 404, description: 'Property not found' })
   @ApiParam({ name: 'id', description: 'Property ID' })
   async findById(@Param('id') id: string): Promise<PropertyResponseDto> {
@@ -86,7 +121,11 @@ export class PropertyController {
 
   @Get(':id/summary')
   @ApiOperation({ summary: 'Get property summary by ID' })
-  @ApiResponse({ status: 200, description: 'Property summary retrieved successfully', type: PropertySummaryDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Property summary retrieved successfully',
+    type: PropertySummaryDto,
+  })
   @ApiResponse({ status: 404, description: 'Property not found' })
   @ApiParam({ name: 'id', description: 'Property ID' })
   async findSummaryById(@Param('id') id: string): Promise<PropertySummaryDto> {
@@ -95,12 +134,19 @@ export class PropertyController {
 
   @Put(':id')
   @ApiOperation({ summary: 'Update property' })
-  @ApiResponse({ status: 200, description: 'Property updated successfully', type: PropertyResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Property updated successfully',
+    type: PropertyResponseDto,
+  })
   @ApiResponse({ status: 404, description: 'Property not found' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiParam({ name: 'id', description: 'Property ID' })
   @ApiBearerAuth()
-  async update(@Param('id') id: string, @Body() dto: UpdatePropertyDto): Promise<PropertyResponseDto> {
+  async update(
+    @Param('id') id: string,
+    @Body() dto: UpdatePropertyDto
+  ): Promise<PropertyResponseDto> {
     return this.propertyService.update(id, dto, 'current-user-id');
   }
 
@@ -118,18 +164,35 @@ export class PropertyController {
 
   @Post(':id/publish')
   @ApiOperation({ summary: 'Publish property' })
-  @ApiResponse({ status: 200, description: 'Property published successfully', type: PropertyResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Property published successfully',
+    type: PropertyResponseDto,
+  })
   @ApiResponse({ status: 404, description: 'Property not found' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiParam({ name: 'id', description: 'Property ID' })
   @ApiBearerAuth()
-  async publish(@Param('id') id: string): Promise<PropertyResponseDto> {
-    return this.propertyService.publish(id, 'current-user-id');
+  async publish(@Param('id') id: string, @Req() req: any): Promise<PropertyResponseDto> {
+    const property = await this.propertyService.publish(id, 'current-user-id');
+    const distinctId = req.user?.id || 'anonymous';
+    await this.posthog.capture({
+      distinctId,
+      event: 'property_published',
+      properties: {
+        property_id: id,
+      },
+    });
+    return property;
   }
 
   @Post(':id/unpublish')
   @ApiOperation({ summary: 'Unpublish property' })
-  @ApiResponse({ status: 200, description: 'Property unpublished successfully', type: PropertyResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Property unpublished successfully',
+    type: PropertyResponseDto,
+  })
   @ApiResponse({ status: 404, description: 'Property not found' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiParam({ name: 'id', description: 'Property ID' })
@@ -140,7 +203,11 @@ export class PropertyController {
 
   @Post(':id/verify')
   @ApiOperation({ summary: 'Verify property' })
-  @ApiResponse({ status: 200, description: 'Property verified successfully', type: PropertyResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Property verified successfully',
+    type: PropertyResponseDto,
+  })
   @ApiResponse({ status: 404, description: 'Property not found' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiParam({ name: 'id', description: 'Property ID' })
@@ -155,8 +222,14 @@ export class PropertyController {
   @ApiResponse({ status: 204, description: 'Views incremented successfully' })
   @ApiResponse({ status: 404, description: 'Property not found' })
   @ApiParam({ name: 'id', description: 'Property ID' })
-  async incrementViews(@Param('id') id: string): Promise<void> {
-    return this.propertyService.incrementViews(id);
+  async incrementViews(@Param('id') id: string, @Req() req: any): Promise<void> {
+    await this.propertyService.incrementViews(id);
+    const distinctId = req.user?.id || 'anonymous';
+    await this.posthog.capture({
+      distinctId,
+      event: 'property_viewed',
+      properties: { property_id: id },
+    });
   }
 
   @Post(':id/inquiries')
@@ -165,7 +238,13 @@ export class PropertyController {
   @ApiResponse({ status: 204, description: 'Inquiries incremented successfully' })
   @ApiResponse({ status: 404, description: 'Property not found' })
   @ApiParam({ name: 'id', description: 'Property ID' })
-  async incrementInquiries(@Param('id') id: string): Promise<void> {
-    return this.propertyService.incrementInquiries(id);
+  async incrementInquiries(@Param('id') id: string, @Req() req: any): Promise<void> {
+    await this.propertyService.incrementInquiries(id);
+    const distinctId = req.user?.id || 'anonymous';
+    await this.posthog.capture({
+      distinctId,
+      event: 'property_inquiry_submitted',
+      properties: { property_id: id },
+    });
   }
 }

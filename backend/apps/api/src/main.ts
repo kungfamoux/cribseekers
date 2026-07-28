@@ -4,10 +4,12 @@ import { ConfigService } from '@nestjs/config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
 import compression from 'compression';
+import { setupExpressRequestContext } from 'posthog-node';
 import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { LoggerService } from './common/logger/logger.service';
+import { PostHogService } from './posthog/posthog.service';
 import { initializeTracing } from './infrastructure/tracing/tracing.config';
 
 async function bootstrap() {
@@ -24,7 +26,15 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   const logger = app.get(LoggerService);
+  const posthogService = app.get(PostHogService);
 
+  const posthogClient = posthogService.getClient();
+  if (posthogClient) {
+    const expressApp = app.getHttpAdapter().getInstance();
+    setupExpressRequestContext(posthogClient, expressApp);
+  }
+
+  app.useGlobalFilters(new GlobalExceptionFilter(logger, posthogService));
   app.enableShutdownHooks();
 
   const port = configService.get<number>('port') || 3001;
@@ -59,15 +69,16 @@ async function bootstrap() {
       transformOptions: {
         enableImplicitConversion: true,
       },
-    }),
+    })
   );
 
-  app.useGlobalFilters(new GlobalExceptionFilter(logger));
   app.useGlobalInterceptors(new ResponseInterceptor());
 
   const config = new DocumentBuilder()
     .setTitle('CribSeekers API')
-    .setDescription('Modern Nigerian real estate platform API. Authentication: JWT Bearer tokens. Pagination: page, limit parameters. Sorting: sort=field:direction. Filtering: query parameters. Rate limiting: 100 req/min per IP, 1000 req/min per user. Error responses: RFC7807 Problem Details format. WebSocket: ws://localhost:3002 for real-time events.')
+    .setDescription(
+      'Modern Nigerian real estate platform API. Authentication: JWT Bearer tokens. Pagination: page, limit parameters. Sorting: sort=field:direction. Filtering: query parameters. Rate limiting: 100 req/min per IP, 1000 req/min per user. Error responses: RFC7807 Problem Details format. WebSocket: ws://localhost:3002 for real-time events.'
+    )
     .setVersion(apiVersion)
     .addBearerAuth(
       {
@@ -78,7 +89,7 @@ async function bootstrap() {
         description: 'Enter JWT token (obtain from /auth/login)',
         in: 'header',
       },
-      'JWT-auth',
+      'JWT-auth'
     )
     .addApiKey(
       {
@@ -87,7 +98,7 @@ async function bootstrap() {
         description: 'API Key for external integrations',
         in: 'header',
       },
-      'api-key',
+      'api-key'
     )
     .addServer('http://localhost:3001', 'Local Development')
     .addServer('https://api.cribseekers.com', 'Production')
@@ -121,7 +132,9 @@ async function bootstrap() {
           operationsSorter: 'alpha',
         },
       });
-      logger.log(`Swagger documentation: http://localhost:${port}/${apiPrefix}/v${apiVersion}/docs`);
+      logger.log(
+        `Swagger documentation: http://localhost:${port}/${apiPrefix}/v${apiVersion}/docs`
+      );
     } catch (error) {
       logger.error('Failed to setup Swagger:', String(error));
     }
