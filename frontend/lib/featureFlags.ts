@@ -46,8 +46,8 @@ export function setFeatureEnabled(feature: keyof typeof featureFlags, enabled: b
     'enablePropertyAlerts',
   ] as const;
 
-  if (mutableFeatures.includes(feature as any)) {
-    (featureFlags as any)[feature] = enabled;
+  if (mutableFeatures.includes(feature as typeof mutableFeatures[number])) {
+    (featureFlags as Record<string, boolean>)[feature] = enabled;
   }
 }
 

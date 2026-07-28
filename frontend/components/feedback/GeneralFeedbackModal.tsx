@@ -103,7 +103,7 @@ export function GeneralFeedbackModal({ onClose }: GeneralFeedbackModalProps) {
               <label className="block text-sm font-medium mb-2">Category</label>
               <select
                 value={category}
-                onChange={(e) => setCategory(e.target.value as any)}
+                onChange={(e) => setCategory(e.target.value as 'experience' | 'ui' | 'performance' | 'content' | 'other')}
                 className="w-full px-4 py-2 bg-surface-primary border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="experience">Overall Experience</option>

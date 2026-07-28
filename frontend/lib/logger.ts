@@ -7,7 +7,7 @@ interface LogContext {
   route?: string;
   userAgent?: string;
   timestamp?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 class Logger {
@@ -35,8 +35,10 @@ class Logger {
     } else if (level === 'warn') {
       console.warn(JSON.stringify(logEntry));
     } else if (level === 'debug' && this.isDebugEnabled) {
+      // eslint-disable-next-line no-console
       console.debug(JSON.stringify(logEntry));
     } else if (level === 'info') {
+      // eslint-disable-next-line no-console
       console.log(JSON.stringify(logEntry));
     }
 
@@ -71,7 +73,7 @@ class Logger {
   }
 
   // Track user actions for analytics
-  track(event: string, properties?: Record<string, any>) {
+  track(event: string, properties?: Record<string, unknown>) {
     if (typeof window !== 'undefined' && window.posthog) {
       window.posthog.capture(event, properties);
     }
@@ -79,7 +81,7 @@ class Logger {
   }
 
   // Track page views
-  pageView(path: string, properties?: Record<string, any>) {
+  pageView(path: string, properties?: Record<string, unknown>) {
     if (typeof window !== 'undefined' && window.posthog) {
       window.posthog.capture('$pageview', {
         $current_url: window.location.href,

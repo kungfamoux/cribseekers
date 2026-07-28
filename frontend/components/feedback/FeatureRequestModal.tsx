@@ -118,7 +118,7 @@ export function FeatureRequestModal({ onClose }: FeatureRequestModalProps) {
               <label className="block text-sm font-medium mb-2">Category</label>
               <select
                 value={category}
-                onChange={(e) => setCategory(e.target.value as any)}
+                onChange={(e) => setCategory(e.target.value as 'search' | 'properties' | 'inspections' | 'payments' | 'messaging' | 'other')}
                 className="w-full px-4 py-2 bg-surface-primary border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="search">Property Search</option>
@@ -134,7 +134,7 @@ export function FeatureRequestModal({ onClose }: FeatureRequestModalProps) {
               <label className="block text-sm font-medium mb-2">Priority</label>
               <select
                 value={priority}
-                onChange={(e) => setPriority(e.target.value as any)}
+                onChange={(e) => setPriority(e.target.value as 'low' | 'medium' | 'high')}
                 className="w-full px-4 py-2 bg-surface-primary border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="low">Low - Nice to have</option>

@@ -6,7 +6,7 @@ interface ErrorContext {
   userId?: string;
   route?: string;
   userAgent?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export class ErrorReporter {
@@ -56,7 +56,7 @@ export class ErrorReporter {
     logger.info('User cleared from error reporting');
   }
 
-  addBreadcrumb(category: string, message: string, data?: Record<string, any>) {
+  addBreadcrumb(category: string, message: string, data?: Record<string, unknown>) {
     Sentry.addBreadcrumb({
       category,
       message,
