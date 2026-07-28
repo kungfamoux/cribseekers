@@ -1,5 +1,4 @@
 // Global error reporting utility
-import * as Sentry from '@sentry/nextjs';
 import { logger } from './logger';
 
 interface ErrorContext {
@@ -13,14 +12,6 @@ export class ErrorReporter {
   reportError(error: Error, context: ErrorContext = {}) {
     // Log to console
     logger.error(error.message, error, context);
-
-    // Send to Sentry
-    Sentry.captureException(error, {
-      extra: context,
-      tags: {
-        route: context.route || 'unknown',
-      },
-    });
   }
 
   reportMessage(message: string, level: 'info' | 'warning' | 'error' = 'warning', context: ErrorContext = {}) {
@@ -32,37 +23,17 @@ export class ErrorReporter {
     } else {
       logger.info(message, context);
     }
-
-    // Send to Sentry
-    Sentry.captureMessage(message, {
-      level,
-      extra: context,
-      tags: {
-        route: context.route || 'unknown',
-      },
-    });
   }
 
   setUser(userId: string, email?: string) {
-    Sentry.setUser({
-      id: userId,
-      email,
-    });
-    logger.info('User set in error reporting', { userId });
+    logger.info('User set in error reporting', { userId, email });
   }
 
   clearUser() {
-    Sentry.setUser(null);
     logger.info('User cleared from error reporting');
   }
 
   addBreadcrumb(category: string, message: string, data?: Record<string, unknown>) {
-    Sentry.addBreadcrumb({
-      category,
-      message,
-      level: 'info',
-      data,
-    });
     logger.debug('Breadcrumb added', { category, message, data });
   }
 }
