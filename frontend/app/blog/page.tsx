@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { Navbar, Footer } from '@/components/public';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, ArrowRight, Building2 } from 'lucide-react';
