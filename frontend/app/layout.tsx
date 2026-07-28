@@ -3,9 +3,6 @@ export const dynamic = 'force-dynamic';
 import type { Metadata, Viewport } from 'next';
 import { DM_Sans, Playfair_Display, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
-import { ErrorBoundary } from '@/components/shared';
-import { ThemeProvider, QueryProvider, ToastProvider, AuthProvider } from '@/components/providers';
-import { PHProvider } from '@/lib/posthog';
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -67,18 +64,7 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${dmSans.variable} ${playfairDisplay.variable} ${jetbrainsMono.variable} font-body bg-surface-primary text-text-primary`}
       >
-        <ErrorBoundary>
-          <PHProvider>
-            <ThemeProvider>
-              <AuthProvider>
-                <QueryProvider>
-                  <ToastProvider />
-                  {children}
-                </QueryProvider>
-              </AuthProvider>
-            </ThemeProvider>
-          </PHProvider>
-        </ErrorBoundary>
+        {children}
       </body>
     </html>
   );

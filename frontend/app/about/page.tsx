@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { Navbar, Footer, NewsletterForm } from '@/components/public';
 import { motion } from 'framer-motion';
 import { Shield, Users, Target, Award, Home, TrendingUp } from 'lucide-react';

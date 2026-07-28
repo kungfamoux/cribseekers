@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useEscrow } from '@/hooks/useEscrow';
 import { Button } from '@/components/shared/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/shared/card';
