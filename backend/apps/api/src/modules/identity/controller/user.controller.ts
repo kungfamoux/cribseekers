@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, Query, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+  Query,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { UserService } from '../service/user.service';
 import { CreateUserDto } from '../dto/create-user.dto';
@@ -6,41 +17,76 @@ import { UpdateUserDto } from '../dto/update-user.dto';
 import { UserResponseDto } from '../dto/user-response.dto';
 import { UserFilterDto } from '../dto/user-filter.dto';
 import { PaginationDto } from '../dto/pagination.dto';
+import { PostHogService } from '../../../posthog/posthog.service';
 
 @ApiTags('users')
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly posthog: PostHogService
+  ) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new user' })
-  @ApiResponse({ status: HttpStatus.CREATED, description: 'User created successfully', type: UserResponseDto })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'User created successfully',
+    type: UserResponseDto,
+  })
   @ApiResponse({ status: HttpStatus.CONFLICT, description: 'User with email already exists' })
   async create(@Body() createUserDto: CreateUserDto): Promise<UserResponseDto> {
-    return this.userService.create(createUserDto);
+    const user = await this.userService.create(createUserDto);
+    await this.posthog.identify({
+      distinctId: user.id,
+      properties: {
+        $set: {
+          name: `${user.firstName} ${user.lastName}`,
+          user_type: user.type,
+        },
+        $set_once: { created_at: user.createdAt },
+      },
+    });
+    await this.posthog.capture({
+      distinctId: user.id,
+      event: 'user_registered',
+      properties: {
+        user_type: user.type,
+        email_verified: user.emailVerified,
+      },
+    });
+    return user;
   }
 
   @Get()
   @ApiOperation({ summary: 'Get all users with filtering and pagination' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Users retrieved successfully', type: [UserResponseDto] })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Users retrieved successfully',
+    type: [UserResponseDto],
+  })
   @ApiQuery({ type: UserFilterDto, required: false })
   @ApiQuery({ type: PaginationDto, required: false })
   async findAll(
     @Query() filterDto: UserFilterDto,
-    @Query() paginationDto: PaginationDto,
+    @Query() paginationDto: PaginationDto
   ): Promise<UserResponseDto[]> {
     return this.userService.findAll(filterDto, paginationDto);
   }
 
   @Get('search')
   @ApiOperation({ summary: 'Search users by query' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Search results retrieved successfully', type: [UserResponseDto] })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Search results retrieved successfully',
+    type: [UserResponseDto],
+  })
   @ApiQuery({ name: 'query', required: true, description: 'Search query' })
   @ApiQuery({ type: PaginationDto, required: false })
   async search(
     @Query('query') query: string,
-    @Query() paginationDto: PaginationDto,
+    @Query() paginationDto: PaginationDto
   ): Promise<UserResponseDto[]> {
     return this.userService.search(query, paginationDto);
   }
@@ -63,7 +109,11 @@ export class UserController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a user by ID' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'User retrieved successfully', type: UserResponseDto })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'User retrieved successfully',
+    type: UserResponseDto,
+  })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found' })
   @ApiParam({ name: 'id', description: 'User ID' })
   async findOne(@Param('id') id: string): Promise<UserResponseDto> {
@@ -72,7 +122,11 @@ export class UserController {
 
   @Get('email/:email')
   @ApiOperation({ summary: 'Get a user by email' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'User retrieved successfully', type: UserResponseDto })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'User retrieved successfully',
+    type: UserResponseDto,
+  })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found' })
   @ApiParam({ name: 'email', description: 'User email' })
   async findByEmail(@Param('email') email: string): Promise<UserResponseDto> {
@@ -81,13 +135,17 @@ export class UserController {
 
   @Put(':id')
   @ApiOperation({ summary: 'Update a user' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'User updated successfully', type: UserResponseDto })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'User updated successfully',
+    type: UserResponseDto,
+  })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found' })
   @ApiResponse({ status: HttpStatus.CONFLICT, description: 'User with email already exists' })
   @ApiParam({ name: 'id', description: 'User ID' })
   async update(
     @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto,
+    @Body() updateUserDto: UpdateUserDto
   ): Promise<UserResponseDto> {
     return this.userService.update(id, updateUserDto);
   }
@@ -114,7 +172,11 @@ export class UserController {
 
   @Post(':id/restore')
   @ApiOperation({ summary: 'Restore a soft deleted user' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'User restored successfully', type: UserResponseDto })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'User restored successfully',
+    type: UserResponseDto,
+  })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found' })
   @ApiParam({ name: 'id', description: 'User ID' })
   async restore(@Param('id') id: string): Promise<UserResponseDto> {

@@ -1,13 +1,8 @@
-import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { mapPrismaException } from '../../database/database-exception.util';
 import { LoggerService } from '../logger/logger.service';
+import { PostHogService } from '../../posthog/posthog.service';
 
 interface ProblemDetails {
   type: string;
@@ -24,7 +19,10 @@ interface ProblemDetails {
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
-  constructor(private readonly logger: LoggerService) {}
+  constructor(
+    private readonly logger: LoggerService,
+    private readonly posthog?: PostHogService
+  ) {}
 
   catch(exception: unknown, host: ArgumentsHost): void {
     const mappedException = mapPrismaException(exception);
@@ -38,9 +36,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
     const message =
-      mappedException instanceof HttpException
-        ? mappedException.message
-        : 'Internal server error';
+      mappedException instanceof HttpException ? mappedException.message : 'Internal server error';
 
     // RFC7807 Problem Details response
     const problemDetails: ProblemDetails = {
@@ -80,12 +76,17 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         message,
         stack: mappedException instanceof Error ? mappedException.stack : undefined,
       },
-      'GlobalExceptionFilter',
+      'GlobalExceptionFilter'
     );
 
     // Don't expose stack traces in production
     if (process.env.NODE_ENV === 'production') {
       delete (problemDetails as any).stack;
+    }
+
+    if (this.posthog && status >= 500 && mappedException instanceof Error) {
+      const distinctId = (request.user as any)?.id || 'anonymous';
+      void this.posthog.captureException(mappedException, distinctId);
     }
 
     response.status(status).json(problemDetails);

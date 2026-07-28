@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { PostHogModule } from './posthog/posthog.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { TerminusModule } from '@nestjs/terminus';
 import { HealthModule } from './modules/health/health.module';
@@ -57,6 +58,7 @@ import { AppController } from './app.controller';
     RateLimitModule,
     MetricsModule,
     SchedulerModule,
+    PostHogModule,
   ],
   controllers: [AppController],
 })
