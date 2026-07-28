@@ -1,10 +1,13 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { WalletService } from '../service/wallet.service';
 import { WalletResponseDto } from '../dto/wallet-response.dto';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 
 @ApiTags('Wallets')
+@ApiBearerAuth()
 @Controller('wallets')
+@UseGuards(JwtAuthGuard)
 export class WalletController {
   constructor(private readonly walletService: WalletService) {}
 
@@ -27,6 +30,26 @@ export class WalletController {
   @ApiResponse({ status: 200, description: 'Wallet retrieved successfully', type: WalletResponseDto })
   async findByUserId(@Param('userId') userId: string): Promise<WalletResponseDto> {
     return this.walletService.findByUserId(userId);
+  }
+
+  @Get(':id/transactions')
+  @ApiOperation({ summary: 'Get wallet transaction history' })
+  @ApiResponse({ status: 200, description: 'Transactions retrieved successfully' })
+  async getTransactions(
+    @Param('id') id: string,
+    @Query('type') type?: string,
+    @Query('status') status?: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    return this.walletService.getTransactions(id, { type, status, page, limit });
+  }
+
+  @Get(':id/summary')
+  @ApiOperation({ summary: 'Get wallet summary' })
+  @ApiResponse({ status: 200, description: 'Wallet summary retrieved successfully' })
+  async getSummary(@Param('id') id: string) {
+    return this.walletService.getSummary(id);
   }
 
   @Post(':id/freeze')

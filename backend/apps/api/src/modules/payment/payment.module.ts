@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from '../../database/prisma.module';
+import { ConfigModule } from '@nestjs/config';
 
 // Controllers
 import { WalletController } from './controller/wallet.controller';
@@ -10,6 +11,7 @@ import { BankAccountController } from './controller/bank-account.controller';
 import { SettlementController } from './controller/settlement.controller';
 import { InvoiceController } from './controller/invoice.controller';
 import { ReceiptController } from './controller/receipt.controller';
+import { WebhookController } from './controller/webhook.controller';
 
 // Services
 import { WalletService } from './service/wallet.service';
@@ -22,6 +24,7 @@ import { BankAccountService } from './service/bank-account.service';
 import { InvoiceService } from './service/invoice.service';
 import { ReceiptService } from './service/receipt.service';
 import { PaymentGatewayService } from './service/payment-gateway.service';
+import { WebhookService } from './service/webhook.service';
 
 // Repositories
 import { WalletRepository } from './repository/wallet.repository';
@@ -39,7 +42,7 @@ import { PaystackGateway } from './service/gateways/paystack.gateway';
 import { FlutterwaveGateway } from './service/gateways/flutterwave.gateway';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, ConfigModule],
   controllers: [
     WalletController,
     PaymentController,
@@ -49,6 +52,7 @@ import { FlutterwaveGateway } from './service/gateways/flutterwave.gateway';
     SettlementController,
     InvoiceController,
     ReceiptController,
+    WebhookController,
   ],
   providers: [
     WalletService,
@@ -61,6 +65,7 @@ import { FlutterwaveGateway } from './service/gateways/flutterwave.gateway';
     InvoiceService,
     ReceiptService,
     PaymentGatewayService,
+    WebhookService,
     WalletRepository,
     PaymentRepository,
     EscrowRepository,
@@ -84,6 +89,7 @@ import { FlutterwaveGateway } from './service/gateways/flutterwave.gateway';
     InvoiceService,
     ReceiptService,
     PaymentGatewayService,
+    WebhookService,
   ],
 })
 export class PaymentModule {}

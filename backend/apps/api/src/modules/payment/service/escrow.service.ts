@@ -194,4 +194,29 @@ export class EscrowService {
   async findByPayeeId(payeeId: string, options?: any): Promise<any> {
     return this.escrowRepository.findByPayeeId(payeeId, options);
   }
+
+  async dispute(escrowId: string, dto: any): Promise<any> {
+    this.logger.log(`Disputing escrow ${escrowId} with reason: ${dto.reason}`);
+
+    const escrow = await this.escrowRepository.findById(escrowId);
+    if (!escrow) {
+      throw new EscrowNotFoundException(escrowId);
+    }
+
+    if (!PaymentValidator.canDisputeEscrow(escrow)) {
+      throw new RefundNotAllowedException('Escrow cannot be disputed in current state');
+    }
+
+    const updatedEscrow = await this.prisma.escrow.update({
+      where: { id: escrowId },
+      data: {
+        status: 'DISPUTED',
+        disputeReason: dto.reason,
+        disputeEvidence: dto.evidence,
+        disputedAt: new Date(),
+      },
+    });
+
+    return EscrowMapper.toEntity(updatedEscrow);
+  }
 }

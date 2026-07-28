@@ -181,4 +181,76 @@ export class WalletService {
 
     return WalletMapper.toResponseDto(updatedWallet);
   }
+
+  async getTransactions(walletId: string, options: any = {}): Promise<any> {
+    this.logger.log(`Getting transactions for wallet ${walletId}`);
+
+    const wallet = await this.walletRepository.findById(walletId);
+    if (!wallet) {
+      throw new WalletNotFoundException(walletId);
+    }
+
+    const { type, status, page = 1, limit = 20 } = options;
+    const skip = (page - 1) * limit;
+
+    const where: any = { walletId };
+    if (type) where.type = type;
+    if (status) where.status = status;
+
+    const [transactions, total] = await this.prisma.$transaction([
+      this.prisma.walletTransaction.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.walletTransaction.count({ where }),
+    ]);
+
+    return {
+      data: transactions,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async getSummary(walletId: string): Promise<any> {
+    this.logger.log(`Getting summary for wallet ${walletId}`);
+
+    const wallet = await this.walletRepository.findById(walletId);
+    if (!wallet) {
+      throw new WalletNotFoundException(walletId);
+    }
+
+    const [totalCredits, totalDebits, transactionCount] = await this.prisma.$transaction([
+      this.prisma.walletTransaction.aggregate({
+        where: { walletId, type: 'CREDIT' },
+        _sum: { amount: true },
+      }),
+      this.prisma.walletTransaction.aggregate({
+        where: { walletId, type: 'DEBIT' },
+        _sum: { amount: true },
+      }),
+      this.prisma.walletTransaction.count({ where: { walletId } }),
+    ]);
+
+    const escrowBalance = await this.prisma.escrow.aggregate({
+      where: { walletId, status: 'FUNDED' },
+      _sum: { amount: true },
+    });
+
+    return {
+      balance: wallet.balance,
+      availableBalance: wallet.availableBalance,
+      pendingBalance: Number(wallet.balance) - Number(wallet.availableBalance),
+      escrowBalance: escrowBalance._sum.amount || 0,
+      totalCredits: totalCredits._sum.amount || 0,
+      totalDebits: totalDebits._sum.amount || 0,
+      transactionCount,
+    };
+  }
 }

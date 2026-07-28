@@ -93,4 +93,18 @@ export class FlutterwaveGateway implements IPaymentGateway {
       },
     };
   }
+
+  async resolveBankAccount(accountNumber: string, bankCode: string): Promise<PaymentGatewayResponse> {
+    this.logger.log(`Resolving bank account with Flutterwave: ${accountNumber}`);
+    
+    return {
+      success: true,
+      message: 'Account resolved successfully',
+      data: {
+        account_number: accountNumber,
+        account_name: 'Mock Account Name',
+        bank_id: bankCode,
+      },
+    };
+  }
 }

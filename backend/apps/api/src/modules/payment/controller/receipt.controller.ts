@@ -1,11 +1,14 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { ReceiptService } from '../service/receipt.service';
 import { ReceiptResponseDto } from '../dto/receipt-response.dto';
 import { PaymentPaginationDto } from '../dto/payment-pagination.dto';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 
 @ApiTags('Receipts')
+@ApiBearerAuth()
 @Controller('receipts')
+@UseGuards(JwtAuthGuard)
 export class ReceiptController {
   constructor(private readonly receiptService: ReceiptService) {}
 

@@ -10,6 +10,7 @@ export interface InitializePaymentOptions {
   email: string;
   reference: string;
   callbackUrl?: string;
+  currency?: string;
   metadata?: any;
 }
 
@@ -25,9 +26,11 @@ export interface RefundOptions {
 
 export interface CreateTransferOptions {
   accountNumber: string;
+  accountName: string;
   bankCode: string;
   amount: number;
-  narration?: string;
+  currency?: string;
+  reason?: string;
   reference?: string;
 }
 
@@ -46,4 +49,5 @@ export interface IPaymentGateway {
   refund(options: RefundOptions): Promise<PaymentGatewayResponse>;
   createTransfer(options: CreateTransferOptions): Promise<PaymentGatewayResponse>;
   createCustomer(options: CreateCustomerOptions): Promise<PaymentGatewayResponse>;
+  resolveBankAccount?(accountNumber: string, bankCode: string): Promise<PaymentGatewayResponse>;
 }

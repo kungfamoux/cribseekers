@@ -1,10 +1,13 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { SettlementService } from '../service/settlement.service';
 import { SettlementResponseDto } from '../dto/settlement-response.dto';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 
 @ApiTags('Settlements')
+@ApiBearerAuth()
 @Controller('settlements')
+@UseGuards(JwtAuthGuard)
 export class SettlementController {
   constructor(private readonly settlementService: SettlementService) {}
 

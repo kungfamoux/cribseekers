@@ -1,11 +1,14 @@
-import { Controller, Get, Post, Delete, Body, Param, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Get, Post, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { BankAccountService } from '../service/bank-account.service';
 import { BankAccountDto } from '../dto/bank-account.dto';
 import { PaymentPaginationDto } from '../dto/payment-pagination.dto';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 
 @ApiTags('Bank Accounts')
+@ApiBearerAuth()
 @Controller('bank-accounts')
+@UseGuards(JwtAuthGuard)
 export class BankAccountController {
   constructor(private readonly bankAccountService: BankAccountService) {}
 

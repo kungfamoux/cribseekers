@@ -1,12 +1,16 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { EscrowService } from '../service/escrow.service';
 import { CreateEscrowDto } from '../dto/create-escrow.dto';
 import { ReleaseEscrowDto } from '../dto/release-escrow.dto';
+import { DisputeEscrowDto } from '../dto/dispute-escrow.dto';
 import { PaymentPaginationDto } from '../dto/payment-pagination.dto';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 
 @ApiTags('Escrows')
+@ApiBearerAuth()
 @Controller('escrows')
+@UseGuards(JwtAuthGuard)
 export class EscrowController {
   constructor(private readonly escrowService: EscrowService) {}
 
@@ -35,6 +39,16 @@ export class EscrowController {
     @Body('reason') reason?: string,
   ): Promise<any> {
     return this.escrowService.refund(id, reason);
+  }
+
+  @Post(':id/dispute')
+  @ApiOperation({ summary: 'Dispute escrow' })
+  @ApiResponse({ status: 200, description: 'Escrow disputed successfully' })
+  async dispute(
+    @Param('id') id: string,
+    @Body() dto: DisputeEscrowDto,
+  ): Promise<any> {
+    return this.escrowService.dispute(id, dto);
   }
 
   @Get(':id')

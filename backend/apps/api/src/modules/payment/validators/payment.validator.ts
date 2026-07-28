@@ -61,6 +61,12 @@ export class PaymentValidator {
     return escrow.status === EscrowStatus.HELD || escrow.status === EscrowStatus.REFUND_PENDING;
   }
 
+  static canDisputeEscrow(escrow: any): boolean {
+    return escrow.status === EscrowStatus.FUNDED || 
+           escrow.status === EscrowStatus.HELD || 
+           escrow.status === EscrowStatus.RELEASED;
+  }
+
   static canRequestWithdrawal(wallet: any, amount: number): boolean {
     if (!this.isValidWalletStatus(wallet.status)) {
       return false;

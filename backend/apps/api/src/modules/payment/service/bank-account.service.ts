@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../../database/prisma.service';
 import { BankAccountRepository } from '../repository/bank-account.repository';
 import { BankAccountMapper } from '../mappers/bank-account.mapper';
+import { PaymentGatewayService } from './payment-gateway.service';
 
 @Injectable()
 export class BankAccountService {
@@ -9,6 +10,7 @@ export class BankAccountService {
 
   constructor(
     private readonly prisma: PrismaService,
+    private readonly paymentGatewayService: PaymentGatewayService,
     private readonly bankAccountRepository: BankAccountRepository,
   ) {}
 
@@ -85,10 +87,37 @@ export class BankAccountService {
       throw new Error('Bank account not found');
     }
 
+    // Use Paystack to resolve and verify the bank account
+    const paystackGateway = this.paymentGatewayService.getGateway('PAYSTACK');
+    
+    if (!paystackGateway.resolveBankAccount) {
+      throw new Error('Bank account verification not supported by this gateway');
+    }
+    
+    const verificationResult = await paystackGateway.resolveBankAccount(
+      bankAccount.accountNumber,
+      bankAccount.bankCode,
+    );
+
+    if (!verificationResult.success) {
+      throw new Error('Bank account verification failed: ' + verificationResult.message);
+    }
+
+    // Verify the account name matches
+    const resolvedAccountName = verificationResult.data.account_name.toLowerCase();
+    const providedAccountName = bankAccount.accountName.toLowerCase();
+
+    if (!resolvedAccountName.includes(providedAccountName.split(' ')[0])) {
+      throw new Error('Account name does not match');
+    }
+
+    // Update bank account as verified
     const updatedBankAccount = await this.bankAccountRepository.update(id, {
       isVerified: true,
+      verifiedAt: new Date(),
     });
 
+    this.logger.log(`Bank account ${id} verified successfully`);
     return BankAccountMapper.toEntity(updatedBankAccount);
   }
 
