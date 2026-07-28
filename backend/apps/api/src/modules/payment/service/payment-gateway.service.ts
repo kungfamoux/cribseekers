@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { IPaymentGateway } from '../interfaces/payment-gateway.interface';
 import { PaystackGateway } from './gateways/paystack.gateway';
 import { FlutterwaveGateway } from './gateways/flutterwave.gateway';
@@ -8,10 +9,10 @@ export class PaymentGatewayService {
   private readonly logger = new Logger(PaymentGatewayService.name);
   private readonly gateways: Map<string, IPaymentGateway>;
 
-  constructor() {
+  constructor(private readonly configService: ConfigService) {
     this.gateways = new Map();
-    this.registerGateway('PAYSTACK', new PaystackGateway());
-    this.registerGateway('FLUTTERWAVE', new FlutterwaveGateway());
+    this.registerGateway('PAYSTACK', new PaystackGateway(this.configService));
+    this.registerGateway('FLUTTERWAVE', new FlutterwaveGateway(this.configService));
   }
 
   registerGateway(name: string, gateway: IPaymentGateway): void {

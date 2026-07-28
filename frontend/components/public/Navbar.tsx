@@ -56,7 +56,7 @@ export function Navbar() {
               <Search className="h-5 w-5 text-text-tertiary" />
             </Link>
             <Link
-              href="/auth/login"
+              href="/login"
               className="flex h-10 items-center space-x-2 rounded-lg bg-forest-900 px-4 text-white hover:bg-forest-800 transition-colors"
             >
               <LogIn className="h-4 w-4" />
@@ -103,7 +103,7 @@ export function Navbar() {
                 <span>Search</span>
               </Link>
               <Link
-                href="/auth/login"
+                href="/login"
                 className="flex items-center space-x-3 body-lg text-text-secondary hover:text-text-primary transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >

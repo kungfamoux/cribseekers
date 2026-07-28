@@ -212,7 +212,6 @@ export class EscrowService {
       data: {
         status: 'DISPUTED',
         disputeReason: dto.reason,
-        disputeEvidence: dto.evidence,
         disputedAt: new Date(),
       },
     });

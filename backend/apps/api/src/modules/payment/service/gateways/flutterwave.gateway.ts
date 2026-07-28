@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
   IPaymentGateway,
   PaymentGatewayResponse,
@@ -12,6 +13,14 @@ import {
 @Injectable()
 export class FlutterwaveGateway implements IPaymentGateway {
   private readonly logger = new Logger(FlutterwaveGateway.name);
+  private readonly secretKey: string;
+
+  constructor(private readonly configService: ConfigService) {
+    this.secretKey = this.configService.get<string>('FLUTTERWAVE_SECRET_KEY') || '';
+    if (!this.secretKey) {
+      this.logger.warn('FLUTTERWAVE_SECRET_KEY not configured');
+    }
+  }
 
   getName(): string {
     return 'FLUTTERWAVE';
