@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UserService } from './user.service';
 import { UserRepository } from '../repository/user.repository';
+import { PrismaService } from '../../../database/prisma.service';
 import { LoginDto } from '../dto/login.dto';
 import { SignupDto } from '../dto/signup.dto';
 import { RefreshTokenDto } from '../dto/refresh.dto';
@@ -17,6 +18,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
+    private readonly prisma: PrismaService,
   ) {}
 
   async login(loginDto: LoginDto): Promise<AuthResponseDto> {
@@ -33,7 +35,7 @@ export class AuthService {
     }
 
     // Get user roles
-    const roles = await this.getUserRoles();
+    const roles = await this.getUserRoles(user.id);
 
     // Generate tokens
     const tokens = await this.generateTokens(user.id, user.email, roles);
@@ -76,7 +78,7 @@ export class AuthService {
     // }
 
     // Get user roles
-    const roles = await this.getUserRoles();
+    const roles = await this.getUserRoles(user.id);
 
     // Generate tokens
     const tokens = await this.generateTokens(user.id, user.email, roles);
@@ -177,9 +179,19 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  private async getUserRoles(): Promise<string[]> {
-    // This would typically query the user_roles table
-    // For now, return a default role
-    return ['TENANT'];
+  private async getUserRoles(userId?: string): Promise<string[]> {
+    if (!userId) {
+      return ['TENANT'];
+    }
+    
+    // Query the user_roles table to get actual roles
+    const userRoles = await this.prisma.userRole.findMany({
+      where: { userId },
+      include: {
+        role: true,
+      },
+    });
+    
+    return userRoles.map((ur: any) => ur.role.name);
   }
 }
