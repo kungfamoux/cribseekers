@@ -115,16 +115,14 @@ async function main(): Promise<void> {
     });
 
     if (role) {
-      // Assign role to user
-      await prisma.userRole.upsert({
-        where: {
-          userId_roleId: {
-            userId: user.id,
-            roleId: role.id,
-          },
-        },
-        update: {},
-        create: {
+      // Remove existing roles for this user
+      await prisma.userRole.deleteMany({
+        where: { userId: user.id },
+      });
+
+      // Assign correct role to user
+      await prisma.userRole.create({
+        data: {
           userId: user.id,
           roleId: role.id,
         },
