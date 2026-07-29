@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Body, Param, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AdminService } from '../service/admin.service';
 import { UserModerationDto, SuspendUserDto, ReactivateUserDto, DeleteUserDto } from '../dto/user-moderation.dto';
 import { ApprovePropertyDto, RejectPropertyDto } from '../dto/property-moderation.dto';
@@ -7,13 +7,9 @@ import { FreezeWalletDto, UnfreezeWalletDto } from '../dto/wallet-moderation.dto
 import { ApproveWithdrawalDto, RejectWithdrawalDto } from '../dto/withdrawal-moderation.dto';
 import { PaginationDto, SortDto, FilterDto } from '../dto/pagination.dto';
 import { User } from '../../../common/decorators/user.decorator';
-import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
-import { RolesGuard } from '../../../common/guards/roles.guard';
 
 @ApiTags('Admin')
-@ApiBearerAuth()
 @Controller('admin')
-@UseGuards(JwtAuthGuard, RolesGuard)
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
