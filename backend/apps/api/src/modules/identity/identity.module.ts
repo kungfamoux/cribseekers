@@ -3,9 +3,11 @@ import { PrismaModule } from '../../database/prisma.module';
 import { UserController } from './controller/user.controller';
 import { RoleController } from './controller/role.controller';
 import { PermissionController } from './controller/permission.controller';
+import { AuthController } from './controller/auth.controller';
 import { UserService } from './service/user.service';
 import { RoleService } from './service/role.service';
 import { PermissionService } from './service/permission.service';
+import { AuthService } from './service/auth.service';
 import { UserRepository } from './repository/user.repository';
 import { RoleRepository } from './repository/role.repository';
 import { PermissionRepository } from './repository/permission.repository';
@@ -16,11 +18,13 @@ import { PermissionRepository } from './repository/permission.repository';
     UserController,
     RoleController,
     PermissionController,
+    AuthController,
   ],
   providers: [
     UserService,
     RoleService,
     PermissionService,
+    AuthService,
     UserRepository,
     RoleRepository,
     PermissionRepository,
@@ -29,6 +33,7 @@ import { PermissionRepository } from './repository/permission.repository';
     UserService,
     RoleService,
     PermissionService,
+    AuthService,
     UserRepository,
     RoleRepository,
     PermissionRepository,
