@@ -7,6 +7,7 @@ import { RefreshTokenDto } from '../dto/refresh.dto';
 import { ForgotPasswordDto } from '../dto/forgot-password.dto';
 import { ResetPasswordDto } from '../dto/reset-password.dto';
 import { AuthResponseDto } from '../dto/auth-response.dto';
+import { BaseRegistrationDto } from '../dto/role-registration.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -29,6 +30,15 @@ export class AuthController {
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'User already exists' })
   async signup(@Body() signupDto: SignupDto): Promise<AuthResponseDto> {
     return this.authService.signup(signupDto);
+  }
+
+  @Post('register')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Role-based registration' })
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'Registration successful', type: AuthResponseDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'User already exists or invalid data' })
+  async register(@Body() registrationDto: BaseRegistrationDto): Promise<AuthResponseDto> {
+    return this.authService.registerWithRole(registrationDto);
   }
 
   @Post('refresh')

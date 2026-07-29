@@ -36,9 +36,11 @@ export enum NotificationType {
 
 export enum UserRole {
   ADMIN = 'ADMIN',
-  AGENT = 'AGENT',
-  LANDLORD = 'LANDLORD',
+  BUYER = 'BUYER',
   TENANT = 'TENANT',
+  LANDLORD = 'LANDLORD',
+  AGENT = 'AGENT',
+  DEVELOPER = 'DEVELOPER',
 }
 
 export enum Permission {
