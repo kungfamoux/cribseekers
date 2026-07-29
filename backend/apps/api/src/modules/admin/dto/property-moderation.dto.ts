@@ -1,7 +1,7 @@
-import { IsUUID, IsString, IsOptional } from 'class-validator';
+import { IsString, IsOptional } from 'class-validator';
 
 export class ApprovePropertyDto {
-  @IsUUID()
+  @IsString()
   propertyId: string;
 
   @IsString()
@@ -10,7 +10,7 @@ export class ApprovePropertyDto {
 }
 
 export class RejectPropertyDto {
-  @IsUUID()
+  @IsString()
   propertyId: string;
 
   @IsString()

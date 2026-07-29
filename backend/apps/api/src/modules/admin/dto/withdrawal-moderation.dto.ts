@@ -1,7 +1,7 @@
-import { IsUUID, IsString, IsOptional } from 'class-validator';
+import { IsString, IsOptional } from 'class-validator';
 
 export class ApproveWithdrawalDto {
-  @IsUUID()
+  @IsString()
   withdrawalId: string;
 
   @IsString()
@@ -10,7 +10,7 @@ export class ApproveWithdrawalDto {
 }
 
 export class RejectWithdrawalDto {
-  @IsUUID()
+  @IsString()
   withdrawalId: string;
 
   @IsString()

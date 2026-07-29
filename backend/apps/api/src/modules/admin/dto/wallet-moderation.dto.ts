@@ -1,7 +1,7 @@
-import { IsUUID, IsString, IsOptional } from 'class-validator';
+import { IsString, IsOptional } from 'class-validator';
 
 export class FreezeWalletDto {
-  @IsUUID()
+  @IsString()
   walletId: string;
 
   @IsString()
@@ -13,7 +13,7 @@ export class FreezeWalletDto {
 }
 
 export class UnfreezeWalletDto {
-  @IsUUID()
+  @IsString()
   walletId: string;
 
   @IsString()

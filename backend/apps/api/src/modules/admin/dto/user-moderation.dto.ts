@@ -1,4 +1,4 @@
-import { IsUUID, IsString, IsOptional, IsEnum } from 'class-validator';
+import { IsString, IsOptional, IsEnum } from 'class-validator';
 
 export enum ModerationAction {
   SUSPEND = 'SUSPEND',
@@ -7,7 +7,7 @@ export enum ModerationAction {
 }
 
 export class UserModerationDto {
-  @IsUUID()
+  @IsString()
   userId: string;
 
   @IsEnum(ModerationAction)
@@ -23,7 +23,7 @@ export class UserModerationDto {
 }
 
 export class SuspendUserDto {
-  @IsUUID()
+  @IsString()
   userId: string;
 
   @IsString()
@@ -35,7 +35,7 @@ export class SuspendUserDto {
 }
 
 export class ReactivateUserDto {
-  @IsUUID()
+  @IsString()
   userId: string;
 
   @IsString()
@@ -44,7 +44,7 @@ export class ReactivateUserDto {
 }
 
 export class DeleteUserDto {
-  @IsUUID()
+  @IsString()
   userId: string;
 
   @IsString()
