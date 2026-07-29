@@ -3,8 +3,6 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AdminService } from '../service/admin.service';
 import { UserModerationDto, SuspendUserDto, ReactivateUserDto, DeleteUserDto } from '../dto/user-moderation.dto';
 import { ApprovePropertyDto, RejectPropertyDto } from '../dto/property-moderation.dto';
-import { FreezeWalletDto, UnfreezeWalletDto } from '../dto/wallet-moderation.dto';
-import { ApproveWithdrawalDto, RejectWithdrawalDto } from '../dto/withdrawal-moderation.dto';
 import { PaginationDto, SortDto, FilterDto } from '../dto/pagination.dto';
 
 @ApiTags('Admin')
@@ -92,62 +90,6 @@ export class AdminController {
       'REJECT_PROPERTY',
       'PROPERTY',
       dto.propertyId,
-      dto.reason,
-    );
-  }
-
-  @Post('wallets/freeze')
-  @ApiOperation({ summary: 'Freeze wallet' })
-  @ApiResponse({ status: 200, description: 'Wallet frozen successfully' })
-  async freezeWallet(@Body() dto: FreezeWalletDto): Promise<any> {
-    return this.adminService.performAdminAction(
-      'admin-id',
-      'SUPPORT_ADMIN',
-      'FREEZE_WALLET',
-      'WALLET',
-      dto.walletId,
-      dto.reason,
-    );
-  }
-
-  @Post('wallets/unfreeze')
-  @ApiOperation({ summary: 'Unfreeze wallet' })
-  @ApiResponse({ status: 200, description: 'Wallet unfrozen successfully' })
-  async unfreezeWallet(@Body() dto: UnfreezeWalletDto): Promise<any> {
-    return this.adminService.performAdminAction(
-      'admin-id',
-      'SUPPORT_ADMIN',
-      'UNFREEZE_WALLET',
-      'WALLET',
-      dto.walletId,
-      dto.reason,
-    );
-  }
-
-  @Post('withdrawals/approve')
-  @ApiOperation({ summary: 'Approve withdrawal' })
-  @ApiResponse({ status: 200, description: 'Withdrawal approved successfully' })
-  async approveWithdrawal(@Body() dto: ApproveWithdrawalDto): Promise<any> {
-    return this.adminService.performAdminAction(
-      'admin-id',
-      'SUPPORT_ADMIN',
-      'APPROVE_WITHDRAWAL',
-      'WITHDRAWAL',
-      dto.withdrawalId,
-      'Approved by admin',
-    );
-  }
-
-  @Post('withdrawals/reject')
-  @ApiOperation({ summary: 'Reject withdrawal' })
-  @ApiResponse({ status: 200, description: 'Withdrawal rejected successfully' })
-  async rejectWithdrawal(@Body() dto: RejectWithdrawalDto): Promise<any> {
-    return this.adminService.performAdminAction(
-      'admin-id',
-      'SUPPORT_ADMIN',
-      'REJECT_WITHDRAWAL',
-      'WITHDRAWAL',
-      dto.withdrawalId,
       dto.reason,
     );
   }
