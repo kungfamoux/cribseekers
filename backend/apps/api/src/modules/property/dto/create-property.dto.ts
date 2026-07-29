@@ -81,9 +81,8 @@ export class CreatePropertyDto {
   @Min(1)
   floors?: number;
 
-  @IsOptional()
   @IsString()
-  locationId?: string;
+  locationId: string;
 
   @IsOptional()
   @IsEnum(PropertyStatus)
