@@ -52,7 +52,7 @@ export class AdminController {
     );
   }
 
-  @Post('users/delete')
+  @Post('users/remove')
   @ApiOperation({ summary: 'Delete user account' })
   @ApiResponse({ status: 200, description: 'User deleted successfully' })
   async deleteUser(@Body() dto: DeleteUserDto): Promise<any> {
