@@ -36,6 +36,66 @@ export class AdminService {
     }
 
     return this.prisma.$transaction(async (tx: any) => {
+      // Perform actual operation based on action type
+      switch (action) {
+        case 'SUSPEND_USER':
+          await tx.user.update({
+            where: { id: targetEntityId },
+            data: { status: 'SUSPENDED' },
+          });
+          break;
+        case 'REACTIVATE_USER':
+          await tx.user.update({
+            where: { id: targetEntityId },
+            data: { status: 'ACTIVE' },
+          });
+          break;
+        case 'DELETE_USER':
+          await tx.user.delete({
+            where: { id: targetEntityId },
+          });
+          break;
+        case 'APPROVE_PROPERTY':
+          await tx.property.update({
+            where: { id: targetEntityId },
+            data: { status: 'PUBLISHED' },
+          });
+          break;
+        case 'REJECT_PROPERTY':
+          await tx.property.update({
+            where: { id: targetEntityId },
+            data: { status: 'REJECTED' },
+          });
+          break;
+        case 'FREEZE_WALLET':
+          await tx.wallet.update({
+            where: { id: targetEntityId },
+            data: { status: 'FROZEN' },
+          });
+          break;
+        case 'UNFREEZE_WALLET':
+          await tx.wallet.update({
+            where: { id: targetEntityId },
+            data: { status: 'ACTIVE' },
+          });
+          break;
+        case 'APPROVE_WITHDRAWAL':
+          await tx.withdrawal.update({
+            where: { id: targetEntityId },
+            data: { status: 'COMPLETED' },
+          });
+          break;
+        case 'REJECT_WITHDRAWAL':
+          await tx.withdrawal.update({
+            where: { id: targetEntityId },
+            data: { status: 'REJECTED' },
+          });
+          break;
+        default:
+          // For other actions, just log them
+          break;
+      }
+
       const adminAction = await this.adminActionRepository
         .withTransaction(tx)
         .create(
