@@ -263,6 +263,10 @@ export class InspectionService {
     return participant;
   }
 
+  async findAll(options?: any): Promise<any> {
+    return this.inspectionRepository.findAll(options);
+  }
+
   async findById(id: string): Promise<any> {
     return this.inspectionRepository.findById(id);
   }

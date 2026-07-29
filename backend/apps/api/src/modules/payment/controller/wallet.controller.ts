@@ -6,7 +6,7 @@ import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 
 @ApiTags('Wallets')
 @ApiBearerAuth()
-@Controller('wallets')
+@Controller('wallet')
 @UseGuards(JwtAuthGuard)
 export class WalletController {
   constructor(private readonly walletService: WalletService) {}

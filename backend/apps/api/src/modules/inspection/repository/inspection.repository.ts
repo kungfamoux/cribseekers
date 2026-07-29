@@ -12,6 +12,10 @@ import {
 export class InspectionRepository implements IInspectionRepository {
   constructor(private prisma: PrismaService) {}
 
+  async findAll(options?: PaginationOptions & SortOptions): Promise<PaginationResult<Inspection>> {
+    return this.findMany({}, options);
+  }
+
   async findById(id: string): Promise<Inspection | null> {
     const inspection = await this.prisma.inspection.findUnique({
       where: { id, deletedAt: null },

@@ -13,6 +13,17 @@ import { InspectionMapper } from '../mappers/inspection.mapper';
 export class InspectionController {
   constructor(private readonly inspectionService: InspectionService) {}
 
+  @Get()
+  @ApiOperation({ summary: 'Get all inspections' })
+  @ApiResponse({ status: 200, description: 'Inspections retrieved successfully' })
+  async findAll(@Query() pagination: InspectionPaginationDto) {
+    const result = await this.inspectionService.findAll(pagination);
+    return {
+      data: result.data.map((i: any) => InspectionMapper.toSummaryDto(i)),
+      meta: result.meta,
+    };
+  }
+
   @Post()
   @ApiOperation({ summary: 'Create a new inspection request' })
   @ApiResponse({ status: 201, description: 'Inspection created successfully' })
