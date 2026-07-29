@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AdminService } from '../service/admin.service';
-import { UserModerationDto, SuspendUserDto, ReactivateUserDto, DeleteUserDto } from '../dto/user-moderation.dto';
+import { UserModerationDto, SuspendUserDto, ReactivateUserDto } from '../dto/user-moderation.dto';
 import { ApprovePropertyDto, RejectPropertyDto } from '../dto/property-moderation.dto';
 import { PaginationDto, SortDto, FilterDto } from '../dto/pagination.dto';
 
@@ -52,19 +52,6 @@ export class AdminController {
     );
   }
 
-  @Post('users/remove')
-  @ApiOperation({ summary: 'Delete user account' })
-  @ApiResponse({ status: 200, description: 'User deleted successfully' })
-  async deleteUser(@Body() dto: DeleteUserDto): Promise<any> {
-    return this.adminService.performAdminAction(
-      'admin-id',
-      'SUPER_ADMIN',
-      'DELETE_USER',
-      'USER',
-      dto.userId,
-      dto.reason,
-    );
-  }
 
   @Post('properties/approve')
   @ApiOperation({ summary: 'Approve property' })
