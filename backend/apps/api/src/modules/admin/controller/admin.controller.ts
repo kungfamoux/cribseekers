@@ -9,7 +9,6 @@ import { PaginationDto, SortDto, FilterDto } from '../dto/pagination.dto';
 import { User } from '../../../common/decorators/user.decorator';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../../common/guards/roles.guard';
-import { Roles } from '../../../common/decorators/roles.decorator';
 
 @ApiTags('Admin')
 @ApiBearerAuth()
