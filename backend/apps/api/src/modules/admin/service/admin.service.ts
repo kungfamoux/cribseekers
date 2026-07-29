@@ -3,8 +3,6 @@ import { PrismaService } from '../../../database/prisma.service';
 import { AdminActionRepository } from '../repository/admin-action.repository';
 import { AuditLogRepository } from '../repository/audit-log.repository';
 import { ActivityLogRepository } from '../repository/activity-log.repository';
-import { AdminActionMapper } from '../mappers/admin-action.mapper';
-import { AuditLogMapper } from '../mappers/audit-log.mapper';
 import { ActivityLogMapper } from '../mappers/activity-log.mapper';
 import { AdminAccessDeniedException } from '../exceptions/admin.exception';
 import { AdminValidator } from '../validators/admin.validator';
@@ -26,10 +24,10 @@ export class AdminService {
     action: string,
     targetEntityType: string,
     targetEntityId: string,
-    reason?: string,
-    ipAddress?: string,
-    userAgent?: string,
-    requestId?: string,
+    _reason?: string,
+    _ipAddress?: string,
+    _userAgent?: string,
+    _requestId?: string,
   ): Promise<any> {
     this.logger.log(`Admin action requested: ${action} by ${adminRole} (${adminId}) on ${targetEntityType}:${targetEntityId}`);
     
@@ -91,7 +89,7 @@ export class AdminService {
         case 'REJECT_WITHDRAWAL':
           await this.prisma.withdrawal.update({
             where: { id: targetEntityId },
-            data: { status: 'REJECTED' },
+            data: { status: 'CANCELLED' },
           });
           break;
         default:
