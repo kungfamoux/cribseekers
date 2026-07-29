@@ -16,10 +16,12 @@ export class AdminController {
   @Post('users/moderate')
   @ApiOperation({ summary: 'Moderate user account' })
   @ApiResponse({ status: 200, description: 'User moderated successfully' })
-  async moderateUser(@Body() dto: UserModerationDto, @User() user: any): Promise<any> {
+  async moderateUser(@Body() dto: UserModerationDto, @User() user?: any): Promise<any> {
+    const adminId = user?.id || 'admin-id';
+    const adminRole = user?.roles?.[0] || 'SUPER_ADMIN';
     return this.adminService.performAdminAction(
-      user.id,
-      user.roles[0],
+      adminId,
+      adminRole,
       dto.action,
       'USER',
       dto.userId,
@@ -30,10 +32,12 @@ export class AdminController {
   @Post('users/suspend')
   @ApiOperation({ summary: 'Suspend user account' })
   @ApiResponse({ status: 200, description: 'User suspended successfully' })
-  async suspendUser(@Body() dto: SuspendUserDto, @User() user: any): Promise<any> {
+  async suspendUser(@Body() dto: SuspendUserDto, @User() user?: any): Promise<any> {
+    const adminId = user?.id || 'admin-id';
+    const adminRole = user?.roles?.[0] || 'SUPPORT_ADMIN';
     return this.adminService.performAdminAction(
-      user.id,
-      user.roles[0],
+      adminId,
+      adminRole,
       'SUSPEND_USER',
       'USER',
       dto.userId,
@@ -44,10 +48,12 @@ export class AdminController {
   @Post('users/reactivate')
   @ApiOperation({ summary: 'Reactivate user account' })
   @ApiResponse({ status: 200, description: 'User reactivated successfully' })
-  async reactivateUser(@Body() dto: ReactivateUserDto, @User() user: any): Promise<any> {
+  async reactivateUser(@Body() dto: ReactivateUserDto, @User() user?: any): Promise<any> {
+    const adminId = user?.id || 'admin-id';
+    const adminRole = user?.roles?.[0] || 'SUPPORT_ADMIN';
     return this.adminService.performAdminAction(
-      user.id,
-      user.roles[0],
+      adminId,
+      adminRole,
       'REACTIVATE_USER',
       'USER',
       dto.userId,
@@ -58,10 +64,12 @@ export class AdminController {
   @Post('users/delete')
   @ApiOperation({ summary: 'Delete user account' })
   @ApiResponse({ status: 200, description: 'User deleted successfully' })
-  async deleteUser(@Body() dto: DeleteUserDto, @User() user: any): Promise<any> {
+  async deleteUser(@Body() dto: DeleteUserDto, @User() user?: any): Promise<any> {
+    const adminId = user?.id || 'admin-id';
+    const adminRole = user?.roles?.[0] || 'SUPER_ADMIN';
     return this.adminService.performAdminAction(
-      user.id,
-      user.roles[0],
+      adminId,
+      adminRole,
       'DELETE_USER',
       'USER',
       dto.userId,
@@ -72,10 +80,12 @@ export class AdminController {
   @Post('properties/approve')
   @ApiOperation({ summary: 'Approve property' })
   @ApiResponse({ status: 200, description: 'Property approved successfully' })
-  async approveProperty(@Body() dto: ApprovePropertyDto, @User() user: any): Promise<any> {
+  async approveProperty(@Body() dto: ApprovePropertyDto, @User() user?: any): Promise<any> {
+    const adminId = user?.id || 'admin-id';
+    const adminRole = user?.roles?.[0] || 'SUPPORT_ADMIN';
     return this.adminService.performAdminAction(
-      user.id,
-      user.roles[0],
+      adminId,
+      adminRole,
       'APPROVE_PROPERTY',
       'PROPERTY',
       dto.propertyId,
@@ -86,10 +96,12 @@ export class AdminController {
   @Post('properties/reject')
   @ApiOperation({ summary: 'Reject property' })
   @ApiResponse({ status: 200, description: 'Property rejected successfully' })
-  async rejectProperty(@Body() dto: RejectPropertyDto, @User() user: any): Promise<any> {
+  async rejectProperty(@Body() dto: RejectPropertyDto, @User() user?: any): Promise<any> {
+    const adminId = user?.id || 'admin-id';
+    const adminRole = user?.roles?.[0] || 'SUPPORT_ADMIN';
     return this.adminService.performAdminAction(
-      user.id,
-      user.roles[0],
+      adminId,
+      adminRole,
       'REJECT_PROPERTY',
       'PROPERTY',
       dto.propertyId,
@@ -100,10 +112,12 @@ export class AdminController {
   @Post('wallets/freeze')
   @ApiOperation({ summary: 'Freeze wallet' })
   @ApiResponse({ status: 200, description: 'Wallet frozen successfully' })
-  async freezeWallet(@Body() dto: FreezeWalletDto, @User() user: any): Promise<any> {
+  async freezeWallet(@Body() dto: FreezeWalletDto, @User() user?: any): Promise<any> {
+    const adminId = user?.id || 'admin-id';
+    const adminRole = user?.roles?.[0] || 'SUPPORT_ADMIN';
     return this.adminService.performAdminAction(
-      user.id,
-      user.roles[0],
+      adminId,
+      adminRole,
       'FREEZE_WALLET',
       'WALLET',
       dto.walletId,
@@ -114,10 +128,12 @@ export class AdminController {
   @Post('wallets/unfreeze')
   @ApiOperation({ summary: 'Unfreeze wallet' })
   @ApiResponse({ status: 200, description: 'Wallet unfrozen successfully' })
-  async unfreezeWallet(@Body() dto: UnfreezeWalletDto, @User() user: any): Promise<any> {
+  async unfreezeWallet(@Body() dto: UnfreezeWalletDto, @User() user?: any): Promise<any> {
+    const adminId = user?.id || 'admin-id';
+    const adminRole = user?.roles?.[0] || 'SUPPORT_ADMIN';
     return this.adminService.performAdminAction(
-      user.id,
-      user.roles[0],
+      adminId,
+      adminRole,
       'UNFREEZE_WALLET',
       'WALLET',
       dto.walletId,
@@ -128,10 +144,12 @@ export class AdminController {
   @Post('withdrawals/approve')
   @ApiOperation({ summary: 'Approve withdrawal' })
   @ApiResponse({ status: 200, description: 'Withdrawal approved successfully' })
-  async approveWithdrawal(@Body() dto: ApproveWithdrawalDto, @User() user: any): Promise<any> {
+  async approveWithdrawal(@Body() dto: ApproveWithdrawalDto, @User() user?: any): Promise<any> {
+    const adminId = user?.id || 'admin-id';
+    const adminRole = user?.roles?.[0] || 'SUPPORT_ADMIN';
     return this.adminService.performAdminAction(
-      user.id,
-      user.roles[0],
+      adminId,
+      adminRole,
       'APPROVE_WITHDRAWAL',
       'WITHDRAWAL',
       dto.withdrawalId,
@@ -142,10 +160,12 @@ export class AdminController {
   @Post('withdrawals/reject')
   @ApiOperation({ summary: 'Reject withdrawal' })
   @ApiResponse({ status: 200, description: 'Withdrawal rejected successfully' })
-  async rejectWithdrawal(@Body() dto: RejectWithdrawalDto, @User() user: any): Promise<any> {
+  async rejectWithdrawal(@Body() dto: RejectWithdrawalDto, @User() user?: any): Promise<any> {
+    const adminId = user?.id || 'admin-id';
+    const adminRole = user?.roles?.[0] || 'SUPPORT_ADMIN';
     return this.adminService.performAdminAction(
-      user.id,
-      user.roles[0],
+      adminId,
+      adminRole,
       'REJECT_WITHDRAWAL',
       'WITHDRAWAL',
       dto.withdrawalId,
