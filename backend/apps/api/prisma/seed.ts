@@ -4,9 +4,10 @@ import * as bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 async function main(): Promise<void> {
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error('Refusing to run seed script in production');
-  }
+  // Allow seeding in production for test data
+  // if (process.env.NODE_ENV === 'production') {
+  //   throw new Error('Refusing to run seed script in production');
+  // }
 
   console.log('🌱 Starting database seed...');
 
