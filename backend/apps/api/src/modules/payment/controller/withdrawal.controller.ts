@@ -1,13 +1,16 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { WithdrawalService } from '../service/withdrawal.service';
 import { CreateWithdrawalDto } from '../dto/create-withdrawal.dto';
 import { ApproveWithdrawalDto } from '../dto/approve-withdrawal.dto';
 import { RejectWithdrawalDto } from '../dto/reject-withdrawal.dto';
 import { PaymentPaginationDto } from '../dto/payment-pagination.dto';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 
 @ApiTags('Withdrawals')
+@ApiBearerAuth()
 @Controller('withdrawals')
+@UseGuards(JwtAuthGuard)
 export class WithdrawalController {
   constructor(private readonly withdrawalService: WithdrawalService) {}
 

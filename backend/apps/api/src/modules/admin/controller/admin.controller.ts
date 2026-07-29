@@ -1,22 +1,27 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AdminService } from '../service/admin.service';
 import { UserModerationDto, SuspendUserDto, ReactivateUserDto } from '../dto/user-moderation.dto';
 import { ApprovePropertyDto, RejectPropertyDto } from '../dto/property-moderation.dto';
 import { PaginationDto, SortDto, FilterDto } from '../dto/pagination.dto';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../../common/guards/roles.guard';
+import { User } from '../../../common/decorators/user.decorator';
 
 @ApiTags('Admin')
+@ApiBearerAuth()
 @Controller('admin')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Post('users/moderate')
   @ApiOperation({ summary: 'Moderate user account' })
   @ApiResponse({ status: 200, description: 'User moderated successfully' })
-  async moderateUser(@Body() dto: UserModerationDto): Promise<any> {
+  async moderateUser(@User('id') adminId: string, @User('role') adminRole: string, @Body() dto: UserModerationDto): Promise<any> {
     return this.adminService.performAdminAction(
-      'admin-id',
-      'SUPER_ADMIN',
+      adminId,
+      adminRole,
       dto.action,
       'USER',
       dto.userId,
@@ -27,10 +32,10 @@ export class AdminController {
   @Post('users/suspend')
   @ApiOperation({ summary: 'Suspend user account' })
   @ApiResponse({ status: 200, description: 'User suspended successfully' })
-  async suspendUser(@Body() dto: SuspendUserDto): Promise<any> {
+  async suspendUser(@User('id') adminId: string, @User('role') adminRole: string, @Body() dto: SuspendUserDto): Promise<any> {
     return this.adminService.performAdminAction(
-      'admin-id',
-      'SUPPORT_ADMIN',
+      adminId,
+      adminRole,
       'SUSPEND_USER',
       'USER',
       dto.userId,
@@ -41,10 +46,10 @@ export class AdminController {
   @Post('users/reactivate')
   @ApiOperation({ summary: 'Reactivate user account' })
   @ApiResponse({ status: 200, description: 'User reactivated successfully' })
-  async reactivateUser(@Body() dto: ReactivateUserDto): Promise<any> {
+  async reactivateUser(@User('id') adminId: string, @User('role') adminRole: string, @Body() dto: ReactivateUserDto): Promise<any> {
     return this.adminService.performAdminAction(
-      'admin-id',
-      'SUPPORT_ADMIN',
+      adminId,
+      adminRole,
       'REACTIVATE_USER',
       'USER',
       dto.userId,
@@ -56,10 +61,10 @@ export class AdminController {
   @Post('properties/approve')
   @ApiOperation({ summary: 'Approve property' })
   @ApiResponse({ status: 200, description: 'Property approved successfully' })
-  async approveProperty(@Body() dto: ApprovePropertyDto): Promise<any> {
+  async approveProperty(@User('id') adminId: string, @User('role') adminRole: string, @Body() dto: ApprovePropertyDto): Promise<any> {
     return this.adminService.performAdminAction(
-      'admin-id',
-      'SUPPORT_ADMIN',
+      adminId,
+      adminRole,
       'APPROVE_PROPERTY',
       'PROPERTY',
       dto.propertyId,
@@ -70,10 +75,10 @@ export class AdminController {
   @Post('properties/reject')
   @ApiOperation({ summary: 'Reject property' })
   @ApiResponse({ status: 200, description: 'Property rejected successfully' })
-  async rejectProperty(@Body() dto: RejectPropertyDto): Promise<any> {
+  async rejectProperty(@User('id') adminId: string, @User('role') adminRole: string, @Body() dto: RejectPropertyDto): Promise<any> {
     return this.adminService.performAdminAction(
-      'admin-id',
-      'SUPPORT_ADMIN',
+      adminId,
+      adminRole,
       'REJECT_PROPERTY',
       'PROPERTY',
       dto.propertyId,
