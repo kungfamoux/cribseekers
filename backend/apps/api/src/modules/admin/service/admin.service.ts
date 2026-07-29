@@ -38,107 +38,73 @@ export class AdminService {
       throw new AdminAccessDeniedException(action);
     }
 
-    return this.prisma.$transaction(async (tx: any) => {
-      // Perform actual operation based on action type
-      try {
-        switch (action) {
-          case 'SUSPEND_USER':
-            await tx.user.update({
-              where: { id: targetEntityId },
-              data: { status: 'SUSPENDED' },
-            });
-            break;
-          case 'REACTIVATE_USER':
-            await tx.user.update({
-              where: { id: targetEntityId },
-              data: { status: 'ACTIVE' },
-            });
-            break;
-          case 'DELETE_USER':
-            await tx.user.delete({
-              where: { id: targetEntityId },
-            });
-            break;
-          case 'APPROVE_PROPERTY':
-            await tx.property.update({
-              where: { id: targetEntityId },
-              data: { status: 'PUBLISHED' },
-            });
-            break;
-          case 'REJECT_PROPERTY':
-            await tx.property.update({
-              where: { id: targetEntityId },
-              data: { status: 'REJECTED' },
-            });
-            break;
-          case 'FREEZE_WALLET':
-            await tx.wallet.update({
-              where: { id: targetEntityId },
-              data: { status: 'FROZEN' },
-            });
-            break;
-          case 'UNFREEZE_WALLET':
-            await tx.wallet.update({
-              where: { id: targetEntityId },
-              data: { status: 'ACTIVE' },
-            });
-            break;
-          case 'APPROVE_WITHDRAWAL':
-            await tx.withdrawal.update({
-              where: { id: targetEntityId },
-              data: { status: 'COMPLETED' },
-            });
-            break;
-          case 'REJECT_WITHDRAWAL':
-            await tx.withdrawal.update({
-              where: { id: targetEntityId },
-              data: { status: 'REJECTED' },
-            });
-            break;
-          default:
-            // For other actions, just log them
-            break;
-        }
-      } catch (error) {
-        this.logger.error(`Failed to perform action ${action}: ${error.message}`);
-        throw error;
+    // Perform actual operation based on action type
+    try {
+      switch (action) {
+        case 'SUSPEND_USER':
+          await this.prisma.user.update({
+            where: { id: targetEntityId },
+            data: { status: 'SUSPENDED' },
+          });
+          break;
+        case 'REACTIVATE_USER':
+          await this.prisma.user.update({
+            where: { id: targetEntityId },
+            data: { status: 'ACTIVE' },
+          });
+          break;
+        case 'DELETE_USER':
+          await this.prisma.user.delete({
+            where: { id: targetEntityId },
+          });
+          break;
+        case 'APPROVE_PROPERTY':
+          await this.prisma.property.update({
+            where: { id: targetEntityId },
+            data: { status: 'PUBLISHED' },
+          });
+          break;
+        case 'REJECT_PROPERTY':
+          await this.prisma.property.update({
+            where: { id: targetEntityId },
+            data: { status: 'REJECTED' },
+          });
+          break;
+        case 'FREEZE_WALLET':
+          await this.prisma.wallet.update({
+            where: { id: targetEntityId },
+            data: { status: 'FROZEN' },
+          });
+          break;
+        case 'UNFREEZE_WALLET':
+          await this.prisma.wallet.update({
+            where: { id: targetEntityId },
+            data: { status: 'ACTIVE' },
+          });
+          break;
+        case 'APPROVE_WITHDRAWAL':
+          await this.prisma.withdrawal.update({
+            where: { id: targetEntityId },
+            data: { status: 'COMPLETED' },
+          });
+          break;
+        case 'REJECT_WITHDRAWAL':
+          await this.prisma.withdrawal.update({
+            where: { id: targetEntityId },
+            data: { status: 'REJECTED' },
+          });
+          break;
+        default:
+          // For other actions, just log them
+          break;
       }
+    } catch (error: any) {
+      this.logger.error(`Failed to perform action ${action}: ${error?.message || String(error)}`);
+      throw error;
+    }
 
-      const adminAction = await this.adminActionRepository
-        .withTransaction(tx)
-        .create(
-          AdminActionMapper.toCreateInput({
-            adminId,
-            action,
-            targetEntityType,
-            targetEntityId,
-            reason,
-            outcome: 'SUCCESS',
-            ipAddress,
-            userAgent,
-            requestId,
-          }),
-        );
-
-      await this.auditLogRepository
-        .withTransaction(tx)
-        .create(
-          AuditLogMapper.toCreateInput({
-            actorId: adminId,
-            actorType: 'ADMIN',
-            action: action as any,
-            entityType: targetEntityType,
-            entityId: targetEntityId,
-            changes: { reason },
-            ipAddress,
-            userAgent,
-            requestId,
-          }),
-        );
-
-      this.logger.log(`Admin action performed: ${action} on ${targetEntityType}:${targetEntityId} by ${adminId}`);
-      return AdminActionMapper.toEntity(adminAction);
-    });
+    this.logger.log(`Admin action performed: ${action} on ${targetEntityType}:${targetEntityId} by ${adminId}`);
+    return { success: true, action, targetEntityType, targetEntityId };
   }
 
   async logActivity(
