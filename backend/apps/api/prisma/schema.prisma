@@ -428,7 +428,7 @@ model Property {
   yearBuilt         Int?
   parkingSpaces     Int?
   floors            Int?
-  locationId        String   @unique
+  locationId        String?
   status            PropertyStatus     @default(DRAFT)
   visibility        PropertyVisibility @default(PRIVATE)
   featured          Boolean            @default(false)
