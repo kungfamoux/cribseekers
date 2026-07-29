@@ -45,7 +45,7 @@ export default function LoginPage() {
       toast.success('Login successful!', {
         description: 'Welcome back to CribSeekers',
       });
-      window.location.href = '/dashboard';
+      // Redirect is now handled by AuthProvider based on role
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'An error occurred';
       toast.error('Login failed', {

@@ -58,6 +58,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     setUser(newUser);
     setAuth(newUser, accessToken, refreshToken);
+
+    // Role-based redirect
+    const role = newUser.roles[0] || 'TENANT';
+    let redirectPath = '/dashboard/home'; // Default for TENANT
+
+    switch (role) {
+      case 'LANDLORD':
+        redirectPath = '/dashboard/properties';
+        break;
+      case 'AGENT':
+        redirectPath = '/dashboard/messages';
+        break;
+      case 'AGENCY_ADMIN':
+        redirectPath = '/dashboard/favourites';
+        break;
+      case 'SUPPORT_ADMIN':
+        redirectPath = '/dashboard/support';
+        break;
+      case 'SUPER_ADMIN':
+        redirectPath = '/dashboard/settings';
+        break;
+      default:
+        redirectPath = '/dashboard/home';
+    }
+
+    router.push(redirectPath);
   };
 
   const logout = async () => {
