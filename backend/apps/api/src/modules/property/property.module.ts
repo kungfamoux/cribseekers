@@ -6,6 +6,8 @@ import { CacheModule } from '../../infrastructure/cache/cache.module';
 import { PropertyController } from './controllers/property.controller';
 import { PropertiesController } from './controllers/properties.controller';
 import { CategoryController } from './controllers/category.controller';
+import { TypeController } from './controllers/type.controller';
+import { PurposeController } from './controllers/purpose.controller';
 
 // Services
 import { PropertyService } from './service/property.service';
@@ -25,6 +27,8 @@ import { PurposeRepository } from './repository/purpose.repository';
     PropertyController,
     PropertiesController,
     CategoryController,
+    TypeController,
+    PurposeController,
   ],
   providers: [
     // Services
