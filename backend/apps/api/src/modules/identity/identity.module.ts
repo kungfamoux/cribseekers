@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
 import { PrismaModule } from '../../database/prisma.module';
 import { UserController } from './controller/user.controller';
 import { RoleController } from './controller/role.controller';
@@ -13,7 +14,15 @@ import { RoleRepository } from './repository/role.repository';
 import { PermissionRepository } from './repository/permission.repository';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [
+    PrismaModule,
+    JwtModule.register({
+      secret: process.env.JWT_SECRET || 'default-secret-key-change-in-production',
+      signOptions: {
+        expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+      },
+    }),
+  ],
   controllers: [
     UserController,
     RoleController,
