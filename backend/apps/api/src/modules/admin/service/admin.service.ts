@@ -31,69 +31,77 @@ export class AdminService {
     userAgent?: string,
     requestId?: string,
   ): Promise<any> {
+    this.logger.log(`Admin action requested: ${action} by ${adminRole} (${adminId}) on ${targetEntityType}:${targetEntityId}`);
+    
     if (!AdminValidator.canPerformAction(adminRole, 'SUPPORT_ADMIN')) {
+      this.logger.warn(`Access denied for ${adminRole} to perform ${action}`);
       throw new AdminAccessDeniedException(action);
     }
 
     return this.prisma.$transaction(async (tx: any) => {
       // Perform actual operation based on action type
-      switch (action) {
-        case 'SUSPEND_USER':
-          await tx.user.update({
-            where: { id: targetEntityId },
-            data: { status: 'SUSPENDED' },
-          });
-          break;
-        case 'REACTIVATE_USER':
-          await tx.user.update({
-            where: { id: targetEntityId },
-            data: { status: 'ACTIVE' },
-          });
-          break;
-        case 'DELETE_USER':
-          await tx.user.delete({
-            where: { id: targetEntityId },
-          });
-          break;
-        case 'APPROVE_PROPERTY':
-          await tx.property.update({
-            where: { id: targetEntityId },
-            data: { status: 'PUBLISHED' },
-          });
-          break;
-        case 'REJECT_PROPERTY':
-          await tx.property.update({
-            where: { id: targetEntityId },
-            data: { status: 'REJECTED' },
-          });
-          break;
-        case 'FREEZE_WALLET':
-          await tx.wallet.update({
-            where: { id: targetEntityId },
-            data: { status: 'FROZEN' },
-          });
-          break;
-        case 'UNFREEZE_WALLET':
-          await tx.wallet.update({
-            where: { id: targetEntityId },
-            data: { status: 'ACTIVE' },
-          });
-          break;
-        case 'APPROVE_WITHDRAWAL':
-          await tx.withdrawal.update({
-            where: { id: targetEntityId },
-            data: { status: 'COMPLETED' },
-          });
-          break;
-        case 'REJECT_WITHDRAWAL':
-          await tx.withdrawal.update({
-            where: { id: targetEntityId },
-            data: { status: 'REJECTED' },
-          });
-          break;
-        default:
-          // For other actions, just log them
-          break;
+      try {
+        switch (action) {
+          case 'SUSPEND_USER':
+            await tx.user.update({
+              where: { id: targetEntityId },
+              data: { status: 'SUSPENDED' },
+            });
+            break;
+          case 'REACTIVATE_USER':
+            await tx.user.update({
+              where: { id: targetEntityId },
+              data: { status: 'ACTIVE' },
+            });
+            break;
+          case 'DELETE_USER':
+            await tx.user.delete({
+              where: { id: targetEntityId },
+            });
+            break;
+          case 'APPROVE_PROPERTY':
+            await tx.property.update({
+              where: { id: targetEntityId },
+              data: { status: 'PUBLISHED' },
+            });
+            break;
+          case 'REJECT_PROPERTY':
+            await tx.property.update({
+              where: { id: targetEntityId },
+              data: { status: 'REJECTED' },
+            });
+            break;
+          case 'FREEZE_WALLET':
+            await tx.wallet.update({
+              where: { id: targetEntityId },
+              data: { status: 'FROZEN' },
+            });
+            break;
+          case 'UNFREEZE_WALLET':
+            await tx.wallet.update({
+              where: { id: targetEntityId },
+              data: { status: 'ACTIVE' },
+            });
+            break;
+          case 'APPROVE_WITHDRAWAL':
+            await tx.withdrawal.update({
+              where: { id: targetEntityId },
+              data: { status: 'COMPLETED' },
+            });
+            break;
+          case 'REJECT_WITHDRAWAL':
+            await tx.withdrawal.update({
+              where: { id: targetEntityId },
+              data: { status: 'REJECTED' },
+            });
+            break;
+          default:
+            // For other actions, just log them
+            break;
+        }
+      } catch (error) {
+        this.logger.error(`Failed to perform action ${action}: ${error.message}`);
+        throw error;
       }
 
       const adminAction = await this.adminActionRepository
