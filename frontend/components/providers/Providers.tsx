@@ -6,7 +6,6 @@ import { QueryProvider } from './QueryProvider';
 import { ToastProvider } from './ToastProvider';
 import { AuthProvider } from './AuthProvider';
 import { SocketProvider } from './SocketProvider';
-import { MapsProvider } from './MapsProvider';
 import { ModalProvider } from './ModalProvider';
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -16,12 +15,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <AuthProvider>
           <QueryProvider>
             <SocketProvider>
-              <MapsProvider>
-                <ModalProvider>
-                  {children}
-                  <ToastProvider />
-                </ModalProvider>
-              </MapsProvider>
+              <ModalProvider>
+                {children}
+                <ToastProvider />
+              </ModalProvider>
             </SocketProvider>
           </QueryProvider>
         </AuthProvider>
