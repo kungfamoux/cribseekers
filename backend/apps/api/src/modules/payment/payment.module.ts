@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from '../../database/prisma.module';
 import { ConfigModule } from '@nestjs/config';
+import { FinanceModule } from '../finance/finance.module';
 
 // Controllers
 import { WalletController } from './controller/wallet.controller';
@@ -42,7 +43,7 @@ import { PaystackGateway } from './service/gateways/paystack.gateway';
 import { FlutterwaveGateway } from './service/gateways/flutterwave.gateway';
 
 @Module({
-  imports: [PrismaModule, ConfigModule],
+  imports: [PrismaModule, ConfigModule, FinanceModule],
   controllers: [
     WalletController,
     PaymentController,
