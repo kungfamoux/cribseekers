@@ -21,9 +21,10 @@ export class LandlordService {
 
   async getProperties(userId: string) {
     this.logger.log(`Getting properties for landlord ${userId}`);
-    
+
     return {
-      properties: [],
+      data: [],
+      items: [],
       meta: {
         total: 0,
         page: 1,
@@ -61,9 +62,10 @@ export class LandlordService {
 
   async getTenants(userId: string) {
     this.logger.log(`Getting tenants for landlord ${userId}`);
-    
+
     return {
-      tenants: [],
+      data: [],
+      items: [],
       meta: {
         total: 0,
         page: 1,
@@ -74,7 +76,7 @@ export class LandlordService {
 
   async getAnalytics(userId: string) {
     this.logger.log(`Getting analytics for landlord ${userId}`);
-    
+
     return {
       revenue: [],
       occupancy: [],
@@ -84,9 +86,10 @@ export class LandlordService {
 
   async getRentCollection(userId: string) {
     this.logger.log(`Getting rent collection for landlord ${userId}`);
-    
+
     return {
-      collections: [],
+      data: [],
+      items: [],
       meta: {
         total: 0,
         page: 1,
@@ -97,14 +100,88 @@ export class LandlordService {
 
   async getMaintenanceRequests(userId: string) {
     this.logger.log(`Getting maintenance requests for landlord ${userId}`);
-    
+
     return {
-      requests: [],
+      data: [],
+      items: [],
       meta: {
         total: 0,
         page: 1,
         limit: 10,
       },
+    };
+  }
+
+  async getPayments(userId: string) {
+    this.logger.log(`Getting payments for landlord ${userId}`);
+
+    return {
+      data: [],
+      items: [],
+      meta: {
+        total: 0,
+        page: 1,
+        limit: 10,
+      },
+    };
+  }
+
+  async getWallet(userId: string) {
+    this.logger.log(`Getting wallet for landlord ${userId}`);
+
+    return {
+      balance: 0,
+      currency: 'NGN',
+      lastUpdated: new Date().toISOString(),
+    };
+  }
+
+  async getMessages(userId: string) {
+    this.logger.log(`Getting messages for landlord ${userId}`);
+
+    return {
+      data: [],
+      items: [],
+      meta: {
+        total: 0,
+        page: 1,
+        limit: 10,
+      },
+    };
+  }
+
+  async getNotifications(userId: string) {
+    this.logger.log(`Getting notifications for landlord ${userId}`);
+
+    return {
+      data: [],
+      items: [],
+      meta: {
+        total: 0,
+        page: 1,
+        limit: 10,
+      },
+    };
+  }
+
+  async getProfile(userId: string) {
+    this.logger.log(`Getting profile for landlord ${userId}`);
+
+    return {
+      id: userId,
+      name: '',
+      email: '',
+      phone: '',
+    };
+  }
+
+  async getSettings(userId: string) {
+    this.logger.log(`Getting settings for landlord ${userId}`);
+
+    return {
+      notifications: true,
+      emailAlerts: true,
+      smsAlerts: false,
     };
   }
 }

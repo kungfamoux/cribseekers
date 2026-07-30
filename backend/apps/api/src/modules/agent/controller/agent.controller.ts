@@ -67,4 +67,46 @@ export class AgentController {
   async getDeals(@User('id') userId: string) {
     return this.agentService.getDeals(userId);
   }
+
+  @Get('wallet')
+  @ApiOperation({ summary: 'Get agent wallet' })
+  @ApiResponse({ status: 200, description: 'Wallet retrieved successfully' })
+  async getWallet(@User('id') userId: string) {
+    return this.agentService.getWallet(userId);
+  }
+
+  @Get('properties')
+  @ApiOperation({ summary: 'Get agent properties' })
+  @ApiResponse({ status: 200, description: 'Properties retrieved successfully' })
+  async getProperties(@User('id') userId: string) {
+    return this.agentService.getProperties(userId);
+  }
+
+  @Get('messages')
+  @ApiOperation({ summary: 'Get agent messages' })
+  @ApiResponse({ status: 200, description: 'Messages retrieved successfully' })
+  async getMessages(@User('id') userId: string) {
+    return this.agentService.getMessages(userId);
+  }
+
+  @Get('notifications')
+  @ApiOperation({ summary: 'Get agent notifications' })
+  @ApiResponse({ status: 200, description: 'Notifications retrieved successfully' })
+  async getNotifications(@User('id') userId: string) {
+    return this.agentService.getNotifications(userId);
+  }
+
+  @Get('profile')
+  @ApiOperation({ summary: 'Get agent profile' })
+  @ApiResponse({ status: 200, description: 'Profile retrieved successfully' })
+  async getProfile(@User('id') userId: string) {
+    return this.agentService.getProfile(userId);
+  }
+
+  @Get('settings')
+  @ApiOperation({ summary: 'Get agent settings' })
+  @ApiResponse({ status: 200, description: 'Settings retrieved successfully' })
+  async getSettings(@User('id') userId: string) {
+    return this.agentService.getSettings(userId);
+  }
 }

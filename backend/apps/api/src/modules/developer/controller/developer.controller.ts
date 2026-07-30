@@ -60,4 +60,46 @@ export class DeveloperController {
   async getConstructionProgress(@User('id') userId: string) {
     return this.developerService.getConstructionProgress(userId);
   }
+
+  @Get('wallet')
+  @ApiOperation({ summary: 'Get developer wallet' })
+  @ApiResponse({ status: 200, description: 'Wallet retrieved successfully' })
+  async getWallet(@User('id') userId: string) {
+    return this.developerService.getWallet(userId);
+  }
+
+  @Get('properties')
+  @ApiOperation({ summary: 'Get developer properties' })
+  @ApiResponse({ status: 200, description: 'Properties retrieved successfully' })
+  async getProperties(@User('id') userId: string) {
+    return this.developerService.getProperties(userId);
+  }
+
+  @Get('messages')
+  @ApiOperation({ summary: 'Get developer messages' })
+  @ApiResponse({ status: 200, description: 'Messages retrieved successfully' })
+  async getMessages(@User('id') userId: string) {
+    return this.developerService.getMessages(userId);
+  }
+
+  @Get('notifications')
+  @ApiOperation({ summary: 'Get developer notifications' })
+  @ApiResponse({ status: 200, description: 'Notifications retrieved successfully' })
+  async getNotifications(@User('id') userId: string) {
+    return this.developerService.getNotifications(userId);
+  }
+
+  @Get('profile')
+  @ApiOperation({ summary: 'Get developer profile' })
+  @ApiResponse({ status: 200, description: 'Profile retrieved successfully' })
+  async getProfile(@User('id') userId: string) {
+    return this.developerService.getProfile(userId);
+  }
+
+  @Get('settings')
+  @ApiOperation({ summary: 'Get developer settings' })
+  @ApiResponse({ status: 200, description: 'Settings retrieved successfully' })
+  async getSettings(@User('id') userId: string) {
+    return this.developerService.getSettings(userId);
+  }
 }

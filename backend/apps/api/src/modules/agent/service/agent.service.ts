@@ -20,9 +20,10 @@ export class AgentService {
 
   async getListings(userId: string) {
     this.logger.log(`Getting listings for agent ${userId}`);
-    
+
     return {
-      listings: [],
+      data: [],
+      items: [],
       meta: {
         total: 0,
         page: 1,
@@ -33,9 +34,10 @@ export class AgentService {
 
   async getLeads(userId: string) {
     this.logger.log(`Getting leads for agent ${userId}`);
-    
+
     return {
-      leads: [],
+      data: [],
+      items: [],
       meta: {
         total: 0,
         page: 1,
@@ -46,9 +48,10 @@ export class AgentService {
 
   async getClients(userId: string) {
     this.logger.log(`Getting clients for agent ${userId}`);
-    
+
     return {
-      clients: [],
+      data: [],
+      items: [],
       meta: {
         total: 0,
         page: 1,
@@ -59,9 +62,10 @@ export class AgentService {
 
   async getCommissions(userId: string) {
     this.logger.log(`Getting commissions for agent ${userId}`);
-    
+
     return {
-      commissions: [],
+      data: [],
+      items: [],
       meta: {
         total: 0,
         page: 1,
@@ -72,9 +76,10 @@ export class AgentService {
 
   async getAppointments(userId: string) {
     this.logger.log(`Getting appointments for agent ${userId}`);
-    
+
     return {
-      appointments: [],
+      data: [],
+      items: [],
       meta: {
         total: 0,
         page: 1,
@@ -94,14 +99,88 @@ export class AgentService {
 
   async getDeals(userId: string) {
     this.logger.log(`Getting deals for agent ${userId}`);
-    
+
     return {
-      deals: [],
+      data: [],
+      items: [],
       meta: {
         total: 0,
         page: 1,
         limit: 10,
       },
+    };
+  }
+
+  async getWallet(userId: string) {
+    this.logger.log(`Getting wallet for agent ${userId}`);
+
+    return {
+      balance: 0,
+      currency: 'NGN',
+      lastUpdated: new Date().toISOString(),
+    };
+  }
+
+  async getProperties(userId: string) {
+    this.logger.log(`Getting properties for agent ${userId}`);
+
+    return {
+      data: [],
+      items: [],
+      meta: {
+        total: 0,
+        page: 1,
+        limit: 10,
+      },
+    };
+  }
+
+  async getMessages(userId: string) {
+    this.logger.log(`Getting messages for agent ${userId}`);
+
+    return {
+      data: [],
+      items: [],
+      meta: {
+        total: 0,
+        page: 1,
+        limit: 10,
+      },
+    };
+  }
+
+  async getNotifications(userId: string) {
+    this.logger.log(`Getting notifications for agent ${userId}`);
+
+    return {
+      data: [],
+      items: [],
+      meta: {
+        total: 0,
+        page: 1,
+        limit: 10,
+      },
+    };
+  }
+
+  async getProfile(userId: string) {
+    this.logger.log(`Getting profile for agent ${userId}`);
+
+    return {
+      id: userId,
+      name: '',
+      email: '',
+      phone: '',
+    };
+  }
+
+  async getSettings(userId: string) {
+    this.logger.log(`Getting settings for agent ${userId}`);
+
+    return {
+      notifications: true,
+      emailAlerts: true,
+      smsAlerts: false,
     };
   }
 }

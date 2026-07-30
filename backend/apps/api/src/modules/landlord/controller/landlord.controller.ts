@@ -74,4 +74,46 @@ export class LandlordController {
   async getMaintenanceRequests(@User('id') userId: string) {
     return this.landlordService.getMaintenanceRequests(userId);
   }
+
+  @Get('payments')
+  @ApiOperation({ summary: 'Get landlord payments' })
+  @ApiResponse({ status: 200, description: 'Payments retrieved successfully' })
+  async getPayments(@User('id') userId: string) {
+    return this.landlordService.getPayments(userId);
+  }
+
+  @Get('wallet')
+  @ApiOperation({ summary: 'Get landlord wallet' })
+  @ApiResponse({ status: 200, description: 'Wallet retrieved successfully' })
+  async getWallet(@User('id') userId: string) {
+    return this.landlordService.getWallet(userId);
+  }
+
+  @Get('messages')
+  @ApiOperation({ summary: 'Get landlord messages' })
+  @ApiResponse({ status: 200, description: 'Messages retrieved successfully' })
+  async getMessages(@User('id') userId: string) {
+    return this.landlordService.getMessages(userId);
+  }
+
+  @Get('notifications')
+  @ApiOperation({ summary: 'Get landlord notifications' })
+  @ApiResponse({ status: 200, description: 'Notifications retrieved successfully' })
+  async getNotifications(@User('id') userId: string) {
+    return this.landlordService.getNotifications(userId);
+  }
+
+  @Get('profile')
+  @ApiOperation({ summary: 'Get landlord profile' })
+  @ApiResponse({ status: 200, description: 'Profile retrieved successfully' })
+  async getProfile(@User('id') userId: string) {
+    return this.landlordService.getProfile(userId);
+  }
+
+  @Get('settings')
+  @ApiOperation({ summary: 'Get landlord settings' })
+  @ApiResponse({ status: 200, description: 'Settings retrieved successfully' })
+  async getSettings(@User('id') userId: string) {
+    return this.landlordService.getSettings(userId);
+  }
 }

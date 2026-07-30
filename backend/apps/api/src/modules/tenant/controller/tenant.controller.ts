@@ -61,10 +61,59 @@ export class TenantController {
     return this.tenantService.getPayments(userId);
   }
 
+  @Post('payments/:id')
+  @ApiOperation({ summary: 'Make a payment' })
+  @ApiResponse({ status: 200, description: 'Payment processed successfully' })
+  async makePayment(@User('id') userId: string, @Body() dto: any) {
+    return this.tenantService.makePayment(userId, dto);
+  }
+
+  @Get('rentals')
+  @ApiOperation({ summary: 'Get tenant rentals (alias for leases)' })
+  @ApiResponse({ status: 200, description: 'Rentals retrieved successfully' })
+  async getRentals(@User('id') userId: string) {
+    return this.tenantService.getLeases(userId);
+  }
+
   @Get('inspections')
   @ApiOperation({ summary: 'Get inspection bookings' })
   @ApiResponse({ status: 200, description: 'Inspections retrieved successfully' })
   async getInspections(@User('id') userId: string) {
     return this.tenantService.getInspections(userId);
+  }
+
+  @Get('wallet')
+  @ApiOperation({ summary: 'Get tenant wallet' })
+  @ApiResponse({ status: 200, description: 'Wallet retrieved successfully' })
+  async getWallet(@User('id') userId: string) {
+    return this.tenantService.getWallet(userId);
+  }
+
+  @Get('messages')
+  @ApiOperation({ summary: 'Get tenant messages' })
+  @ApiResponse({ status: 200, description: 'Messages retrieved successfully' })
+  async getMessages(@User('id') userId: string) {
+    return this.tenantService.getMessages(userId);
+  }
+
+  @Get('notifications')
+  @ApiOperation({ summary: 'Get tenant notifications' })
+  @ApiResponse({ status: 200, description: 'Notifications retrieved successfully' })
+  async getNotifications(@User('id') userId: string) {
+    return this.tenantService.getNotifications(userId);
+  }
+
+  @Get('profile')
+  @ApiOperation({ summary: 'Get tenant profile' })
+  @ApiResponse({ status: 200, description: 'Profile retrieved successfully' })
+  async getProfile(@User('id') userId: string) {
+    return this.tenantService.getProfile(userId);
+  }
+
+  @Get('settings')
+  @ApiOperation({ summary: 'Get tenant settings' })
+  @ApiResponse({ status: 200, description: 'Settings retrieved successfully' })
+  async getSettings(@User('id') userId: string) {
+    return this.tenantService.getSettings(userId);
   }
 }

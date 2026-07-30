@@ -10,49 +10,27 @@ export const Route = createFileRoute("/tenant/notifications")({
 });
 
 function TenantNotifications() {
-  // Mock data - replace with API call
-  const notifications = [
-    {
-      id: "1",
-      type: "payment",
-      title: "Rent Payment Reminder",
-      message: "Your rent payment of ₦125,000 is due in 5 days",
-      time: "2 hours ago",
-      read: false,
-      icon: Calendar,
-    },
-    {
-      id: "2",
-      type: "maintenance",
-      title: "Maintenance Update",
-      message: "Your maintenance request has been scheduled for tomorrow",
-      time: "5 hours ago",
-      read: false,
-      icon: Wrench,
-    },
-    {
-      id: "3",
-      type: "wallet",
-      title: "Wallet Funded",
-      message: "Your wallet has been credited with ₦100,000",
-      time: "1 day ago",
-      read: true,
-      icon: Wallet,
-    },
-    {
-      id: "4",
-      type: "message",
-      title: "New Message",
-      message: "You have a new message from Emeka Okafor",
-      time: "2 days ago",
-      read: true,
-      icon: MessageSquare,
-    },
-  ];
+  // Data will be populated from API calls
+  const notifications: any[] = [];
 
   const getNotificationIcon = (icon: any) => {
     const Icon = icon;
     return <Icon className="h-5 w-5" />;
+  };
+
+  const getIconForType = (type: string) => {
+    switch (type) {
+      case "payment":
+        return Calendar;
+      case "maintenance":
+        return Wrench;
+      case "wallet":
+        return Wallet;
+      case "message":
+        return MessageSquare;
+      default:
+        return Bell;
+    }
   };
 
   const getNotificationColor = (type: string) => {
@@ -71,7 +49,7 @@ function TenantNotifications() {
   };
 
   return (
-    <DashboardLayout role="tenant" userName="Jane Doe">
+    <DashboardLayout role="TENANT" userName="Jane Doe">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -100,7 +78,7 @@ function TenantNotifications() {
                     <CardContent className="p-4">
                       <div className="flex items-start gap-4">
                         <div className={`rounded-full p-2 ${getNotificationColor(notification.type)}`}>
-                          {getNotificationIcon(notification.icon)}
+                          {getNotificationIcon(getIconForType(notification.type))}
                         </div>
                         <div className="flex-1">
                           <div className="flex items-start justify-between">
@@ -144,7 +122,7 @@ function TenantNotifications() {
                     <CardContent className="p-4">
                       <div className="flex items-start gap-4">
                         <div className={`rounded-full p-2 ${getNotificationColor(notification.type)}`}>
-                          {getNotificationIcon(notification.icon)}
+                          {getNotificationIcon(getIconForType(notification.type))}
                         </div>
                         <div className="flex-1">
                           <h4 className="font-semibold">{notification.title}</h4>

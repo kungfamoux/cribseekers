@@ -10,15 +10,9 @@ export const Route = createFileRoute("/tenant/wallet")({
 });
 
 function TenantWallet() {
-  // Mock data - replace with API call
-  const balance = 150000;
-  const transactions = [
-    { id: "1", type: "credit", amount: 100000, description: "Wallet Funding", date: "2024-01-18" },
-    { id: "2", type: "debit", amount: 125000, description: "Rent Payment - 2-Bedroom Apartment", date: "2024-01-17" },
-    { id: "3", type: "credit", amount: 200000, description: "Wallet Funding", date: "2024-01-15" },
-    { id: "4", type: "debit", amount: 250000, description: "Rent Payment - 3-Bedroom Flat", date: "2024-01-14" },
-    { id: "5", type: "credit", amount: 75000, description: "Refund", date: "2024-01-12" },
-  ];
+  // Data will be populated from API calls
+  const balance = 0;
+  const transactions: any[] = [];
 
   const formatAmount = (amount: number) => {
     return new Intl.NumberFormat("en-NG", {
@@ -37,7 +31,7 @@ function TenantWallet() {
   };
 
   return (
-    <DashboardLayout role="tenant" userName="Jane Doe">
+    <DashboardLayout role="TENANT" userName="Jane Doe">
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Wallet</h2>
@@ -124,40 +118,46 @@ function TenantWallet() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {transactions.map((transaction) => (
-                <div
-                  key={transaction.id}
-                  className="flex items-center justify-between py-3 border-b last:border-0"
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`rounded-full p-2 ${
-                        transaction.type === "credit"
-                          ? "bg-green-500/10"
-                          : "bg-red-500/10"
+              {transactions.length === 0 ? (
+                <div className="text-center text-muted-foreground py-8">
+                  No transactions yet
+                </div>
+              ) : (
+                transactions.map((transaction) => (
+                  <div
+                    key={transaction.id}
+                    className="flex items-center justify-between py-3 border-b last:border-0"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`rounded-full p-2 ${
+                          transaction.type === "credit"
+                            ? "bg-green-500/10"
+                            : "bg-red-500/10"
+                        }`}
+                      >
+                        {transaction.type === "credit" ? (
+                          <ArrowDownLeft className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <ArrowUpRight className="h-4 w-4 text-red-500" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-medium">{transaction.description}</p>
+                        <p className="text-sm text-muted-foreground">{formatDate(transaction.date)}</p>
+                      </div>
+                    </div>
+                    <p
+                      className={`font-semibold ${
+                        transaction.type === "credit" ? "text-green-500" : "text-red-500"
                       }`}
                     >
-                      {transaction.type === "credit" ? (
-                        <ArrowDownLeft className="h-4 w-4 text-green-500" />
-                      ) : (
-                        <ArrowUpRight className="h-4 w-4 text-red-500" />
-                      )}
-                    </div>
-                    <div>
-                      <p className="font-medium">{transaction.description}</p>
-                      <p className="text-sm text-muted-foreground">{formatDate(transaction.date)}</p>
-                    </div>
+                      {transaction.type === "credit" ? "+" : "-"}
+                      {formatAmount(transaction.amount)}
+                    </p>
                   </div>
-                  <p
-                    className={`font-semibold ${
-                      transaction.type === "credit" ? "text-green-500" : "text-red-500"
-                    }`}
-                  >
-                    {transaction.type === "credit" ? "+" : "-"}
-                    {formatAmount(transaction.amount)}
-                  </p>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </CardContent>
         </Card>

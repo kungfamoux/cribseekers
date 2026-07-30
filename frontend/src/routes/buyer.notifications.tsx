@@ -10,58 +10,29 @@ export const Route = createFileRoute("/buyer/notifications")({
 });
 
 function BuyerNotifications() {
-  // Mock data - replace with API call
-  const notifications = [
-    {
-      id: "1",
-      type: "inspection",
-      title: "Inspection Reminder",
-      message: "Your property inspection is scheduled for tomorrow at 2:00 PM",
-      time: "2 hours ago",
-      read: false,
-      icon: Calendar,
-    },
-    {
-      id: "2",
-      type: "escrow",
-      title: "Escrow Update",
-      message: "Your escrow payment has been successfully released to the seller",
-      time: "5 hours ago",
-      read: false,
-      icon: Shield,
-    },
-    {
-      id: "3",
-      type: "property",
-      title: "Price Drop Alert",
-      message: "A property you saved has dropped in price by ₦5,000,000",
-      time: "1 day ago",
-      read: true,
-      icon: Heart,
-    },
-    {
-      id: "4",
-      type: "message",
-      title: "New Message",
-      message: "You have a new message from Tunde Adeyemi",
-      time: "2 days ago",
-      read: true,
-      icon: MessageSquare,
-    },
-    {
-      id: "5",
-      type: "wallet",
-      title: "Wallet Funded",
-      message: "Your wallet has been credited with ₦100,000",
-      time: "3 days ago",
-      read: true,
-      icon: Wallet,
-    },
-  ];
+  // Data will be populated from API calls
+  const notifications: any[] = [];
 
   const getNotificationIcon = (icon: any) => {
     const Icon = icon;
     return <Icon className="h-5 w-5" />;
+  };
+
+  const getIconForType = (type: string) => {
+    switch (type) {
+      case "inspection":
+        return Calendar;
+      case "escrow":
+        return Shield;
+      case "property":
+        return Heart;
+      case "message":
+        return MessageSquare;
+      case "wallet":
+        return Wallet;
+      default:
+        return Bell;
+    }
   };
 
   const getNotificationColor = (type: string) => {
@@ -82,7 +53,7 @@ function BuyerNotifications() {
   };
 
   return (
-    <DashboardLayout role="buyer" userName="John Doe">
+    <DashboardLayout role="BUYER" userName="John Doe">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -111,7 +82,7 @@ function BuyerNotifications() {
                     <CardContent className="p-4">
                       <div className="flex items-start gap-4">
                         <div className={`rounded-full p-2 ${getNotificationColor(notification.type)}`}>
-                          {getNotificationIcon(notification.icon)}
+                          {getNotificationIcon(getIconForType(notification.type))}
                         </div>
                         <div className="flex-1">
                           <div className="flex items-start justify-between">
@@ -155,7 +126,7 @@ function BuyerNotifications() {
                     <CardContent className="p-4">
                       <div className="flex items-start gap-4">
                         <div className={`rounded-full p-2 ${getNotificationColor(notification.type)}`}>
-                          {getNotificationIcon(notification.icon)}
+                          {getNotificationIcon(getIconForType(notification.type))}
                         </div>
                         <div className="flex-1">
                           <h4 className="font-semibold">{notification.title}</h4>
