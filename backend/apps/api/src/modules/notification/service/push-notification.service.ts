@@ -64,7 +64,7 @@ export class PushNotificationService {
 
   async sendToUser(userId: string, payload: any): Promise<any> {
     const subscriptions = await this.pushSubscriptionRepository.findByUserId(userId, { limit: 100 });
-    const results = [];
+    const results: any[] = [];
 
     for (const subscription of subscriptions.data) {
       if (!subscription.isActive) continue;

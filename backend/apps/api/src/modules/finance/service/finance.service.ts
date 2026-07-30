@@ -153,12 +153,17 @@ export class FinanceService {
     });
 
     // Credit agent wallet
-    await this.prisma.$transaction.create({
+    const walletId = await this.getAgentWalletId(agentId);
+    const currentBalance = await this.getWalletBalance(walletId);
+    await this.prisma.walletTransaction.create({
       data: {
-        walletId: await this.getAgentWalletId(agentId),
+        walletId,
         amount: amount as any,
         type: 'CREDIT',
         description: 'Inspection commission',
+        balanceBefore: currentBalance,
+        balanceAfter: currentBalance + Number(amount),
+        reference: `COMM-${commission.id}`,
         metadata: { commissionId: commission.id },
       },
     });
@@ -372,7 +377,7 @@ export class FinanceService {
 
   async getPlatformWalletBalance() {
     const platformWallet = await this.getPlatformWallet();
-    const transactions = await this.prisma.$transaction.findMany({
+    const transactions = await this.prisma.walletTransaction.findMany({
       where: { walletId: platformWallet.id },
     });
 
@@ -385,26 +390,34 @@ export class FinanceService {
 
   async creditPlatformWallet(amount: number, description: string) {
     const platformWallet = await this.getPlatformWallet();
+    const currentBalance = await this.getWalletBalance(platformWallet.id);
 
-    return this.prisma.$transaction.create({
+    return this.prisma.walletTransaction.create({
       data: {
         walletId: platformWallet.id,
         amount: amount as any,
         type: 'CREDIT',
         description,
+        balanceBefore: currentBalance,
+        balanceAfter: currentBalance + amount,
+        reference: `CREDIT-${Date.now()}`,
       },
     });
   }
 
   async debitPlatformWallet(amount: number, description: string) {
     const platformWallet = await this.getPlatformWallet();
+    const currentBalance = await this.getWalletBalance(platformWallet.id);
 
-    return this.prisma.$transaction.create({
+    return this.prisma.walletTransaction.create({
       data: {
         walletId: platformWallet.id,
         amount: amount as any,
         type: 'DEBIT',
         description,
+        balanceBefore: currentBalance,
+        balanceAfter: currentBalance - amount,
+        reference: `DEBIT-${Date.now()}`,
       },
     });
   }
@@ -450,7 +463,7 @@ export class FinanceService {
   }
 
   private async getWalletBalance(walletId: string) {
-    const transactions = await this.prisma.$transaction.findMany({
+    const transactions = await this.prisma.walletTransaction.findMany({
       where: { walletId },
     });
 
@@ -461,13 +474,17 @@ export class FinanceService {
 
   private async debitAgentWallet(agentId: string, amount: number) {
     const walletId = await this.getAgentWalletId(agentId);
+    const currentBalance = await this.getWalletBalance(walletId);
 
-    return this.prisma.$transaction.create({
+    return this.prisma.walletTransaction.create({
       data: {
         walletId,
         amount: amount as any,
         type: 'DEBIT',
         description: 'Payout withdrawal',
+        balanceBefore: currentBalance,
+        balanceAfter: currentBalance - amount,
+        reference: `PAYOUT-${Date.now()}`,
       },
     });
   }

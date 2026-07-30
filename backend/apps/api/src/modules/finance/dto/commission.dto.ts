@@ -1,4 +1,4 @@
-import { IsEnum, IsString, IsNumber, IsUUID, IsOptional } from 'class-validator';
+import { IsEnum, IsNumber, IsUUID, IsOptional } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export enum CommissionType {
