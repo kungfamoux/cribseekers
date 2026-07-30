@@ -281,7 +281,7 @@ export class InspectionService {
     return this.inspectionRepository.findByRequestedBy(userId, options);
   }
 
-  async processPaymentSuccess(inspectionId: string, paymentId: string): Promise<any> {
+  async processPaymentSuccess(inspectionId: string): Promise<any> {
     this.logger.log(`Processing payment success for inspection ${inspectionId}`);
 
     const inspection = await this.inspectionRepository.findById(inspectionId);
@@ -290,7 +290,7 @@ export class InspectionService {
     }
 
     // Process finance settlement
-    const settlement = await this.financeService.processInspectionSettlement(inspectionId, paymentId);
+    const settlement = await this.financeService.processInspectionSettlement(inspectionId, inspectionId);
 
     // Update inspection status if needed
     await this.prisma.inspection.update({

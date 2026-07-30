@@ -7,7 +7,7 @@ import { RefreshTokenDto } from '../dto/refresh.dto';
 import { ForgotPasswordDto } from '../dto/forgot-password.dto';
 import { ResetPasswordDto } from '../dto/reset-password.dto';
 import { AuthResponseDto } from '../dto/auth-response.dto';
-import { BaseRegistrationDto, BuyerRegistrationDto, TenantRegistrationDto, LandlordRegistrationDto, AgentRegistrationDto, DeveloperRegistrationDto } from '../dto/role-registration.dto';
+import { BaseRegistrationDto } from '../dto/role-registration.dto';
 
 @ApiTags('auth')
 @Controller('auth')

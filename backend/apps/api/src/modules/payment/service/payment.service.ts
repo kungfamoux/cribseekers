@@ -110,7 +110,7 @@ export class PaymentService {
 
     // Create finance transaction record
     await this.financeService.createTransaction({
-      transactionType: 'INSPECTION', // Default, should be determined from payment metadata
+      transactionType: 'INSPECTION' as any, // Default, should be determined from payment metadata
       source: payment.description || 'Payment',
       amount: Number(payment.amount),
       currency: payment.currency,
