@@ -12,6 +12,9 @@ import { ResetPasswordDto } from '../dto/reset-password.dto';
 import { AuthResponseDto } from '../dto/auth-response.dto';
 import { UserStatus, UserType, RoleType } from '@prisma/client';
 import { BaseRegistrationDto, RegistrationRole } from '../dto/role-registration.dto';
+import { VerifyEmailDto } from '../dto/verify-email.dto';
+import { ResendEmailCodeDto } from '../dto/resend-email-code.dto';
+import { EmailVerificationService } from './email-verification.service';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +23,7 @@ export class AuthService {
     private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
     private readonly prisma: PrismaService,
+    private readonly emailVerificationService: EmailVerificationService,
   ) {}
 
   async login(loginDto: LoginDto): Promise<AuthResponseDto> {
@@ -142,6 +146,14 @@ export class AuthService {
     // Get user roles
     const roles = await this.getUserRoles(user.id);
 
+    // Generate email verification code
+    try {
+      await this.emailVerificationService.generateVerificationCode(user.id, user.email);
+    } catch (error) {
+      // Log error but don't fail registration
+      console.error('Failed to generate email verification code:', error);
+    }
+
     // Generate tokens
     const tokens = await this.generateTokens(user.id, user.email, roles);
 
@@ -220,6 +232,26 @@ export class AuthService {
     } catch (error) {
       throw new UnauthorizedException('Invalid or expired reset token');
     }
+  }
+
+  async verifyEmail(verifyEmailDto: VerifyEmailDto): Promise<{ success: boolean; message: string }> {
+    return this.emailVerificationService.verifyCode(verifyEmailDto.email, verifyEmailDto.code);
+  }
+
+  async resendEmailCode(resendEmailCodeDto: ResendEmailCodeDto): Promise<{ message: string; code?: string }> {
+    const result = await this.emailVerificationService.resendCode(resendEmailCodeDto.email);
+    
+    // For development, return the code if email sending failed
+    if (!result.sent) {
+      return {
+        message: 'Verification code generated (email not sent - check console)',
+        code: result.code,
+      };
+    }
+
+    return {
+      message: 'Verification code sent to your email',
+    };
   }
 
   private async generateTokens(userId: string, email: string, roles: string[]) {

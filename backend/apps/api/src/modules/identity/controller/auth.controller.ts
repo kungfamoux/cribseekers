@@ -8,6 +8,8 @@ import { ForgotPasswordDto } from '../dto/forgot-password.dto';
 import { ResetPasswordDto } from '../dto/reset-password.dto';
 import { AuthResponseDto } from '../dto/auth-response.dto';
 import { BaseRegistrationDto } from '../dto/role-registration.dto';
+import { VerifyEmailDto } from '../dto/verify-email.dto';
+import { ResendEmailCodeDto } from '../dto/resend-email-code.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -74,5 +76,23 @@ export class AuthController {
   async logout(): Promise<{ message: string }> {
     // In a real implementation, you would invalidate the refresh token
     return { message: 'Logout successful' };
+  }
+
+  @Post('verify-email')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Verify email with code' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Email verified successfully' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid or expired code' })
+  async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto): Promise<{ success: boolean; message: string }> {
+    return this.authService.verifyEmail(verifyEmailDto);
+  }
+
+  @Post('resend-email-code')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Resend email verification code' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Verification code sent' })
+  @ApiResponse({ status: HttpStatus.TOO_MANY_REQUESTS, description: 'Too many requests' })
+  async resendEmailCode(@Body() resendEmailCodeDto: ResendEmailCodeDto): Promise<{ message: string; code?: string }> {
+    return this.authService.resendEmailCode(resendEmailCodeDto);
   }
 }

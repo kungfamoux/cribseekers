@@ -27,7 +27,7 @@ const baseRegistrationSchema = z.object({
   password: passwordSchema,
   firstName: z.string().trim().min(1, "First name is required").max(100),
   lastName: z.string().trim().min(1, "Last name is required").max(100),
-  phoneNumber: z.string().trim().regex(phoneRegex, "Enter a valid phone number").max(20).optional(),
+  phoneNumber: z.string().trim().regex(phoneRegex, "Enter a valid phone number").max(20).optional().or(z.literal("")),
   role: z.enum(["BUYER", "TENANT", "LANDLORD", "AGENT", "DEVELOPER"]),
 });
 
@@ -60,7 +60,7 @@ export const developerRegistrationSchema = baseRegistrationSchema.extend({
   role: z.literal("DEVELOPER"),
   companyName: z.string().trim().min(1, "Company name is required").max(200),
   cacNumber: z.string().trim().max(50).optional(),
-  website: z.string().trim().url("Enter a valid website").max(255).optional(),
+  website: z.string().trim().max(255).optional(),
   officeAddress: z.string().trim().min(1, "Office address is required").max(500),
 });
 

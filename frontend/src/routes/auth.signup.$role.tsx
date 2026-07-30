@@ -83,21 +83,21 @@ function SignupPage() {
       password: "",
       firstName: "",
       lastName: "",
-      phoneNumber: "",
+      phoneNumber: undefined,
       role: signupRole,
     };
 
     switch (signupRole) {
       case "BUYER":
-        return { ...base, businessName: "" };
+        return { ...base, businessName: undefined };
       case "TENANT":
-        return { ...base, businessName: "" };
+        return { ...base, businessName: undefined };
       case "LANDLORD":
-        return { ...base, businessName: "", taxNumber: "" };
+        return { ...base, businessName: undefined, taxNumber: undefined };
       case "AGENT":
-        return { ...base, agencyName: "", licenseNumber: "", officeAddress: "", commissionRate: "" };
+        return { ...base, agencyName: "", licenseNumber: undefined, officeAddress: "", commissionRate: undefined };
       case "DEVELOPER":
-        return { ...base, companyName: "", cacNumber: "", website: "", officeAddress: "" };
+        return { ...base, companyName: "", cacNumber: undefined, website: undefined, officeAddress: "" };
       default:
         return base;
     }
@@ -142,11 +142,11 @@ function SignupPage() {
       footer={
         <p>
           Already have an account?{" "}
-          <Link to="/auth/login" search={undefined} className="font-medium text-primary underline underline-offset-4">
+          <Link to="/auth/login" className="font-medium text-primary underline underline-offset-4">
             Log in
           </Link>
           {" · "}
-          <Link to="/auth/role" search={undefined} className="font-medium text-primary underline underline-offset-4">
+          <Link to="/auth/role" className="font-medium text-primary underline underline-offset-4">
             Change role
           </Link>
         </p>

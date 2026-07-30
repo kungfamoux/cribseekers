@@ -10,6 +10,8 @@ import { UserService } from './service/user.service';
 import { RoleService } from './service/role.service';
 import { PermissionService } from './service/permission.service';
 import { AuthService } from './service/auth.service';
+import { EmailVerificationService } from './service/email-verification.service';
+import { EmailJSService } from './service/emailjs.service';
 import { UserRepository } from './repository/user.repository';
 import { RoleRepository } from './repository/role.repository';
 import { PermissionRepository } from './repository/permission.repository';
@@ -37,6 +39,8 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     RoleService,
     PermissionService,
     AuthService,
+    EmailVerificationService,
+    EmailJSService,
     UserRepository,
     RoleRepository,
     PermissionRepository,

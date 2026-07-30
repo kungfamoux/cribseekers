@@ -51,12 +51,23 @@ export type RegisterPayload =
   | AgentRegistrationPayload
   | DeveloperRegistrationPayload;
 
+// Helper to clean up optional fields (remove empty strings and undefined)
+function cleanRegistrationData(data: RegisterPayload): RegisterPayload {
+  const cleaned: any = { ...data };
+  for (const key in cleaned) {
+    if (cleaned[key] === "" || cleaned[key] === undefined) {
+      delete cleaned[key];
+    }
+  }
+  return cleaned as RegisterPayload;
+}
+
 export const authApi = {
   login: (body: { email: string; password: string; rememberMe?: boolean }) =>
     apiFetch<AuthSession>("/auth/login", { method: "POST", body }),
 
   register: (body: RegisterPayload) =>
-    apiFetch<AuthSession>("/auth/register", { method: "POST", body }),
+    apiFetch<AuthSession>("/auth/register", { method: "POST", body: cleanRegistrationData(body) }),
 
   logout: () => apiFetch<{ message?: string }>("/auth/logout", { method: "POST", auth: true }),
 
