@@ -22,6 +22,12 @@ import { CacheModule } from './infrastructure/cache/cache.module';
 import { RateLimitModule } from './infrastructure/rate-limit/rate-limit.module';
 import { MetricsModule } from './infrastructure/metrics/metrics.module';
 import { SchedulerModule } from './modules/scheduler/scheduler.module';
+import { BuyerModule } from './modules/buyer/buyer.module';
+import { TenantModule } from './modules/tenant/tenant.module';
+import { LandlordModule } from './modules/landlord/landlord.module';
+import { AgentModule } from './modules/agent/agent.module';
+import { DeveloperModule } from './modules/developer/developer.module';
+import { FinanceModule } from './modules/finance/finance.module';
 import { AppController } from './app.controller';
 
 @Module({
@@ -57,6 +63,12 @@ import { AppController } from './app.controller';
     RateLimitModule,
     MetricsModule,
     SchedulerModule,
+    BuyerModule,
+    TenantModule,
+    LandlordModule,
+    AgentModule,
+    DeveloperModule,
+    FinanceModule,
   ],
   controllers: [AppController],
 })

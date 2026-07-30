@@ -135,6 +135,7 @@ model User {
   adminActions      AdminAction[]
   apiKeys          ApiKey[]
   profiles         Profile[]
+  payouts          Payout[] @relation("PayoutAgent")
 
   @@index([email])
   @@index([phoneNumber])
@@ -1483,6 +1484,7 @@ model BankAccount {
 
   wallet      Wallet       @relation(fields: [walletId], references: [id], onDelete: Cascade)
   withdrawals Withdrawal[] @relation("BankAccountWithdrawals")
+  payouts     Payout[]
 
   @@index([walletId])
   @@index([accountNumber])
@@ -2334,4 +2336,164 @@ model StorageFile {
   @@index([expiresAt])
   @@index([storageKey])
   @@map("storage_files")
+}
+
+// ============================================================
+// FINANCE DOMAIN
+// ============================================================
+
+enum FinanceTransactionType {
+  INSPECTION
+  ESCROW
+  PREMIUM
+  ADVERTISEMENT
+  MOVING_SERVICE
+  REFUND
+  PAYOUT
+}
+
+enum CommissionType {
+  INSPECTION_COMMISSION
+  REFERRAL_COMMISSION
+  PARTNER_COMMISSION
+}
+
+enum CommissionStatus {
+  PENDING
+  APPROVED
+  PAID
+  FAILED
+}
+
+enum FinanceSettlementStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum PayoutStatus {
+  PENDING
+  APPROVED
+  PROCESSING
+  COMPLETED
+  FAILED
+  REJECTED
+}
+
+enum RevenueSource {
+  INSPECTION
+  ESCROW
+  PREMIUM
+  ADVERTISEMENT
+  MOVING_SERVICE
+}
+
+model FinanceTransaction {
+  id                    String           @id @default(uuid())
+  transactionType       FinanceTransactionType
+  source                String
+  amount                Decimal          @db.Decimal(18, 2)
+  currency              String           @default("NGN")
+  platformRevenue       Decimal          @db.Decimal(18, 2)
+  serviceProviderRevenue Decimal          @db.Decimal(18, 2) @default(0)
+  customerId            String?
+  serviceProviderId      String?
+  reference             String
+  status                TransactionStatus @default(PENDING)
+  metadata              Json?
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+
+  @@index([transactionType])
+  @@index([customerId])
+  @@index([serviceProviderId])
+  @@index([reference])
+  @@index([status])
+  @@index([createdAt])
+  @@map("finance_transactions")
+}
+
+model Commission {
+  id             String           @id @default(uuid())
+  transactionId  String
+  agentId        String
+  commissionType CommissionType
+  amount         Decimal          @db.Decimal(18, 2)
+  percentage     Decimal          @db.Decimal(5, 2)
+  status         CommissionStatus @default(PENDING)
+  paidAt         DateTime?
+  metadata       Json?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@index([transactionId])
+  @@index([agentId])
+  @@index([commissionType])
+  @@index([status])
+  @@map("commissions")
+}
+
+model FinanceSettlement {
+  id                  String                   @id @default(uuid())
+  entityType          String
+  entityId            String
+  amount              Decimal                  @db.Decimal(18, 2)
+  platformFee         Decimal                  @db.Decimal(18, 2)
+  serviceProviderFee   Decimal                  @db.Decimal(18, 2) @default(0)
+  status              FinanceSettlementStatus  @default(PENDING)
+  processedAt         DateTime?
+  metadata            Json?
+  createdAt           DateTime                 @default(now())
+  updatedAt           DateTime                 @updatedAt
+
+  @@index([entityType, entityId])
+  @@index([status])
+  @@map("finance_settlements")
+}
+
+model Payout {
+  id           String       @id @default(uuid())
+  agentId      String
+  amount       Decimal      @db.Decimal(18, 2)
+  fee          Decimal      @db.Decimal(18, 2) @default(100)
+  netAmount    Decimal      @db.Decimal(18, 2)
+  bankAccountId String
+  status       PayoutStatus @default(PENDING)
+  approvedBy   String?
+  approvedAt   DateTime?
+  processedAt  DateTime?
+  reference    String
+  rejectionReason String?
+  metadata     Json?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  agent        User         @relation("PayoutAgent", fields: [agentId], references: [id], onDelete: Cascade)
+  bankAccount  BankAccount  @relation(fields: [bankAccountId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+  @@index([bankAccountId])
+  @@index([status])
+  @@index([approvedAt])
+  @@map("payouts")
+}
+
+model RevenueRecord {
+  id         String        @id @default(uuid())
+  source     RevenueSource
+  amount     Decimal      @db.Decimal(18, 2)
+  date       DateTime
+  customerId String?
+  reference  String
+  status     String       @default("SUCCESS")
+  metadata   Json?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  @@index([source])
+  @@index([date])
+  @@index([customerId])
+  @@index([status])
+  @@map("revenue_records")
 }

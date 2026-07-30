@@ -3,6 +3,7 @@ import { PrismaService } from '../../../database/prisma.service';
 import { PaymentRepository } from '../repository/payment.repository';
 import { PaymentMapper } from '../mappers/payment.mapper';
 import { PaymentValidator } from '../validators/payment.validator';
+import { FinanceService } from '../../finance/service/finance.service';
 import {
   DuplicatePaymentException,
 } from '../exceptions/payment.exception';
@@ -15,6 +16,7 @@ export class PaymentService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly paymentRepository: PaymentRepository,
+    private readonly financeService: FinanceService,
   ) {}
 
   async initializePayment(dto: any): Promise<any> {
@@ -104,6 +106,18 @@ export class PaymentService {
           issuedAt: new Date(),
         },
       });
+    });
+
+    // Create finance transaction record
+    await this.financeService.createTransaction({
+      transactionType: 'INSPECTION', // Default, should be determined from payment metadata
+      source: payment.description || 'Payment',
+      amount: Number(payment.amount),
+      currency: payment.currency,
+      platformRevenue: 0, // Will be calculated based on payment type
+      serviceProviderRevenue: 0,
+      customerId: payment.userId,
+      reference: `PAY-${payment.id}`,
     });
 
     const updatedPayment = await this.paymentRepository.findById(payment.id);

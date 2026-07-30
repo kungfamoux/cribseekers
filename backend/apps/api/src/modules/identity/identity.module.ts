@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
 import { PrismaModule } from '../../database/prisma.module';
 import { UserController } from './controller/user.controller';
 import { RoleController } from './controller/role.controller';
@@ -12,10 +13,12 @@ import { AuthService } from './service/auth.service';
 import { UserRepository } from './repository/user.repository';
 import { RoleRepository } from './repository/role.repository';
 import { PermissionRepository } from './repository/permission.repository';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [
     PrismaModule,
+    PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'default-secret-key-change-in-production',
       signOptions: {
@@ -37,6 +40,7 @@ import { PermissionRepository } from './repository/permission.repository';
     UserRepository,
     RoleRepository,
     PermissionRepository,
+    JwtStrategy,
   ],
   exports: [
     UserService,

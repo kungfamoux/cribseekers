@@ -121,7 +121,7 @@ export class AuthService {
         lastName: registrationDto.lastName,
         phoneNumber: registrationDto.phoneNumber,
         type: userType,
-        status: UserStatus.PENDING_VERIFICATION,
+        status: UserStatus.ACTIVE,
       },
     });
 

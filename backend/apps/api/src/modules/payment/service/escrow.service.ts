@@ -4,6 +4,7 @@ import { EscrowRepository } from '../repository/escrow.repository';
 import { WalletRepository } from '../repository/wallet.repository';
 import { EscrowMapper } from '../mappers/escrow.mapper';
 import { PaymentValidator } from '../validators/payment.validator';
+import { FinanceService } from '../../finance/service/finance.service';
 import {
   EscrowNotFoundException,
   RefundNotAllowedException,
@@ -18,6 +19,7 @@ export class EscrowService {
     private readonly prisma: PrismaService,
     private readonly escrowRepository: EscrowRepository,
     private readonly walletRepository: WalletRepository,
+    private readonly financeService: FinanceService,
   ) {}
 
   async create(dto: any): Promise<any> {
@@ -64,6 +66,9 @@ export class EscrowService {
 
       return newEscrow;
     });
+
+    // Process finance settlement for escrow fee
+    await this.financeService.processEscrowSettlement(escrow.id, Number(dto.amount));
 
     this.logger.log(`Escrow created successfully: ${escrow.id}`);
     return escrow;

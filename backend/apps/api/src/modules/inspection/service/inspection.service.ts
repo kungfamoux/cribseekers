@@ -10,6 +10,7 @@ import { InspectionScheduleMapper } from '../mappers/inspection-schedule.mapper'
 import { InspectionParticipantMapper } from '../mappers/inspection-participant.mapper';
 import { InspectionHistoryMapper } from '../mappers/inspection-history.mapper';
 import { InspectionValidator } from '../validators/inspection.validator';
+import { FinanceService } from '../../finance/service/finance.service';
 import {
   InspectionNotFoundException,
   InspectionAlreadyCancelledException,
@@ -30,6 +31,7 @@ export class InspectionService {
     private readonly inspectionRepository: InspectionRepository,
         private readonly participantRepository: InspectionParticipantRepository,
         private readonly historyRepository: InspectionHistoryRepository,
+        private readonly financeService: FinanceService,
   ) {}
 
   async create(dto: CreateInspectionDto, userId: string): Promise<any> {
@@ -277,5 +279,27 @@ export class InspectionService {
 
   async findByRequestedBy(userId: string, options?: any): Promise<any> {
     return this.inspectionRepository.findByRequestedBy(userId, options);
+  }
+
+  async processPaymentSuccess(inspectionId: string, paymentId: string): Promise<any> {
+    this.logger.log(`Processing payment success for inspection ${inspectionId}`);
+
+    const inspection = await this.inspectionRepository.findById(inspectionId);
+    if (!inspection) {
+      throw new InspectionNotFoundException(inspectionId);
+    }
+
+    // Process finance settlement
+    const settlement = await this.financeService.processInspectionSettlement(inspectionId, paymentId);
+
+    // Update inspection status if needed
+    await this.prisma.inspection.update({
+      where: { id: inspectionId },
+      data: {
+        status: InspectionStatus.CONFIRMED,
+      },
+    });
+
+    return settlement;
   }
 }
