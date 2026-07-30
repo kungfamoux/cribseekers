@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Get, Body, HttpCode, HttpStatus, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from '../service/auth.service';
 import { LoginDto } from '../dto/login.dto';
@@ -10,6 +10,7 @@ import { AuthResponseDto } from '../dto/auth-response.dto';
 import { BaseRegistrationDto } from '../dto/role-registration.dto';
 import { VerifyEmailDto } from '../dto/verify-email.dto';
 import { ResendEmailCodeDto } from '../dto/resend-email-code.dto';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -94,5 +95,15 @@ export class AuthController {
   @ApiResponse({ status: HttpStatus.TOO_MANY_REQUESTS, description: 'Too many requests' })
   async resendEmailCode(@Body() resendEmailCodeDto: ResendEmailCodeDto): Promise<{ message: string; code?: string }> {
     return this.authService.resendEmailCode(resendEmailCodeDto);
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Get current authenticated user' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'User retrieved successfully' })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
+  async getMe(@Request() req: any): Promise<any> {
+    // The JwtAuthGuard attaches the user to the request
+    return req.user;
   }
 }

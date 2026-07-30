@@ -104,10 +104,20 @@ export class AuthService {
   }
 
   async registerWithRole(registrationDto: BaseRegistrationDto): Promise<AuthResponseDto> {
-    // Check if user already exists
+    // Check if user already exists by email
     const existingUser = await this.userRepository.findByEmail(registrationDto.email);
     if (existingUser) {
       throw new BadRequestException('User with this email already exists');
+    }
+
+    // Check if phone number already exists (if provided)
+    if (registrationDto.phoneNumber) {
+      const existingPhone = await this.prisma.user.findUnique({
+        where: { phoneNumber: registrationDto.phoneNumber },
+      });
+      if (existingPhone) {
+        throw new BadRequestException('User with this phone number already exists');
+      }
     }
 
     // Hash password

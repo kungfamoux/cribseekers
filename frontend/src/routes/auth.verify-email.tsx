@@ -40,11 +40,8 @@ function VerifyEmailPage() {
       toast.success("Email verified.");
       await refreshUser().catch(() => {});
       const primaryRole = user?.roles?.[0] as any;
-      if (user && user.phoneVerified) {
-        navigate({ to: roleHome(primaryRole) });
-      } else {
-        navigate({ to: "/auth/verify-phone", search: { phone: user?.phone } });
-      }
+      // Skip phone verification for now - go directly to dashboard
+      navigate({ to: roleHome(primaryRole) });
     },
     onError: (error) => {
       setCode("");
