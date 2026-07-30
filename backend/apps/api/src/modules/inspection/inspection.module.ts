@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from '../../database/prisma.module';
+import { FinanceModule } from '../finance/finance.module';
 
 import { InspectionController } from './controller/inspection.controller';
 import { InspectionFeedbackController } from './controller/inspection-feedback.controller';
@@ -24,7 +25,7 @@ import { InspectionReminderRepository } from './repository/inspection-reminder.r
 import { InspectionHistoryRepository } from './repository/inspection-history.repository';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, FinanceModule],
   controllers: [
     InspectionController,
     InspectionFeedbackController,
