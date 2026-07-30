@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from "@tanstack/react-router";
-import { Home, Search, Heart, ClipboardCheck, Wallet, Shield, MessageSquare, Bell, User, Settings, LogOut, Menu } from "lucide-react";
+import { Home, Search, Heart, ClipboardCheck, Wallet, Shield, MessageSquare, Bell, User, Settings, LogOut, Menu, Building, Users, Wrench, DollarSign, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -26,6 +26,57 @@ const buyerNavItems = [
   { to: "/buyer/settings" as any, icon: Settings, label: "Settings" },
 ];
 
+const tenantNavItems = [
+  { to: "/tenant/dashboard" as any, icon: Home, label: "Dashboard" },
+  { to: "/tenant/rentals" as any, icon: Building, label: "My Rentals" },
+  { to: "/tenant/payments" as any, icon: DollarSign, label: "Payments" },
+  { to: "/tenant/maintenance" as any, icon: Wrench, label: "Maintenance" },
+  { to: "/tenant/messages" as any, icon: MessageSquare, label: "Messages" },
+  { to: "/tenant/notifications" as any, icon: Bell, label: "Notifications" },
+  { to: "/tenant/profile" as any, icon: User, label: "Profile" },
+  { to: "/tenant/settings" as any, icon: Settings, label: "Settings" },
+];
+
+const landlordNavItems = [
+  { to: "/landlord/dashboard" as any, icon: Home, label: "Dashboard" },
+  { to: "/landlord/properties" as any, icon: Building, label: "Properties" },
+  { to: "/landlord/tenants" as any, icon: Users, label: "Tenants" },
+  { to: "/landlord/payments" as any, icon: DollarSign, label: "Payments" },
+  { to: "/landlord/messages" as any, icon: MessageSquare, label: "Messages" },
+  { to: "/landlord/notifications" as any, icon: Bell, label: "Notifications" },
+  { to: "/landlord/profile" as any, icon: User, label: "Profile" },
+  { to: "/landlord/settings" as any, icon: Settings, label: "Settings" },
+];
+
+const agentNavItems = [
+  { to: "/agent/dashboard" as any, icon: Home, label: "Dashboard" },
+  { to: "/agent/listings" as any, icon: Building, label: "Listings" },
+  { to: "/agent/commissions" as any, icon: DollarSign, label: "Commissions" },
+  { to: "/agent/messages" as any, icon: MessageSquare, label: "Messages" },
+  { to: "/agent/notifications" as any, icon: Bell, label: "Notifications" },
+  { to: "/agent/profile" as any, icon: User, label: "Profile" },
+  { to: "/agent/settings" as any, icon: Settings, label: "Settings" },
+];
+
+const developerNavItems = [
+  { to: "/developer/dashboard" as any, icon: Home, label: "Dashboard" },
+  { to: "/developer/projects" as any, icon: Building, label: "Projects" },
+  { to: "/developer/sales" as any, icon: DollarSign, label: "Sales" },
+  { to: "/developer/messages" as any, icon: MessageSquare, label: "Messages" },
+  { to: "/developer/notifications" as any, icon: Bell, label: "Notifications" },
+  { to: "/developer/profile" as any, icon: User, label: "Profile" },
+  { to: "/developer/settings" as any, icon: Settings, label: "Settings" },
+];
+
+const NAV_ITEMS_BY_ROLE: Record<string, typeof buyerNavItems> = {
+  BUYER: buyerNavItems,
+  TENANT: tenantNavItems,
+  LANDLORD: landlordNavItems,
+  AGENT: agentNavItems,
+  DEVELOPER: developerNavItems,
+  ADMIN: buyerNavItems, // Fallback for admin
+};
+
 interface DashboardLayoutProps {
   role: "BUYER" | "TENANT" | "LANDLORD" | "AGENT" | "DEVELOPER" | "ADMIN";
   userName?: string;
@@ -36,9 +87,11 @@ interface DashboardLayoutProps {
 export function DashboardLayout({ role, userName = "User", userAvatar }: DashboardLayoutProps) {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const navItems = buyerNavItems; // Will be dynamic based on role
+  const navItems = NAV_ITEMS_BY_ROLE[role] || buyerNavItems;
 
   const isActive = (path: string) => location.pathname === path;
+
+  const roleLower = role.toLowerCase();
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -69,6 +122,7 @@ export function DashboardLayout({ role, userName = "User", userAvatar }: Dashboa
         <div className="border-t p-4">
           <Link
             to="/auth/login"
+            search={{ redirect: undefined }}
             className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
           >
             <LogOut className="h-4 w-4" />
@@ -113,6 +167,7 @@ export function DashboardLayout({ role, userName = "User", userAvatar }: Dashboa
               <div className="border-t p-4">
                 <Link
                   to="/auth/login"
+                  search={{ redirect: undefined }}
                   onClick={() => setMobileOpen(false)}
                   className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                 >
@@ -139,14 +194,14 @@ export function DashboardLayout({ role, userName = "User", userAvatar }: Dashboa
               <DropdownMenuLabel>{userName}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link to="/buyer/profile" search={undefined}>Profile</Link>
+                <Link to={`/${roleLower}/profile` as any}>Profile</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/buyer/settings" search={undefined}>Settings</Link>
+                <Link to={`/${roleLower}/settings` as any}>Settings</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link to="/auth/login" search={undefined} className="text-destructive">
+                <Link to="/auth/login" search={{ redirect: undefined }} className="text-destructive">
                   Logout
                 </Link>
               </DropdownMenuItem>
@@ -161,7 +216,7 @@ export function DashboardLayout({ role, userName = "User", userAvatar }: Dashboa
       {/* Desktop Main Content */}
       <div className="hidden flex-1 flex-col lg:flex">
         <header className="flex h-16 items-center justify-between border-b px-6">
-          <h1 className="text-xl font-semibold capitalize">{role} Dashboard</h1>
+          <h1 className="text-xl font-semibold capitalize">{roleLower} Dashboard</h1>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="gap-2">
@@ -176,14 +231,14 @@ export function DashboardLayout({ role, userName = "User", userAvatar }: Dashboa
               <DropdownMenuLabel>{userName}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link to="/buyer/profile" search={undefined}>Profile</Link>
+                <Link to={`/${roleLower}/profile` as any}>Profile</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/buyer/settings" search={undefined}>Settings</Link>
+                <Link to={`/${roleLower}/settings` as any}>Settings</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link to="/auth/login" search={undefined} className="text-destructive">
+                <Link to="/auth/login" search={{ redirect: undefined }} className="text-destructive">
                   Logout
                 </Link>
               </DropdownMenuItem>

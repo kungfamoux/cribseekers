@@ -56,8 +56,10 @@ export function getPrimaryRole(roles: string[]): UserRole | null {
   const knownRoles: UserRole[] = ["BUYER", "TENANT", "LANDLORD", "AGENT", "DEVELOPER", "ADMIN"];
   for (const role of roles) {
     if (knownRoles.includes(role as UserRole)) {
+      console.log("getPrimaryRole: Found role", role, "from roles", roles);
       return role as UserRole;
     }
   }
+  console.log("getPrimaryRole: No valid role found in", roles);
   return null;
 }

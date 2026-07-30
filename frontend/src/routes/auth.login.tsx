@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { authApi } from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/client";
 import { useAuth } from "@/lib/auth/auth-context";
-import { roleHome } from "@/lib/auth/roles";
+import { roleHome, getPrimaryRole } from "@/lib/auth/roles";
 import { loginSchema, type LoginValues } from "@/lib/validation/auth-schemas";
 
 export const Route = createFileRoute("/auth/login")({
@@ -47,10 +47,12 @@ function LoginPage() {
       setSession(session);
       toast.success(`Welcome back${session.user?.firstName ? `, ${session.user.firstName}` : ""}.`);
       if (redirect) {
+        console.log("Login: Using redirect parameter:", redirect);
         navigate({ to: redirect });
         return;
       }
-      const primaryRole = session.user?.roles?.[0] as any;
+      const primaryRole = getPrimaryRole(session.user?.roles || []);
+      console.log("Login: Redirecting to role home:", primaryRole, "->", roleHome(primaryRole));
       navigate({ to: roleHome(primaryRole) });
     },
     onError: (error) => {
