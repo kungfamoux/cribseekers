@@ -1,54 +1,32 @@
-# Dependencies
-node_modules
-.pnp
-.pnp.js
-
-# Testing
-coverage
-*.lcov
-
-# Next.js
-.next/
-out/
-build
-dist
-
-# Production
+# Logs
+logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# Misc
-.DS_Store
-*.pem
+node_modules
+dist
+dist-ssr
+.output
+.vinxi
+.tanstack/**
+.nitro
+*.local
 
-# Debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# Wrangler / Cloudflare
+.wrangler/
+.dev.vars
 
-# Local env files
-.env
-.env*.local
-.env.production
-
-# Vercel
-.vercel
-
-# TypeScript
-*.tsbuildinfo
-next-env.d.ts
-
-# IDE
-.vscode
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
 .idea
-*.swp
-*.swo
-*~
-
-# OS
-Thumbs.db
-
-# Sentry Config File
-.env.sentry-build-plugin
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

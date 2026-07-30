@@ -1,1 +1,0 @@
-export { Hero3D } from './Hero3D';
