@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
 import { FinanceController } from './controller/finance.controller';
 import { FinanceService } from './service/finance.service';
-import { PrismaService } from '../../database/prisma.service';
+import { PrismaModule } from '../../database/prisma.module';
 
 @Module({
-  imports: [ConfigModule],
+  imports: [PrismaModule],
   controllers: [FinanceController],
-  providers: [FinanceService, PrismaService],
+  providers: [FinanceService],
   exports: [FinanceService],
 })
 export class FinanceModule {}
