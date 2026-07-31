@@ -21,7 +21,8 @@ export class AuthController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Login successful' })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Invalid credentials' })
   async login(@Body() loginDto: LoginDto, @Res() response: any): Promise<{ user: any }> {
-    return this.authService.login(loginDto, response);
+    const result = await this.authService.login(loginDto, response);
+    return response.status(HttpStatus.OK).json(result);
   }
 
   @Post('signup')
@@ -30,7 +31,8 @@ export class AuthController {
   @ApiResponse({ status: HttpStatus.CREATED, description: 'Registration successful' })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'User already exists' })
   async signup(@Body() signupDto: SignupDto, @Res() response: any): Promise<{ user: any }> {
-    return this.authService.signup(signupDto, response);
+    const result = await this.authService.signup(signupDto, response);
+    return response.status(HttpStatus.CREATED).json(result);
   }
 
   @Post('register')
@@ -39,7 +41,8 @@ export class AuthController {
   @ApiResponse({ status: HttpStatus.CREATED, description: 'Registration successful' })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'User already exists or invalid data' })
   async register(@Body() registrationDto: BaseRegistrationDto, @Res() response: any): Promise<{ user: any }> {
-    return this.authService.registerWithRole(registrationDto, response);
+    const result = await this.authService.registerWithRole(registrationDto, response);
+    return response.status(HttpStatus.CREATED).json(result);
   }
 
   @Post('refresh')
@@ -48,7 +51,8 @@ export class AuthController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Token refreshed successfully' })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Invalid refresh token' })
   async refresh(@Req() request: any, @Res() response: any): Promise<{ accessToken: string }> {
-    return this.authService.refresh(request, response);
+    const result = await this.authService.refresh(request, response);
+    return response.status(HttpStatus.OK).json(result);
   }
 
   @Post('forgot-password')
@@ -77,7 +81,7 @@ export class AuthController {
     response.clearCookie('access_token', { path: '/' });
     response.clearCookie('refresh_token', { path: '/' });
     
-    return { message: 'Logout successful' };
+    return response.status(HttpStatus.OK).json({ message: 'Logout successful' });
   }
 
   @Post('verify-email')
