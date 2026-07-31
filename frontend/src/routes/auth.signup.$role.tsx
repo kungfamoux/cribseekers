@@ -114,7 +114,7 @@ function SignupPage() {
   const mutation = useMutation({
     mutationFn: (values: any) => {
       // Filter fields based on role to match backend DTO structure
-      const baseFields = {
+      const baseFields: any = {
         email: values.email,
         password: values.password,
         firstName: values.firstName,
@@ -157,11 +157,7 @@ function SignupPage() {
       if (response?.user) setUser(response.user);
       toast.success("Account created. Let's verify your email.");
       const email = form.getValues("email");
-      if (email) {
-        navigate({ to: "/auth/verify-email", search: { email } });
-      } else {
-        navigate({ to: "/auth/verify-email" });
-      }
+      navigate({ to: "/auth/verify-email", search: email ? { email } : undefined } as any);
     },
     onError: (error) => {
       if (error instanceof ApiError) {
@@ -187,7 +183,7 @@ function SignupPage() {
       footer={
         <p>
           Already have an account?{" "}
-          <Link to="/auth/login" className="font-medium text-primary underline underline-offset-4">
+          <Link to="/auth/login" search={undefined as any} className="font-medium text-primary underline underline-offset-4">
             Log in
           </Link>
           {" · "}
