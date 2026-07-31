@@ -131,7 +131,8 @@ function SignupPage() {
       // Store user data for immediate UI use
       if (response?.user) setUser(response.user);
       toast.success("Account created. Let's verify your email.");
-      navigate({ to: "/auth/verify-email", search: { email: form.getValues("email") } });
+      const email = form.getValues("email");
+      navigate({ to: "/auth/verify-email", search: email ? { email } : undefined });
     },
     onError: (error) => {
       if (error instanceof ApiError) {
