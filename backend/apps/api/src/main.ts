@@ -32,10 +32,24 @@ async function bootstrap() {
   const apiPrefix = configService.get<string>('apiPrefix') || 'api';
   const apiVersion = configService.get<string>('apiVersion') || '1';
   const corsOrigin = configService.get<string>('corsOrigin') || '*';
+  
+  // When using credentials: true, we cannot use wildcard origin
+  // Must specify exact origins for cookie-based authentication
+  const allowedOrigins = corsOrigin === '*' 
+    ? [
+        'http://localhost:8080',
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'https://cribseekers.onrender.com',
+        'https://cribseekers.com',
+      ]
+    : corsOrigin.split(',').map(origin => origin.trim());
 
   app.enableCors({
-    origin: corsOrigin,
+    origin: allowedOrigins,
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   app.use(cookieParser());
