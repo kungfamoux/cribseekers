@@ -6,12 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Building, MapPin, Users, Plus, Edit, Trash2, Eye, HardHat, Calendar, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { developerApi } from "@/lib/api/developer";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/developer/projects")({
+  beforeLoad: createAuthGuard({ requiredRole: "DEVELOPER" }),
   component: DeveloperProjects,
 });
 
 function DeveloperProjects() {
+  const { user, role } = useAuth();
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -59,7 +63,7 @@ function DeveloperProjects() {
 
   if (loading) {
     return (
-      <DashboardLayout role="DEVELOPER" userName="Chike Nwosu">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -68,7 +72,7 @@ function DeveloperProjects() {
   }
 
   return (
-    <DashboardLayout role="DEVELOPER" userName="Chike Nwosu">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

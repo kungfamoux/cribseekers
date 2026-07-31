@@ -6,12 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Shield, Clock, CheckCircle, XCircle, AlertCircle, FileText, Calendar, MapPin, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { buyerApi } from "@/lib/api/buyer";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/buyer/escrow")({
+  beforeLoad: createAuthGuard({ requiredRole: "BUYER" }),
   component: BuyerEscrow,
 });
 
 function BuyerEscrow() {
+  const { user, role } = useAuth();
   const [escrowTransactions, setEscrowTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -80,7 +84,7 @@ function BuyerEscrow() {
 
   if (loading) {
     return (
-      <DashboardLayout role="buyer" userName="John Doe">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -89,7 +93,7 @@ function BuyerEscrow() {
   }
 
   return (
-    <DashboardLayout role="buyer" userName="John Doe">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Escrow</h2>

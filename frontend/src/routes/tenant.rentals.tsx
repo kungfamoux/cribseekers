@@ -6,12 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Home, MapPin, Calendar, CheckCircle, AlertCircle, FileText, Wrench, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { tenantApi } from "@/lib/api/tenant";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/tenant/rentals")({
+  beforeLoad: createAuthGuard({ requiredRole: "TENANT" }),
   component: TenantRentals,
 });
 
 function TenantRentals() {
+  const { user, role } = useAuth();
   const [rentals, setRentals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -65,7 +69,7 @@ function TenantRentals() {
 
   if (loading) {
     return (
-      <DashboardLayout role="tenant" userName="Jane Doe">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -74,7 +78,7 @@ function TenantRentals() {
   }
 
   return (
-    <DashboardLayout role="tenant" userName="Jane Doe">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">My Rentals</h2>

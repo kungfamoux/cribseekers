@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, HttpCode, HttpStatus, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Get, Body, HttpCode, HttpStatus, UseGuards, Request, Res } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from '../service/auth.service';
 import { LoginDto } from '../dto/login.dto';
@@ -22,8 +22,8 @@ export class AuthController {
   @ApiOperation({ summary: 'User login' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Login successful', type: AuthResponseDto })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Invalid credentials' })
-  async login(@Body() loginDto: LoginDto): Promise<AuthResponseDto> {
-    return this.authService.login(loginDto);
+  async login(@Body() loginDto: LoginDto, @Res() response: any): Promise<{ user: any }> {
+    return this.authService.login(loginDto, response);
   }
 
   @Post('signup')
@@ -31,8 +31,8 @@ export class AuthController {
   @ApiOperation({ summary: 'User registration' })
   @ApiResponse({ status: HttpStatus.CREATED, description: 'Registration successful', type: AuthResponseDto })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'User already exists' })
-  async signup(@Body() signupDto: SignupDto): Promise<AuthResponseDto> {
-    return this.authService.signup(signupDto);
+  async signup(@Body() signupDto: SignupDto, @Res() response: any): Promise<{ user: any }> {
+    return this.authService.signup(signupDto, response);
   }
 
   @Post('register')
@@ -40,8 +40,8 @@ export class AuthController {
   @ApiOperation({ summary: 'Role-based registration' })
   @ApiResponse({ status: HttpStatus.CREATED, description: 'Registration successful', type: AuthResponseDto })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'User already exists or invalid data' })
-  async register(@Body() registrationDto: BaseRegistrationDto): Promise<AuthResponseDto> {
-    return this.authService.registerWithRole(registrationDto);
+  async register(@Body() registrationDto: BaseRegistrationDto, @Res() response: any): Promise<{ user: any }> {
+    return this.authService.registerWithRole(registrationDto, response);
   }
 
   @Post('refresh')
@@ -49,8 +49,8 @@ export class AuthController {
   @ApiOperation({ summary: 'Refresh access token' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Token refreshed successfully' })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Invalid refresh token' })
-  async refresh(@Body() refreshTokenDto: RefreshTokenDto): Promise<{ accessToken: string }> {
-    return this.authService.refresh(refreshTokenDto);
+  async refresh(@Req() request: any, @Res() response: any): Promise<{ accessToken: string }> {
+    return this.authService.refresh(request, response);
   }
 
   @Post('forgot-password')
@@ -74,8 +74,11 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'User logout' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Logout successful' })
-  async logout(): Promise<{ message: string }> {
-    // In a real implementation, you would invalidate the refresh token
+  async logout(@Res() response: any): Promise<{ message: string }> {
+    // Clear auth cookies
+    response.clearCookie('access_token', { path: '/' });
+    response.clearCookie('refresh_token', { path: '/' });
+    
     return { message: 'Logout successful' };
   }
 

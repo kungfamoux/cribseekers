@@ -9,12 +9,16 @@ import { Separator } from "@/components/ui/separator";
 import { Bell, Lock, Eye, EyeOff, Shield, Globe, Moon, Sun, Building } from "lucide-react";
 import { useState, useEffect } from "react";
 import { developerApi } from "@/lib/api/developer";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/developer/settings")({
+  beforeLoad: createAuthGuard({ requiredRole: "DEVELOPER" }),
   component: DeveloperSettings,
 });
 
 function DeveloperSettings() {
+  const { user, role } = useAuth();
   const [settings, setSettings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +43,7 @@ function DeveloperSettings() {
 
   if (loading) {
     return (
-      <DashboardLayout role="DEVELOPER" userName="Chike Nwosu">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
@@ -48,7 +52,7 @@ function DeveloperSettings() {
   }
 
   return (
-    <DashboardLayout role="DEVELOPER" userName="Chike Nwosu">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Settings</h2>

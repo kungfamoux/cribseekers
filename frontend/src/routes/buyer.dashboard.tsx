@@ -5,12 +5,16 @@ import { Home, Search, Heart, ClipboardCheck, Wallet, Shield, MessageSquare, Bel
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { buyerApi } from "@/lib/api/buyer";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/buyer/dashboard")({
+  beforeLoad: createAuthGuard({ requiredRole: "BUYER" }),
   component: BuyerDashboard,
 });
 
 function BuyerDashboard() {
+  const { user, role } = useAuth();
   const [loading, setLoading] = useState(true);
   const [savedCount, setSavedCount] = useState(0);
   const [inspectionsCount, setInspectionsCount] = useState(0);
@@ -61,7 +65,7 @@ function BuyerDashboard() {
 
   if (loading) {
     return (
-      <DashboardLayout role="BUYER" userName="John Doe">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -70,10 +74,10 @@ function BuyerDashboard() {
   }
 
   return (
-    <DashboardLayout role="BUYER" userName="John Doe">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Welcome back, John!</h2>
+          <h2 className="text-3xl font-bold tracking-tight">Welcome back, {user?.firstName || "User"}!</h2>
           <p className="text-muted-foreground">Here's what's happening with your property search.</p>
         </div>
 

@@ -6,12 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Users, Mail, Phone, MapPin, Clock, TrendingUp, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { agentApi } from "@/lib/api/agent";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/agent/leads")({
+  beforeLoad: createAuthGuard({ requiredRole: "AGENT" }),
   component: AgentLeads,
 });
 
 function AgentLeads() {
+  const { user, role } = useAuth();
   const [leads, setLeads] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -81,7 +85,7 @@ function AgentLeads() {
 
   if (loading) {
     return (
-      <DashboardLayout role="AGENT" userName="Tunde Adeyemi">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -90,7 +94,7 @@ function AgentLeads() {
   }
 
   return (
-    <DashboardLayout role="AGENT" userName="Tunde Adeyemi">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Leads</h2>

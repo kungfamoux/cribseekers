@@ -10,13 +10,17 @@ import { Badge } from "@/components/ui/badge";
 import { User, Mail, Phone, MapPin, Calendar, Camera, Save, Building, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { landlordApi } from "@/lib/api/landlord";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/landlord/profile")({
+  beforeLoad: createAuthGuard({ requiredRole: "LANDLORD" }),
   component: LandlordProfile,
 });
 
 function LandlordProfile() {
-  const [user, setUser] = useState<any>(null);
+  const { user, role } = useAuth();
+  const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,19 +29,8 @@ function LandlordProfile() {
       try {
         setLoading(true);
         setError(null);
-        // Note: Add profile API call when available in landlordApi
-        setUser({
-          name: "Emeka Okafor",
-          email: "emeka.okafor@example.com",
-          phone: "+234 802 123 4567",
-          location: "Lagos, Nigeria",
-          memberSince: "February 2023",
-          bio: "Property investor and landlord with 8 years of experience in the Nigerian real estate market. Specializing in residential properties in Lagos and Abuja.",
-          businessName: "Okafor Properties Ltd",
-          taxNumber: "12345678-0001",
-          avatar: "",
-          verified: true,
-        });
+        const data = await landlordApi.profile();
+        setProfile(data);
       } catch (err) {
         setError("Failed to load profile. Please try again.");
         console.error(err);
@@ -51,7 +44,7 @@ function LandlordProfile() {
 
   if (loading) {
     return (
-      <DashboardLayout role="landlord" userName="Emeka Okafor">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -61,7 +54,7 @@ function LandlordProfile() {
 
   if (error) {
     return (
-      <DashboardLayout role="landlord" userName="Emeka Okafor">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <p className="text-red-500 mb-4">{error}</p>
@@ -73,7 +66,7 @@ function LandlordProfile() {
   }
 
   return (
-    <DashboardLayout role="landlord" userName={user?.name || "Emeka Okafor"}>
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Profile</h2>
@@ -87,21 +80,21 @@ function LandlordProfile() {
               <div className="flex flex-col items-center text-center">
                 <div className="relative">
                   <Avatar className="h-24 w-24 mb-4">
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback className="text-2xl">{user.name.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={profile.avatar} alt={profile.name} />
+                    <AvatarFallback className="text-2xl">{profile.name.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <Button size="icon" variant="ghost" className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-background border">
                     <Camera className="h-4 w-4" />
                   </Button>
                 </div>
-                <h3 className="text-xl font-semibold">{user.name}</h3>
-                {user.verified && (
+                <h3 className="text-xl font-semibold">{profile.name}</h3>
+                {profile.verified && (
                   <Badge className="mt-2 bg-green-500">Verified Landlord</Badge>
                 )}
-                <p className="text-sm text-muted-foreground mt-2">{user.email}</p>
+                <p className="text-sm text-muted-foreground mt-2">{profile.email}</p>
                 <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
                   <Calendar className="h-3 w-3" />
-                  Member since {user.memberSince}
+                  Member since {profile.memberSince}
                 </div>
               </div>
             </CardContent>
@@ -117,51 +110,51 @@ function LandlordProfile() {
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="firstName">First Name</Label>
-                    <Input id="firstName" defaultValue="Emeka" />
+                    <Input id="firstName" defaultValue={user?.firstName || ""} />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="lastName">Last Name</Label>
-                    <Input id="lastName" defaultValue="Okafor" />
+                    <Input id="lastName" defaultValue={user?.lastName || ""} />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input id="email" type="email" defaultValue={user.email} className="pl-10" />
+                    <Input id="email" type="email" defaultValue={profile.email} className="pl-10" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="phone">Phone</Label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input id="phone" type="tel" defaultValue={user.phone} className="pl-10" />
+                    <Input id="phone" type="tel" defaultValue={profile.phone} className="pl-10" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="location">Location</Label>
                   <div className="relative">
                     <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input id="location" defaultValue={user.location} className="pl-10" />
+                    <Input id="location" defaultValue={profile.location} className="pl-10" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="businessName">Business Name</Label>
                   <div className="relative">
                     <Building className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input id="businessName" defaultValue={user.businessName} className="pl-10" />
+                    <Input id="businessName" defaultValue={profile.businessName} className="pl-10" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="taxNumber">Tax Number</Label>
-                  <Input id="taxNumber" defaultValue={user.taxNumber} />
+                  <Input id="taxNumber" defaultValue={profile.taxNumber} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="bio">Bio</Label>
                   <Textarea
                     id="bio"
                     placeholder="Tell us about yourself..."
-                    defaultValue={user.bio}
+                    defaultValue={profile.bio}
                     rows={4}
                   />
                 </div>

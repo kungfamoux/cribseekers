@@ -6,12 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { DollarSign, Calendar, CheckCircle, Clock, AlertCircle, TrendingUp, Download, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { landlordApi } from "@/lib/api/landlord";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/landlord/payments")({
+  beforeLoad: createAuthGuard({ requiredRole: "LANDLORD" }),
   component: LandlordPayments,
 });
 
 function LandlordPayments() {
+  const { user, role } = useAuth();
   const [payments, setPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -82,7 +86,7 @@ function LandlordPayments() {
 
   if (loading) {
     return (
-      <DashboardLayout role="landlord" userName="Emeka Okafor">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -91,7 +95,7 @@ function LandlordPayments() {
   }
 
   return (
-    <DashboardLayout role="landlord" userName="Emeka Okafor">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

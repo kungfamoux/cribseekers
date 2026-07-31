@@ -1,5 +1,5 @@
 import { apiFetch } from "./client";
-import type { AuthSession, User } from "./types";
+import type { User } from "./types";
 
 export type RegistrationRole = "BUYER" | "TENANT" | "LANDLORD" | "AGENT" | "DEVELOPER";
 
@@ -53,15 +53,15 @@ export type RegisterPayload =
 
 export const authApi = {
   login: (body: { email: string; password: string; rememberMe?: boolean }) =>
-    apiFetch<AuthSession>("/auth/login", { method: "POST", body }),
+    apiFetch<{ user: User }>("/auth/login", { method: "POST", body }),
 
   register: (body: RegisterPayload) =>
-    apiFetch<AuthSession>("/auth/register", { method: "POST", body }),
+    apiFetch<{ user: User }>("/auth/register", { method: "POST", body }),
 
   logout: () => apiFetch<{ message?: string }>("/auth/logout", { method: "POST", auth: true }),
 
-  refresh: (body: { refreshToken: string }) =>
-    apiFetch<{ accessToken: string }>("/auth/refresh", { method: "POST", body }),
+  refresh: () =>
+    apiFetch<{ accessToken: string }>("/auth/refresh", { method: "POST", auth: true }),
 
   me: () => apiFetch<User>("/auth/me", { auth: true }),
 

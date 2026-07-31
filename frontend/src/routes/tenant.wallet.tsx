@@ -6,12 +6,16 @@ import { Input } from "@/components/ui/input";
 import { Wallet, Plus, ArrowUpRight, ArrowDownLeft, CreditCard, Banknote, History, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { tenantApi } from "@/lib/api/tenant";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/tenant/wallet")({
+  beforeLoad: createAuthGuard({ requiredRole: "TENANT" }),
   component: TenantWallet,
 });
 
 function TenantWallet() {
+  const { user, role } = useAuth();
   const [wallet, setWallet] = useState<any>(null);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,7 +72,7 @@ function TenantWallet() {
 
   if (loading) {
     return (
-      <DashboardLayout role="tenant" userName="Jane Doe">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -78,7 +82,7 @@ function TenantWallet() {
 
   if (error) {
     return (
-      <DashboardLayout role="tenant" userName="Jane Doe">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <p className="text-red-500 mb-4">{error}</p>
@@ -90,7 +94,7 @@ function TenantWallet() {
   }
 
   return (
-    <DashboardLayout role="tenant" userName="Jane Doe">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Wallet</h2>

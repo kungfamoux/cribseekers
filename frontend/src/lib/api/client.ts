@@ -69,17 +69,17 @@ async function parse(response: Response) {
 }
 
 async function refreshSession(): Promise<boolean> {
-  const refreshToken = handlers.getRefreshToken();
-  if (!refreshToken) return false;
   try {
+    // Note: Refresh endpoint now uses cookies automatically
     const response = await fetch(buildUrl("/auth/refresh"), {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify({ refreshToken }),
+      credentials: 'include', // Important: include cookies
     });
     if (!response.ok) return false;
-    const tokens = unwrap<{ accessToken: string; refreshToken?: string }>(await parse(response));
+    const tokens = unwrap<{ accessToken: string }>(await parse(response));
     if (!tokens?.accessToken) return false;
+    // Note: Backend sets the new access token as a cookie automatically
     handlers.onRefreshed(tokens);
     return true;
   } catch {
@@ -93,14 +93,12 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
   const send = async () => {
     const headers: Record<string, string> = { Accept: "application/json" };
     if (body !== undefined) headers["Content-Type"] = "application/json";
-    if (auth) {
-      const token = handlers.getAccessToken();
-      if (token) headers.Authorization = `Bearer ${token}`;
-    }
+    // Note: Authorization header removed - cookies are sent automatically by browser
     return fetch(buildUrl(path, query), {
       method,
       headers,
       signal,
+      credentials: 'include', // Important: include cookies in requests
       body: body === undefined ? undefined : JSON.stringify(body),
     });
   };

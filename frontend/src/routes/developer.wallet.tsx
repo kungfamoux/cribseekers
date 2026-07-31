@@ -6,12 +6,16 @@ import { Input } from "@/components/ui/input";
 import { Wallet, Plus, ArrowUpRight, ArrowDownLeft, CreditCard, Banknote, History, Building, Calendar, CheckCircle, Clock } from "lucide-react";
 import { useState, useEffect } from "react";
 import { developerApi } from "@/lib/api/developer";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/developer/wallet")({
+  beforeLoad: createAuthGuard({ requiredRole: "DEVELOPER" }),
   component: DeveloperWallet,
 });
 
 function DeveloperWallet() {
+  const { user, role } = useAuth();
   const [wallet, setWallet] = useState<any>(null);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,41 +29,7 @@ function DeveloperWallet() {
         setError(null);
         const walletData = await developerApi.wallet();
         setWallet(walletData);
-        // Mock transactions - replace with actual API call
-        setTransactions([
-          {
-            id: "1",
-            type: "credit",
-            amount: 15000000,
-            description: "Unit sale - Lekki Gardens Estate",
-            date: "2026-07-30",
-            status: "available",
-          },
-          {
-            id: "2",
-            type: "credit",
-            amount: 22000000,
-            description: "Unit sale - Victoria Island Towers",
-            date: "2026-07-29",
-            status: "available",
-          },
-          {
-            id: "3",
-            type: "debit",
-            amount: 30000000,
-            description: "Withdrawal to bank account",
-            date: "2026-07-28",
-            status: "completed",
-          },
-          {
-            id: "4",
-            type: "credit",
-            amount: 18000000,
-            description: "Unit sale - Ikeja City Mall",
-            date: "2026-07-27",
-            status: "paid",
-          },
-        ]);
+        setTransactions(walletData.transactions || []);
       } catch (err) {
         setError("Failed to load wallet data. Please try again.");
         console.error(err);
@@ -117,7 +87,7 @@ function DeveloperWallet() {
 
   if (loading) {
     return (
-      <DashboardLayout role="DEVELOPER" userName="Chike Nwosu">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
@@ -126,7 +96,7 @@ function DeveloperWallet() {
   }
 
   return (
-    <DashboardLayout role="DEVELOPER" userName="Chike Nwosu">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Wallet</h2>

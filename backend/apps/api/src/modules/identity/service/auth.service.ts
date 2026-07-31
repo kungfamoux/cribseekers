@@ -15,6 +15,7 @@ import { BaseRegistrationDto, RegistrationRole } from '../dto/role-registration.
 import { VerifyEmailDto } from '../dto/verify-email.dto';
 import { ResendEmailCodeDto } from '../dto/resend-email-code.dto';
 import { EmailVerificationService } from './email-verification.service';
+import { Request, Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -26,7 +27,7 @@ export class AuthService {
     private readonly emailVerificationService: EmailVerificationService,
   ) {}
 
-  async login(loginDto: LoginDto): Promise<AuthResponseDto> {
+  async login(loginDto: LoginDto, response: Response): Promise<{ user: any }> {
     const user = await this.userRepository.findByEmail(loginDto.email);
 
     // Check if user exists and password matches
@@ -45,9 +46,26 @@ export class AuthService {
     // Generate tokens
     const tokens = await this.generateTokens(user.id, user.email, roles);
 
+    // Set httpOnly cookies
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    
+    response.cookie('access_token', tokens.accessToken, {
+      httpOnly: true,
+      secure: !isDevelopment,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: '/',
+    });
+
+    response.cookie('refresh_token', tokens.refreshToken, {
+      httpOnly: true,
+      secure: !isDevelopment,
+      sameSite: 'strict',
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      path: '/',
+    });
+
     return {
-      accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken,
       user: {
         id: user.id,
         email: user.email,
@@ -60,7 +78,7 @@ export class AuthService {
     };
   }
 
-  async signup(signupDto: SignupDto): Promise<AuthResponseDto> {
+  async signup(signupDto: SignupDto, response: Response): Promise<{ user: any }> {
     // Check if user already exists
     const existingUser = await this.userRepository.findByEmail(signupDto.email);
     if (existingUser) {
@@ -88,9 +106,26 @@ export class AuthService {
     // Generate tokens
     const tokens = await this.generateTokens(user.id, user.email, roles);
 
+    // Set httpOnly cookies
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    
+    response.cookie('access_token', tokens.accessToken, {
+      httpOnly: true,
+      secure: !isDevelopment,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: '/',
+    });
+
+    response.cookie('refresh_token', tokens.refreshToken, {
+      httpOnly: true,
+      secure: !isDevelopment,
+      sameSite: 'strict',
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      path: '/',
+    });
+
     return {
-      accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken,
       user: {
         id: user.id,
         email: user.email,
@@ -103,7 +138,7 @@ export class AuthService {
     };
   }
 
-  async registerWithRole(registrationDto: BaseRegistrationDto): Promise<AuthResponseDto> {
+  async registerWithRole(registrationDto: BaseRegistrationDto, response: Response): Promise<{ user: any }> {
     // Check if user already exists by email
     const existingUser = await this.userRepository.findByEmail(registrationDto.email);
     if (existingUser) {
@@ -167,9 +202,26 @@ export class AuthService {
     // Generate tokens
     const tokens = await this.generateTokens(user.id, user.email, roles);
 
+    // Set httpOnly cookies
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    
+    response.cookie('access_token', tokens.accessToken, {
+      httpOnly: true,
+      secure: !isDevelopment,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: '/',
+    });
+
+    response.cookie('refresh_token', tokens.refreshToken, {
+      httpOnly: true,
+      secure: !isDevelopment,
+      sameSite: 'strict',
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      path: '/',
+    });
+
     return {
-      accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken,
       user: {
         id: user.id,
         email: user.email,
@@ -182,16 +234,33 @@ export class AuthService {
     };
   }
 
-  async refresh(refreshDto: RefreshTokenDto): Promise<{ accessToken: string }> {
+  async refresh(request: Request, response: Response): Promise<{ accessToken: string }> {
+    const refreshToken = request.cookies?.refresh_token;
+    
+    if (!refreshToken) {
+      throw new UnauthorizedException('No refresh token found');
+    }
+
     try {
       // Verify refresh token
-      const payload = this.jwtService.verify(refreshDto.refreshToken);
+      const payload = this.jwtService.verify(refreshToken);
 
       // Generate new access token
       const accessToken = this.jwtService.sign({
         sub: payload.sub,
         email: payload.email,
         roles: payload.roles,
+      });
+
+      // Update access token cookie
+      const isDevelopment = process.env.NODE_ENV === 'development';
+      
+      response.cookie('access_token', accessToken, {
+        httpOnly: true,
+        secure: !isDevelopment,
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        path: '/',
       });
 
       return { accessToken };

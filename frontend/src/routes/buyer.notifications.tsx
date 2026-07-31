@@ -6,12 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Bell, Check, Trash2, Calendar, Shield, Heart, MessageSquare, Wallet, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { buyerApi } from "@/lib/api/buyer";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/buyer/notifications")({
+  beforeLoad: createAuthGuard({ requiredRole: "BUYER" }),
   component: BuyerNotifications,
 });
 
 function BuyerNotifications() {
+  const { user, role } = useAuth();
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,7 +61,7 @@ function BuyerNotifications() {
   };
 
   return (
-    <DashboardLayout role="buyer" userName="John Doe">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

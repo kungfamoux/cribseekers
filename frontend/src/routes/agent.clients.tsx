@@ -7,12 +7,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Users, Mail, Phone, Calendar, DollarSign, MessageSquare, FileText, TrendingUp, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { agentApi } from "@/lib/api/agent";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/agent/clients")({
+  beforeLoad: createAuthGuard({ requiredRole: "AGENT" }),
   component: AgentClients,
 });
 
 function AgentClients() {
+  const { user, role } = useAuth();
   const [clients, setClients] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -66,7 +70,7 @@ function AgentClients() {
 
   if (loading) {
     return (
-      <DashboardLayout role="AGENT" userName="Tunde Adeyemi">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -75,7 +79,7 @@ function AgentClients() {
   }
 
   return (
-    <DashboardLayout role="AGENT" userName="Tunde Adeyemi">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">My Clients</h2>

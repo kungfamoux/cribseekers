@@ -1,19 +1,16 @@
-import type { AuthTokens, User } from "@/lib/api/types";
+import type { User } from "@/lib/api/types";
 
-const ACCESS_KEY = "cribseekers.accessToken";
-const REFRESH_KEY = "cribseekers.refreshToken";
 const USER_KEY = "cribseekers.user";
 
 const isBrowser = () => typeof window !== "undefined";
 
 export const tokenStore = {
+  // Token methods removed - cookies are now handled by browser
   getAccess(): string | null {
-    if (!isBrowser()) return null;
-    return window.localStorage.getItem(ACCESS_KEY);
+    return null; // Tokens are now in httpOnly cookies
   },
   getRefresh(): string | null {
-    if (!isBrowser()) return null;
-    return window.localStorage.getItem(REFRESH_KEY);
+    return null; // Tokens are now in httpOnly cookies
   },
   getUser(): User | null {
     if (!isBrowser()) return null;
@@ -36,10 +33,9 @@ export const tokenStore = {
       return null;
     }
   },
-  setTokens(tokens: AuthTokens) {
-    if (!isBrowser()) return;
-    window.localStorage.setItem(ACCESS_KEY, tokens.accessToken);
-    if (tokens.refreshToken) window.localStorage.setItem(REFRESH_KEY, tokens.refreshToken);
+  setTokens(tokens: any) {
+    // Tokens are now set as httpOnly cookies by backend
+    // This method is kept for compatibility but does nothing
   },
   setUser(user: User) {
     if (!isBrowser()) return;
@@ -47,8 +43,7 @@ export const tokenStore = {
   },
   clear() {
     if (!isBrowser()) return;
-    window.localStorage.removeItem(ACCESS_KEY);
-    window.localStorage.removeItem(REFRESH_KEY);
+    // Only clear user data - cookies are cleared by backend logout
     window.localStorage.removeItem(USER_KEY);
   },
 };

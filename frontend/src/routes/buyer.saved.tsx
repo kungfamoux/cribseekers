@@ -6,12 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, MapPin, Bed, Bath, Maximize, Trash2, Eye, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { buyerApi } from "@/lib/api/buyer";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/buyer/saved")({
+  beforeLoad: createAuthGuard({ requiredRole: "BUYER" }),
   component: BuyerSaved,
 });
 
 function BuyerSaved() {
+  const { user, role } = useAuth();
   const [savedProperties, setSavedProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +65,7 @@ function BuyerSaved() {
 
   if (loading) {
     return (
-      <DashboardLayout role="buyer" userName="John Doe">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -70,7 +74,7 @@ function BuyerSaved() {
   }
 
   return (
-    <DashboardLayout role="buyer" userName="John Doe">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Saved Properties</h2>

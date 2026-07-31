@@ -7,37 +7,70 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { User, Mail, Phone, MapPin, Calendar, Camera, Save, Building, Briefcase } from "lucide-react";
+import { User, Mail, Phone, MapPin, Calendar, Camera, Save, Building, Briefcase, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { agentApi } from "@/lib/api/agent";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/agent/profile")({
+  beforeLoad: createAuthGuard({ requiredRole: "AGENT" }),
   component: AgentProfile,
 });
 
 function AgentProfile() {
-  // Mock data - replace with API call
-  const user = {
-    name: "Tunde Adeyemi",
-    email: "tunde.adeyemi@example.com",
-    phone: "+234 803 456 7890",
-    location: "Lagos, Nigeria",
-    memberSince: "January 2023",
-    bio: "Experienced real estate agent specializing in residential and commercial properties in Lagos. With over 5 years in the industry, I've helped hundreds of clients find their dream properties.",
-    agencyName: "Prime Properties Agency",
-    licenseNumber: "LAG/2023/001234",
-    officeAddress: "15 Adeola Odeku Street, Victoria Island, Lagos",
-    commissionRate: "5",
-    avatar: "",
-    verified: true,
-  };
+  const { user, role } = useAuth();
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await agentApi.profile();
+        setProfile(data);
+      } catch (err) {
+        setError("Failed to load profile. Please try again.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchProfile();
+  }, []);
+
+  if (loading) {
+    return (
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
-    <DashboardLayout role="AGENT" userName="Tunde Adeyemi">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Profile</h2>
           <p className="text-muted-foreground">Manage your personal information</p>
         </div>
 
+        {error && (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <p className="text-red-500 mb-4">{error}</p>
+              <Button onClick={() => window.location.reload()}>Retry</Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {!error && profile && (
+          <>
         <div className="grid gap-6 md:grid-cols-3">
           {/* Profile Card */}
           <Card className="md:col-span-1">
@@ -45,21 +78,21 @@ function AgentProfile() {
               <div className="flex flex-col items-center text-center">
                 <div className="relative">
                   <Avatar className="h-24 w-24 mb-4">
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback className="text-2xl">{user.name.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={profile.avatar} alt={profile.name} />
+                    <AvatarFallback className="text-2xl">{profile.name?.charAt(0) || "T"}</AvatarFallback>
                   </Avatar>
                   <Button size="icon" variant="ghost" className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-background border">
                     <Camera className="h-4 w-4" />
                   </Button>
                 </div>
-                <h3 className="text-xl font-semibold">{user.name}</h3>
-                {user.verified && (
+                <h3 className="text-xl font-semibold">{profile.name}</h3>
+                {profile.verified && (
                   <Badge className="mt-2 bg-green-500">Verified Agent</Badge>
                 )}
-                <p className="text-sm text-muted-foreground mt-2">{user.email}</p>
+                <p className="text-sm text-muted-foreground mt-2">{profile.email}</p>
                 <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
                   <Calendar className="h-3 w-3" />
-                  Member since {user.memberSince}
+                  Member since {profile.memberSince}
                 </div>
               </div>
             </CardContent>
@@ -75,32 +108,32 @@ function AgentProfile() {
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="firstName">First Name</Label>
-                    <Input id="firstName" defaultValue="Tunde" />
+                    <Input id="firstName" defaultValue={profile?.firstName || ""} />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="lastName">Last Name</Label>
-                    <Input id="lastName" defaultValue="Adeyemi" />
+                    <Input id="lastName" defaultValue={profile?.lastName || ""} />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input id="email" type="email" defaultValue={user.email} className="pl-10" />
+                    <Input id="email" type="email" defaultValue={profile.email} className="pl-10" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="phone">Phone</Label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input id="phone" type="tel" defaultValue={user.phone} className="pl-10" />
+                    <Input id="phone" type="tel" defaultValue={profile.phone} className="pl-10" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="location">Location</Label>
                   <div className="relative">
                     <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input id="location" defaultValue={user.location} className="pl-10" />
+                    <Input id="location" defaultValue={profile.location} className="pl-10" />
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -108,7 +141,7 @@ function AgentProfile() {
                   <Textarea
                     id="bio"
                     placeholder="Tell us about yourself..."
-                    defaultValue={user.bio}
+                    defaultValue={profile.bio}
                     rows={4}
                   />
                 </div>
@@ -136,21 +169,21 @@ function AgentProfile() {
                   <Label htmlFor="agencyName">Agency Name</Label>
                   <div className="relative">
                     <Building className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input id="agencyName" defaultValue={user.agencyName} className="pl-10" />
+                    <Input id="agencyName" defaultValue={profile.agencyName} className="pl-10" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="licenseNumber">License Number</Label>
-                  <Input id="licenseNumber" defaultValue={user.licenseNumber} />
+                  <Input id="licenseNumber" defaultValue={profile.licenseNumber} />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="officeAddress">Office Address</Label>
-                <Input id="officeAddress" defaultValue={user.officeAddress} />
+                <Input id="officeAddress" defaultValue={profile.officeAddress} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="commissionRate">Default Commission Rate (%)</Label>
-                <Input id="commissionNumber" type="number" defaultValue={user.commissionRate} />
+                <Input id="commissionNumber" type="number" defaultValue={profile.commissionRate} />
               </div>
               <Button>Update Agency Info</Button>
             </form>
@@ -165,19 +198,19 @@ function AgentProfile() {
           <CardContent>
             <div className="grid gap-4 md:grid-cols-4">
               <div className="text-center">
-                <p className="text-2xl font-bold">15</p>
+                <p className="text-2xl font-bold">{profile.activeListings || 0}</p>
                 <p className="text-sm text-muted-foreground">Active Listings</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold">45</p>
+                <p className="text-2xl font-bold">{profile.totalLeads || 0}</p>
                 <p className="text-sm text-muted-foreground">Total Leads</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold">28</p>
+                <p className="text-2xl font-bold">{profile.dealsClosed || 0}</p>
                 <p className="text-sm text-muted-foreground">Deals Closed</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold">₦12.5M</p>
+                <p className="text-2xl font-bold">₦{(profile.totalCommission || 0).toLocaleString()}</p>
                 <p className="text-sm text-muted-foreground">Total Commission</p>
               </div>
             </div>
@@ -198,7 +231,7 @@ function AgentProfile() {
                   </div>
                   <div>
                     <p className="font-medium">Email Verified</p>
-                    <p className="text-sm text-muted-foreground">tunde.adeyemi@example.com</p>
+                    <p className="text-sm text-muted-foreground">{user.email}</p>
                   </div>
                 </div>
                 <Badge className="bg-green-500">Verified</Badge>
@@ -244,6 +277,8 @@ function AgentProfile() {
             </div>
           </CardContent>
         </Card>
+        </>
+        )}
       </div>
     </DashboardLayout>
   );

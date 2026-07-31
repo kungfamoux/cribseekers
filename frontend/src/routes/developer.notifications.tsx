@@ -6,12 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Bell, Check, Trash2, Calendar, DollarSign, Users, Building, MessageSquare } from "lucide-react";
 import { useState, useEffect } from "react";
 import { developerApi } from "@/lib/api/developer";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/developer/notifications")({
+  beforeLoad: createAuthGuard({ requiredRole: "DEVELOPER" }),
   component: DeveloperNotifications,
 });
 
 function DeveloperNotifications() {
+  const { user, role } = useAuth();
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,7 +61,7 @@ function DeveloperNotifications() {
   };
 
   return (
-    <DashboardLayout role="DEVELOPER" userName="Chike Nwosu">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

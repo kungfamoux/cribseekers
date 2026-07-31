@@ -5,12 +5,16 @@ import { Home, Calendar, Wallet, Shield, MessageSquare, Bell, Wrench, FileText, 
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { tenantApi } from "@/lib/api/tenant";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/tenant/dashboard")({
+  beforeLoad: createAuthGuard({ requiredRole: "TENANT" }),
   component: TenantDashboard,
 });
 
 function TenantDashboard() {
+  const { user, role } = useAuth();
   const [rentals, setRentals] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
   const [maintenance, setMaintenance] = useState<any[]>([]);
@@ -55,7 +59,7 @@ function TenantDashboard() {
 
   if (loading) {
     return (
-      <DashboardLayout role="TENANT" userName="Jane Doe">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -64,10 +68,10 @@ function TenantDashboard() {
   }
 
   return (
-    <DashboardLayout role="TENANT" userName="Jane Doe">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Welcome back, Jane!</h2>
+          <h2 className="text-3xl font-bold tracking-tight">Welcome back, {user?.firstName || "User"}!</h2>
           <p className="text-muted-foreground">Here's what's happening with your rentals.</p>
         </div>
 

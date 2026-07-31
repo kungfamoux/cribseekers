@@ -33,7 +33,7 @@ export const Route = createFileRoute("/auth/login")({
 function LoginPage() {
   const navigate = useNavigate();
   const { redirect } = Route.useSearch();
-  const { setSession } = useAuth();
+  const { setUser } = useAuth();
 
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
@@ -43,14 +43,18 @@ function LoginPage() {
 
   const mutation = useMutation({
     mutationFn: (values: LoginValues) => authApi.login(values),
-    onSuccess: (session) => {
-      setSession(session);
-      toast.success(`Welcome back${session.user?.firstName ? `, ${session.user.firstName}` : ""}.`);
+    onSuccess: (response) => {
+      // Backend sets httpOnly cookies automatically
+      // Store user data for immediate UI use
+      const { setUser } = useAuth();
+      setUser(response.user);
+      
+      toast.success(`Welcome back${response.user?.firstName ? `, ${response.user.firstName}` : ""}.`);
       if (redirect) {
         navigate({ to: redirect });
         return;
       }
-      const primaryRole = session.user?.roles?.[0] as any;
+      const primaryRole = response.user?.roles?.[0] as any;
       navigate({ to: roleHome(primaryRole) });
     },
     onError: (error) => {

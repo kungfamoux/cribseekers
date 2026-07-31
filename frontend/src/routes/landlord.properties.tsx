@@ -6,12 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Home, MapPin, Users, DollarSign, Plus, Edit, Trash2, Eye, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { landlordApi } from "@/lib/api/landlord";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/landlord/properties")({
+  beforeLoad: createAuthGuard({ requiredRole: "LANDLORD" }),
   component: LandlordProperties,
 });
 
 function LandlordProperties() {
+  const { user, role } = useAuth();
   const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,7 +61,7 @@ function LandlordProperties() {
 
   if (loading) {
     return (
-      <DashboardLayout role="landlord" userName="Emeka Okafor">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -66,7 +70,7 @@ function LandlordProperties() {
   }
 
   return (
-    <DashboardLayout role="landlord" userName="Emeka Okafor">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

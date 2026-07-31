@@ -5,12 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Home, Users, DollarSign, TrendingUp, Calendar, Wrench, FileText, Plus, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { landlordApi } from "@/lib/api/landlord";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/landlord/dashboard")({
+  beforeLoad: createAuthGuard({ requiredRole: "LANDLORD" }),
   component: LandlordDashboard,
 });
 
 function LandlordDashboard() {
+  const { user, role } = useAuth();
   const [properties, setProperties] = useState<any[]>([]);
   const [tenants, setTenants] = useState<any[]>([]);
   const [maintenance, setMaintenance] = useState<any[]>([]);
@@ -56,7 +60,7 @@ function LandlordDashboard() {
 
   if (loading) {
     return (
-      <DashboardLayout role="LANDLORD" userName="Emeka Okafor">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -65,10 +69,10 @@ function LandlordDashboard() {
   }
 
   return (
-    <DashboardLayout role="LANDLORD" userName="Emeka Okafor">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Welcome back, Emeka!</h2>
+          <h2 className="text-3xl font-bold tracking-tight">Welcome back, {user?.firstName || "User"}!</h2>
           <p className="text-muted-foreground">Here's what's happening with your properties.</p>
         </div>
 

@@ -6,12 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, MapPin, User, CheckCircle, XCircle, AlertCircle, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { buyerApi } from "@/lib/api/buyer";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/buyer/inspections")({
+  beforeLoad: createAuthGuard({ requiredRole: "BUYER" }),
   component: BuyerInspections,
 });
 
 function BuyerInspections() {
+  const { user, role } = useAuth();
   const [inspections, setInspections] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -79,7 +83,7 @@ function BuyerInspections() {
 
   if (loading) {
     return (
-      <DashboardLayout role="buyer" userName="John Doe">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -88,7 +92,7 @@ function BuyerInspections() {
   }
 
   return (
-    <DashboardLayout role="buyer" userName="John Doe">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

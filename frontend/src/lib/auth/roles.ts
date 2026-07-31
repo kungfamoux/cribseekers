@@ -1,11 +1,11 @@
 import type { UserRole } from "@/lib/api/types";
 
 export const ROLE_HOME: Record<UserRole, string> = {
-  BUYER: "/buyer",
-  TENANT: "/tenant",
-  LANDLORD: "/landlord",
-  AGENT: "/agent",
-  DEVELOPER: "/developer",
+  BUYER: "/buyer/dashboard",
+  TENANT: "/tenant/dashboard",
+  LANDLORD: "/landlord/dashboard",
+  AGENT: "/agent/dashboard",
+  DEVELOPER: "/developer/dashboard",
   ADMIN: "/admin",
 };
 

@@ -6,12 +6,16 @@ import { Button } from "@/components/ui/button";
 import { DollarSign, TrendingUp, Users, Building, Download, Calendar, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { developerApi } from "@/lib/api/developer";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/developer/reports")({
+  beforeLoad: createAuthGuard({ requiredRole: "DEVELOPER" }),
   component: DeveloperReports,
 });
 
 function DeveloperReports() {
+  const { user, role } = useAuth();
   const [sales, setSales] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,7 +59,7 @@ function DeveloperReports() {
 
   if (loading) {
     return (
-      <DashboardLayout role="DEVELOPER" userName="Chike Nwosu">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -64,7 +68,7 @@ function DeveloperReports() {
   }
 
   return (
-    <DashboardLayout role="DEVELOPER" userName="Chike Nwosu">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

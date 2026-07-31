@@ -6,12 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Wrench, Clock, CheckCircle, AlertCircle, Plus, Image, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { tenantApi } from "@/lib/api/tenant";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/tenant/maintenance")({
+  beforeLoad: createAuthGuard({ requiredRole: "TENANT" }),
   component: TenantMaintenance,
 });
 
 function TenantMaintenance() {
+  const { user, role } = useAuth();
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -87,7 +91,7 @@ function TenantMaintenance() {
 
   if (loading) {
     return (
-      <DashboardLayout role="tenant" userName="Jane Doe">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -96,7 +100,7 @@ function TenantMaintenance() {
   }
 
   return (
-    <DashboardLayout role="tenant" userName="Jane Doe">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

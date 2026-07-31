@@ -9,12 +9,16 @@ import { Search, MapPin, Bed, Bath, Maximize, Heart, Filter, SlidersHorizontal, 
 import { useState, useEffect } from "react";
 import { propertiesApi } from "@/lib/api/properties";
 import type { Property } from "@/lib/api/types";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/buyer/search")({
+  beforeLoad: createAuthGuard({ requiredRole: "BUYER" }),
   component: BuyerSearch,
 });
 
 function BuyerSearch() {
+  const { user, role } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [priceRange, setPriceRange] = useState("");
   const [propertyType, setPropertyType] = useState("");
@@ -64,7 +68,7 @@ function BuyerSearch() {
   };
 
   return (
-    <DashboardLayout role="buyer" userName="John Doe">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Search Properties</h2>

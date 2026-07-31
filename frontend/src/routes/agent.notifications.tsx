@@ -3,61 +3,40 @@ import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Bell, Check, Trash2, Calendar, DollarSign, Users, Briefcase, MessageSquare } from "lucide-react";
+import { Bell, Check, Trash2, Calendar, DollarSign, Users, Briefcase, MessageSquare, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { agentApi } from "@/lib/api/agent";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/agent/notifications")({
+  beforeLoad: createAuthGuard({ requiredRole: "AGENT" }),
   component: AgentNotifications,
 });
 
 function AgentNotifications() {
-  // Mock data - replace with API call
-  const notifications = [
-    {
-      id: "1",
-      type: "lead",
-      title: "New Lead",
-      message: "Jane Doe has expressed interest in your Lekki property listing",
-      time: "2 hours ago",
-      read: false,
-      icon: Users,
-    },
-    {
-      id: "2",
-      type: "commission",
-      title: "Commission Available",
-      message: "Your commission of ₦250,000 from the Lekki property sale is now available for withdrawal",
-      time: "5 hours ago",
-      read: false,
-      icon: DollarSign,
-    },
-    {
-      id: "3",
-      type: "deal",
-      title: "Deal Update",
-      message: "The offer for the Ikeja property has been accepted by the buyer",
-      time: "1 day ago",
-      read: true,
-      icon: Briefcase,
-    },
-    {
-      id: "4",
-      type: "appointment",
-      title: "Appointment Reminder",
-      message: "Property inspection with John Doe is scheduled for tomorrow at 2:00 PM",
-      time: "2 days ago",
-      read: true,
-      icon: Calendar,
-    },
-    {
-      id: "5",
-      type: "message",
-      title: "New Message",
-      message: "You have a new message from developer Chioma Nwosu",
-      time: "3 days ago",
-      read: true,
-      icon: MessageSquare,
-    },
-  ];
+  const { user, role } = useAuth();
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchNotifications() {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await agentApi.notifications();
+        setNotifications(data);
+      } catch (err) {
+        setError("Failed to load notifications. Please try again.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchNotifications();
+  }, []);
 
   const getNotificationIcon = (icon: any) => {
     const Icon = icon;
@@ -81,8 +60,18 @@ function AgentNotifications() {
     }
   };
 
+  if (loading) {
+    return (
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
-    <DashboardLayout role="AGENT" userName="Tunde Adeyemi">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -99,6 +88,17 @@ function AgentNotifications() {
           </div>
         </div>
 
+        {error && (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <p className="text-red-500 mb-4">{error}</p>
+              <Button onClick={() => window.location.reload()}>Retry</Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {!error && (
+          <>
         {/* Unread Notifications */}
         {notifications.filter((n) => !n.read).length > 0 && (
           <div>
@@ -185,6 +185,8 @@ function AgentNotifications() {
               </p>
             </CardContent>
           </Card>
+        )}
+        </>
         )}
       </div>
     </DashboardLayout>

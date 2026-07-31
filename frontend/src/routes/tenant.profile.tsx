@@ -10,13 +10,17 @@ import { Badge } from "@/components/ui/badge";
 import { User, Mail, Phone, MapPin, Calendar, Camera, Save, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { tenantApi } from "@/lib/api/tenant";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/tenant/profile")({
+  beforeLoad: createAuthGuard({ requiredRole: "TENANT" }),
   component: TenantProfile,
 });
 
 function TenantProfile() {
-  const [user, setUser] = useState<any>(null);
+  const { user, role } = useAuth();
+  const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,7 +30,7 @@ function TenantProfile() {
         setLoading(true);
         setError(null);
         const data = await tenantApi.profile();
-        setUser(data);
+        setProfile(data);
       } catch (err) {
         setError("Failed to load profile. Please try again.");
         console.error(err);
@@ -40,7 +44,7 @@ function TenantProfile() {
 
   if (loading) {
     return (
-      <DashboardLayout role="tenant" userName="Jane Doe">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -50,7 +54,7 @@ function TenantProfile() {
 
   if (error) {
     return (
-      <DashboardLayout role="tenant" userName="Jane Doe">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <p className="text-red-500 mb-4">{error}</p>
@@ -62,7 +66,7 @@ function TenantProfile() {
   }
 
   return (
-    <DashboardLayout role="tenant" userName={user?.name || "Jane Doe"}>
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Profile</h2>
@@ -76,21 +80,21 @@ function TenantProfile() {
               <div className="flex flex-col items-center text-center">
                 <div className="relative">
                   <Avatar className="h-24 w-24 mb-4">
-                    <AvatarImage src={user?.avatar} alt={user?.name} />
-                    <AvatarFallback className="text-2xl">{user?.name?.charAt(0) || "J"}</AvatarFallback>
+                    <AvatarImage src={profile?.avatar} alt={profile?.name} />
+                    <AvatarFallback className="text-2xl">{profile?.name?.charAt(0) || "J"}</AvatarFallback>
                   </Avatar>
                   <Button size="icon" variant="ghost" className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-background border">
                     <Camera className="h-4 w-4" />
                   </Button>
                 </div>
-                <h3 className="text-xl font-semibold">{user?.name || "Jane Doe"}</h3>
-                {user?.verified && (
+                <h3 className="text-xl font-semibold">{profile?.name || "Jane Doe"}</h3>
+                {profile?.verified && (
                   <Badge className="mt-2 bg-green-500">Verified Tenant</Badge>
                 )}
-                <p className="text-sm text-muted-foreground mt-2">{user?.email || "jane.doe@example.com"}</p>
+                <p className="text-sm text-muted-foreground mt-2">{profile?.email || "jane.doe@example.com"}</p>
                 <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
                   <Calendar className="h-3 w-3" />
-                  Member since {user?.memberSince || "March 2023"}
+                  Member since {profile?.memberSince || "March 2023"}
                 </div>
               </div>
             </CardContent>
@@ -117,21 +121,21 @@ function TenantProfile() {
                   <Label htmlFor="email">Email</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input id="email" type="email" defaultValue={user?.email || ""} className="pl-10" />
+                    <Input id="email" type="email" defaultValue={profile?.email || ""} className="pl-10" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="phone">Phone</Label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input id="phone" type="tel" defaultValue={user?.phone || ""} className="pl-10" />
+                    <Input id="phone" type="tel" defaultValue={profile?.phone || ""} className="pl-10" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="location">Location</Label>
                   <div className="relative">
                     <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input id="location" defaultValue={user?.location || ""} className="pl-10" />
+                    <Input id="location" defaultValue={profile?.location || ""} className="pl-10" />
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -139,7 +143,7 @@ function TenantProfile() {
                   <Textarea
                     id="bio"
                     placeholder="Tell us about yourself..."
-                    defaultValue={user?.bio || ""}
+                    defaultValue={profile?.bio || ""}
                     rows={4}
                   />
                 </div>

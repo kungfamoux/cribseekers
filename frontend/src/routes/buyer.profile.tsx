@@ -10,13 +10,17 @@ import { Badge } from "@/components/ui/badge";
 import { User, Mail, Phone, MapPin, Calendar, Camera, Save, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { buyerApi } from "@/lib/api/buyer";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/buyer/profile")({
+  beforeLoad: createAuthGuard({ requiredRole: "BUYER" }),
   component: BuyerProfile,
 });
 
 function BuyerProfile() {
-  const [user, setUser] = useState<any>(null);
+  const { user: authUser, role } = useAuth();
+  const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,7 +30,7 @@ function BuyerProfile() {
         setLoading(true);
         setError(null);
         const result = await buyerApi.profile();
-        setUser(result);
+        setProfile(result);
       } catch (err) {
         setError("Failed to load profile. Please try again.");
         console.error(err);
@@ -40,7 +44,7 @@ function BuyerProfile() {
 
   if (loading) {
     return (
-      <DashboardLayout role="BUYER" userName="User">
+      <DashboardLayout role={role} userName={authUser?.firstName || "User"}>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -49,7 +53,7 @@ function BuyerProfile() {
   }
 
   return (
-    <DashboardLayout role="BUYER" userName={user?.name || "User"}>
+    <DashboardLayout role={role} userName={authUser?.firstName || "User"}>
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Profile</h2>
@@ -65,7 +69,7 @@ function BuyerProfile() {
           </Card>
         )}
 
-        {!error && user && (
+        {!error && profile && (
           <>
             <div className="grid gap-6 md:grid-cols-3">
               {/* Profile Card */}
@@ -74,21 +78,21 @@ function BuyerProfile() {
                   <div className="flex flex-col items-center text-center">
                     <div className="relative">
                       <Avatar className="h-24 w-24 mb-4">
-                        <AvatarImage src={user.avatar} alt={user.name} />
-                        <AvatarFallback className="text-2xl">{user.name?.charAt(0) || "U"}</AvatarFallback>
+                        <AvatarImage src={profile.avatar} alt={profile.name} />
+                        <AvatarFallback className="text-2xl">{profile.name?.charAt(0) || "U"}</AvatarFallback>
                       </Avatar>
                       <Button size="icon" variant="ghost" className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-background border">
                         <Camera className="h-4 w-4" />
                       </Button>
                     </div>
-                    <h3 className="text-xl font-semibold">{user.name}</h3>
-                    {user.verified && (
+                    <h3 className="text-xl font-semibold">{profile.name}</h3>
+                    {profile.verified && (
                       <Badge className="mt-2 bg-green-500">Verified Buyer</Badge>
                     )}
-                    <p className="text-sm text-muted-foreground mt-2">{user.email}</p>
+                    <p className="text-sm text-muted-foreground mt-2">{profile.email}</p>
                     <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
                       <Calendar className="h-3 w-3" />
-                      Member since {new Date(user.createdAt).toLocaleDateString("en-NG", { month: "long", year: "numeric" })}
+                      Member since {new Date(profile.createdAt).toLocaleDateString("en-NG", { month: "long", year: "numeric" })}
                     </div>
                   </div>
                 </CardContent>
@@ -104,32 +108,32 @@ function BuyerProfile() {
                     <div className="grid gap-4 md:grid-cols-2">
                       <div className="space-y-2">
                         <Label htmlFor="firstName">First Name</Label>
-                        <Input id="firstName" defaultValue={user.firstName} />
+                        <Input id="firstName" defaultValue={profile.firstName} />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="lastName">Last Name</Label>
-                        <Input id="lastName" defaultValue={user.lastName} />
+                        <Input id="lastName" defaultValue={profile.lastName} />
                       </div>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="email">Email</Label>
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input id="email" type="email" defaultValue={user.email} className="pl-10" />
+                        <Input id="email" type="email" defaultValue={profile.email} className="pl-10" />
                       </div>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="phone">Phone</Label>
                       <div className="relative">
                         <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input id="phone" type="tel" defaultValue={user.phone} className="pl-10" />
+                        <Input id="phone" type="tel" defaultValue={profile.phone} className="pl-10" />
                       </div>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="location">Location</Label>
                       <div className="relative">
                         <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input id="location" defaultValue={user.location} className="pl-10" />
+                        <Input id="location" defaultValue={profile.location} className="pl-10" />
                       </div>
                     </div>
                     <div className="space-y-2">
@@ -137,7 +141,7 @@ function BuyerProfile() {
                       <Textarea
                         id="bio"
                         placeholder="Tell us about yourself..."
-                        defaultValue={user.bio}
+                        defaultValue={profile.bio}
                         rows={4}
                       />
                     </div>
@@ -158,19 +162,19 @@ function BuyerProfile() {
               <CardContent>
                 <div className="grid gap-4 md:grid-cols-4">
                   <div className="text-center">
-                    <p className="text-2xl font-bold">{user.savedProperties || 0}</p>
+                    <p className="text-2xl font-bold">{profile.savedProperties || 0}</p>
                     <p className="text-sm text-muted-foreground">Saved Properties</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-2xl font-bold">{user.inspections || 0}</p>
+                    <p className="text-2xl font-bold">{profile.inspections || 0}</p>
                     <p className="text-sm text-muted-foreground">Inspections</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-2xl font-bold">{user.escrowTransactions || 0}</p>
+                    <p className="text-2xl font-bold">{profile.escrowTransactions || 0}</p>
                     <p className="text-sm text-muted-foreground">Escrow Transactions</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-2xl font-bold">₦{(user.totalSpent || 0).toLocaleString()}</p>
+                    <p className="text-2xl font-bold">₦{(profile.totalSpent || 0).toLocaleString()}</p>
                     <p className="text-sm text-muted-foreground">Total Spent</p>
                   </div>
                 </div>
@@ -191,7 +195,7 @@ function BuyerProfile() {
                       </div>
                       <div>
                         <p className="font-medium">Email Verified</p>
-                        <p className="text-sm text-muted-foreground">{user.email}</p>
+                        <p className="text-sm text-muted-foreground">{profile.email}</p>
                       </div>
                     </div>
                     <Badge className="bg-green-500">Verified</Badge>
@@ -203,7 +207,7 @@ function BuyerProfile() {
                       </div>
                       <div>
                         <p className="font-medium">Phone Verified</p>
-                        <p className="text-sm text-muted-foreground">{user.phone}</p>
+                        <p className="text-sm text-muted-foreground">{profile.phone}</p>
                       </div>
                     </div>
                     <Badge className="bg-green-500">Verified</Badge>

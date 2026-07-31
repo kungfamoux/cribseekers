@@ -5,12 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Home, Users, Briefcase, Calendar, DollarSign, TrendingUp, Clock, CheckCircle, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { agentApi } from "@/lib/api/agent";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/agent/dashboard")({
+  beforeLoad: createAuthGuard({ requiredRole: "AGENT" }),
   component: AgentDashboard,
 });
 
 function AgentDashboard() {
+  const { user, role } = useAuth();
   const [listings, setListings] = useState<any[]>([]);
   const [leads, setLeads] = useState<any[]>([]);
   const [deals, setDeals] = useState<any[]>([]);
@@ -59,7 +63,7 @@ function AgentDashboard() {
 
   if (loading) {
     return (
-      <DashboardLayout role="AGENT" userName="Tunde Adeyemi">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -68,10 +72,10 @@ function AgentDashboard() {
   }
 
   return (
-    <DashboardLayout role="AGENT" userName="Tunde Adeyemi">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Welcome back, Tunde!</h2>
+          <h2 className="text-3xl font-bold tracking-tight">Welcome back, {user?.firstName || "User"}!</h2>
           <p className="text-muted-foreground">Here's what's happening with your real estate business.</p>
         </div>
 

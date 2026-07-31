@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { authApi } from "@/lib/api/auth";
 import { configureApi } from "@/lib/api/client";
-import type { AuthSession, AuthTokens, User, UserRole } from "@/lib/api/types";
+import type { User, UserRole } from "@/lib/api/types";
 import { tokenStore } from "./storage";
 import { getPrimaryRole } from "./roles";
 
@@ -11,7 +11,7 @@ type AuthContextValue = {
   user: User | null;
   status: AuthStatus;
   role: UserRole | null;
-  setSession: (session: AuthSession) => void;
+  setUser: (user: User) => void;
   refreshUser: () => Promise<void>;
   logout: () => Promise<void>;
 };
@@ -30,23 +30,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     configureApi({
-      getAccessToken: () => tokenStore.getAccess(),
-      getRefreshToken: () => tokenStore.getRefresh(),
-      onRefreshed: (tokens: AuthTokens) => tokenStore.setTokens(tokens),
+      getAccessToken: () => null, // Tokens are now in cookies
+      getRefreshToken: () => null, // Tokens are now in cookies
+      onRefreshed: (tokens: any) => {
+        // Backend handles cookie updates automatically
+      },
       onSessionExpired: () => clearSession(),
     });
   }, [clearSession]);
 
   useEffect(() => {
     let cancelled = false;
-    const token = tokenStore.getAccess();
-    if (!token) {
-      setStatus("unauthenticated");
-      return;
-    }
+    
+    // Check for cached user data in localStorage
     const cached = tokenStore.getUser();
-    if (cached) setUser(cached);
+    if (cached) {
+      setUser(cached);
+      setStatus("authenticated");
+    }
 
+    // Fetch fresh user data to verify authentication
     authApi
       .me()
       .then((fresh) => {
@@ -57,25 +60,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       .catch(() => {
         if (cancelled) return;
-        tokenStore.clear();
-        setUser(null);
-        setStatus("unauthenticated");
+        clearSession();
       });
 
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [clearSession]);
 
-  const setSession = useCallback((session: AuthSession) => {
-    if (session.accessToken) {
-      tokenStore.setTokens({ accessToken: session.accessToken, refreshToken: session.refreshToken });
-    }
-    if (session.user) {
-      tokenStore.setUser(session.user);
-      setUser(session.user);
-      setStatus(session.accessToken ? "authenticated" : "unauthenticated");
-    }
+  const setUserData = useCallback((userData: User) => {
+    setUser(userData);
+    tokenStore.setUser(userData);
+    setStatus(userData ? "authenticated" : "unauthenticated");
   }, []);
 
   const refreshUser = useCallback(async () => {
@@ -93,7 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await authApi.logout();
     } catch {
-      // signing out locally is what matters
+      // Signing out locally is what matters
     }
     clearSession();
   }, [clearSession]);
@@ -104,8 +100,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [user]);
 
   const value = useMemo(
-    () => ({ user, status, role, setSession, refreshUser, logout }),
-    [user, status, role, setSession, refreshUser, logout],
+    () => ({ user, status, role, setUser: setUserData, refreshUser, logout }),
+    [user, status, role, setUserData, refreshUser, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

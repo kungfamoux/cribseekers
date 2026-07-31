@@ -5,12 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Building, Users, DollarSign, TrendingUp, Calendar, HardHat, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { developerApi } from "@/lib/api/developer";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/developer/dashboard")({
+  beforeLoad: createAuthGuard({ requiredRole: "DEVELOPER" }),
   component: DeveloperDashboard,
 });
 
 function DeveloperDashboard() {
+  const { user, role } = useAuth();
   const [projects, setProjects] = useState<any[]>([]);
   const [sales, setSales] = useState<any[]>([]);
   const [reservations, setReservations] = useState<any[]>([]);
@@ -54,7 +58,7 @@ function DeveloperDashboard() {
 
   if (loading) {
     return (
-      <DashboardLayout role="DEVELOPER" userName="Chike Nwosu">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -63,10 +67,10 @@ function DeveloperDashboard() {
   }
 
   return (
-    <DashboardLayout role="DEVELOPER" userName="Chike Nwosu">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Welcome back, Chike!</h2>
+          <h2 className="text-3xl font-bold tracking-tight">Welcome back, {user?.firstName || "User"}!</h2>
           <p className="text-muted-foreground">Here's what's happening with your development projects.</p>
         </div>
 

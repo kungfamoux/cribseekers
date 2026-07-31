@@ -82,7 +82,7 @@ const developerNavItems = [
 ];
 
 interface DashboardLayoutProps {
-  role: "BUYER" | "TENANT" | "LANDLORD" | "AGENT" | "DEVELOPER" | "ADMIN";
+  role?: "BUYER" | "TENANT" | "LANDLORD" | "AGENT" | "DEVELOPER" | "ADMIN" | null;
   userName?: string;
   userAvatar?: string;
   children?: ReactNode;
@@ -91,15 +91,19 @@ interface DashboardLayoutProps {
 export function DashboardLayout({ role, userName = "User", userAvatar }: DashboardLayoutProps) {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  
+  // Handle missing role gracefully - default to buyer navigation
+  const safeRole = role || "BUYER";
+  
   const navItems = useMemo(() => {
-    switch (role) {
+    switch (safeRole) {
       case "TENANT": return tenantNavItems;
       case "LANDLORD": return landlordNavItems;
       case "AGENT": return agentNavItems;
       case "DEVELOPER": return developerNavItems;
       default: return buyerNavItems;
     }
-  }, [role]);
+  }, [safeRole]);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -202,10 +206,10 @@ export function DashboardLayout({ role, userName = "User", userAvatar }: Dashboa
               <DropdownMenuLabel>{userName}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link to={`/${role.toLowerCase()}/profile`} search={undefined}>Profile</Link>
+                <Link to={`/${safeRole.toLowerCase()}/profile`} search={undefined}>Profile</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to={`/${role.toLowerCase()}/settings`} search={undefined}>Settings</Link>
+                <Link to={`/${safeRole.toLowerCase()}/settings`} search={undefined}>Settings</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
@@ -224,7 +228,7 @@ export function DashboardLayout({ role, userName = "User", userAvatar }: Dashboa
       {/* Desktop Main Content */}
       <div className="hidden flex-1 flex-col lg:flex">
         <header className="flex h-16 items-center justify-between border-b px-6">
-          <h1 className="text-xl font-semibold capitalize">{role} Dashboard</h1>
+          <h1 className="text-xl font-semibold capitalize">{safeRole} Dashboard</h1>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="gap-2">
@@ -239,10 +243,10 @@ export function DashboardLayout({ role, userName = "User", userAvatar }: Dashboa
               <DropdownMenuLabel>{userName}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link to={`/${role.toLowerCase()}/profile`} search={undefined}>Profile</Link>
+                <Link to={`/${safeRole.toLowerCase()}/profile`} search={undefined}>Profile</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to={`/${role.toLowerCase()}/settings`} search={undefined}>Settings</Link>
+                <Link to={`/${safeRole.toLowerCase()}/settings`} search={undefined}>Settings</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>

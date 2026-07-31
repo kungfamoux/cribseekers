@@ -8,12 +8,16 @@ import { Badge } from "@/components/ui/badge";
 import { Search, Send, MoreVertical, Phone, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { tenantApi } from "@/lib/api/tenant";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/tenant/messages")({
+  beforeLoad: createAuthGuard({ requiredRole: "TENANT" }),
   component: TenantMessages,
 });
 
 function TenantMessages() {
+  const { user, role } = useAuth();
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [conversations, setConversations] = useState<any[]>([]);
@@ -45,7 +49,7 @@ function TenantMessages() {
   const selectedChat = conversations.find((c) => c.id === selectedConversation);
 
   return (
-    <DashboardLayout role="TENANT" userName="Jane Doe">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Messages</h2>

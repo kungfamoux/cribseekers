@@ -6,12 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, MapPin, User, CheckCircle, XCircle, AlertCircle, Plus, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { agentApi } from "@/lib/api/agent";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/agent/appointments")({
+  beforeLoad: createAuthGuard({ requiredRole: "AGENT" }),
   component: AgentAppointments,
 });
 
 function AgentAppointments() {
+  const { user, role } = useAuth();
   const [appointments, setAppointments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -85,7 +89,7 @@ function AgentAppointments() {
 
   if (loading) {
     return (
-      <DashboardLayout role="AGENT" userName="Tunde Adeyemi">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -94,7 +98,7 @@ function AgentAppointments() {
   }
 
   return (
-    <DashboardLayout role="AGENT" userName="Tunde Adeyemi">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

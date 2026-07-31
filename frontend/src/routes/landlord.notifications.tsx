@@ -3,61 +3,40 @@ import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Bell, Check, Trash2, Calendar, Wrench, Wallet, MessageSquare, Building, Users } from "lucide-react";
+import { Bell, Check, Trash2, Calendar, Wrench, Wallet, MessageSquare, Building, Users, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { landlordApi } from "@/lib/api/landlord";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/landlord/notifications")({
+  beforeLoad: createAuthGuard({ requiredRole: "LANDLORD" }),
   component: LandlordNotifications,
 });
 
 function LandlordNotifications() {
-  // Mock data - replace with API call
-  const notifications = [
-    {
-      id: "1",
-      type: "payment",
-      title: "Rent Payment Received",
-      message: "Jane Doe has paid ₦125,000 for property at 123 Adeola Odeku Street",
-      time: "2 hours ago",
-      read: false,
-      icon: Wallet,
-    },
-    {
-      id: "2",
-      type: "maintenance",
-      title: "Maintenance Request",
-      message: "New maintenance request from tenant in Lekki Phase 1 property",
-      time: "5 hours ago",
-      read: false,
-      icon: Wrench,
-    },
-    {
-      id: "3",
-      type: "property",
-      title: "Property Verified",
-      message: "Your property at 46 Awolowo Road has been successfully verified",
-      time: "1 day ago",
-      read: true,
-      icon: Building,
-    },
-    {
-      id: "4",
-      type: "tenant",
-      title: "New Lease Agreement",
-      message: "Tunde Adeyemi has signed a lease agreement for property in Ikeja",
-      time: "2 days ago",
-      read: true,
-      icon: Users,
-    },
-    {
-      id: "5",
-      type: "message",
-      title: "New Message",
-      message: "You have a new message from agent Tunde Adeyemi",
-      time: "3 days ago",
-      read: true,
-      icon: MessageSquare,
-    },
-  ];
+  const { user, role } = useAuth();
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchNotifications() {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await landlordApi.notifications();
+        setNotifications(data);
+      } catch (err) {
+        setError("Failed to load notifications. Please try again.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchNotifications();
+  }, []);
 
   const getNotificationIcon = (icon: any) => {
     const Icon = icon;
@@ -81,8 +60,18 @@ function LandlordNotifications() {
     }
   };
 
+  if (loading) {
+    return (
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
-    <DashboardLayout role="landlord" userName="Emeka Okafor">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -99,92 +88,104 @@ function LandlordNotifications() {
           </div>
         </div>
 
-        {/* Unread Notifications */}
-        {notifications.filter((n) => !n.read).length > 0 && (
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Unread ({notifications.filter((n) => !n.read).length})</h3>
-            <div className="space-y-3">
-              {notifications
-                .filter((n) => !n.read)
-                .map((notification) => (
-                  <Card key={notification.id} className="border-l-4 border-l-primary">
-                    <CardContent className="p-4">
-                      <div className="flex items-start gap-4">
-                        <div className={`rounded-full p-2 ${getNotificationColor(notification.type)}`}>
-                          {getNotificationIcon(notification.icon)}
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-start justify-between">
-                            <div>
+        {error && (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <p className="text-red-500 mb-4">{error}</p>
+              <Button onClick={() => window.location.reload()}>Retry</Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {!error && (
+          <>
+            {/* Unread Notifications */}
+            {notifications.filter((n) => !n.read).length > 0 && (
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Unread ({notifications.filter((n) => !n.read).length})</h3>
+                <div className="space-y-3">
+                  {notifications
+                    .filter((n) => !n.read)
+                    .map((notification) => (
+                      <Card key={notification.id} className="border-l-4 border-l-primary">
+                        <CardContent className="p-4">
+                          <div className="flex items-start gap-4">
+                            <div className={`rounded-full p-2 ${getNotificationColor(notification.type)}`}>
+                              {getNotificationIcon(notification.icon)}
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-start justify-between">
+                                <div>
+                                  <h4 className="font-semibold">{notification.title}</h4>
+                                  <p className="text-sm text-muted-foreground mt-1">
+                                    {notification.message}
+                                  </p>
+                                </div>
+                                <Badge variant="outline" className="ml-2">
+                                  {notification.time}
+                                </Badge>
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button size="icon" variant="ghost" className="h-8 w-8">
+                                <Check className="h-4 w-4" />
+                              </Button>
+                              <Button size="icon" variant="ghost" className="h-8 w-8">
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                </div>
+              </div>
+            )}
+
+            {/* Earlier Notifications */}
+            {notifications.filter((n) => n.read).length > 0 && (
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Earlier</h3>
+                <div className="space-y-3">
+                  {notifications
+                    .filter((n) => n.read)
+                    .map((notification) => (
+                      <Card key={notification.id} className="opacity-75">
+                        <CardContent className="p-4">
+                          <div className="flex items-start gap-4">
+                            <div className={`rounded-full p-2 ${getNotificationColor(notification.type)}`}>
+                              {getNotificationIcon(notification.icon)}
+                            </div>
+                            <div className="flex-1">
                               <h4 className="font-semibold">{notification.title}</h4>
                               <p className="text-sm text-muted-foreground mt-1">
                                 {notification.message}
                               </p>
+                              <p className="text-xs text-muted-foreground mt-2">{notification.time}</p>
                             </div>
-                            <Badge variant="outline" className="ml-2">
-                              New
-                            </Badge>
+                            <Button size="icon" variant="ghost" className="h-8 w-8">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
                           </div>
-                          <p className="text-xs text-muted-foreground mt-2">{notification.time}</p>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button size="icon" variant="ghost" className="h-8 w-8">
-                            <Check className="h-4 w-4" />
-                          </Button>
-                          <Button size="icon" variant="ghost" className="h-8 w-8">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-            </div>
-          </div>
-        )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                </div>
+              </div>
+            )}
 
-        {/* Read Notifications */}
-        {notifications.filter((n) => n.read).length > 0 && (
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Earlier</h3>
-            <div className="space-y-3">
-              {notifications
-                .filter((n) => n.read)
-                .map((notification) => (
-                  <Card key={notification.id} className="opacity-75">
-                    <CardContent className="p-4">
-                      <div className="flex items-start gap-4">
-                        <div className={`rounded-full p-2 ${getNotificationColor(notification.type)}`}>
-                          {getNotificationIcon(notification.icon)}
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-semibold">{notification.title}</h4>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {notification.message}
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-2">{notification.time}</p>
-                        </div>
-                        <Button size="icon" variant="ghost" className="h-8 w-8">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-            </div>
-          </div>
-        )}
-
-        {notifications.length === 0 && (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <Bell className="h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No notifications</h3>
-              <p className="text-muted-foreground text-center">
-                You're all caught up! Check back later for updates.
-              </p>
-            </CardContent>
-          </Card>
+            {notifications.length === 0 && (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <Bell className="h-12 w-12 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No notifications</h3>
+                  <p className="text-muted-foreground text-center">
+                    You're all caught up! Check back later for updates.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </>
         )}
       </div>
     </DashboardLayout>

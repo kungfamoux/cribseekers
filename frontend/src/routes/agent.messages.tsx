@@ -5,95 +5,78 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Search, Send, MoreVertical, Phone, Video } from "lucide-react";
-import { useState } from "react";
+import { Search, Send, MoreVertical, Phone, Video, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { agentApi } from "@/lib/api/agent";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/agent/messages")({
+  beforeLoad: createAuthGuard({ requiredRole: "AGENT" }),
   component: AgentMessages,
 });
 
 function AgentMessages() {
-  const [selectedConversation, setSelectedConversation] = useState<string | null>("1");
+  const { user, role } = useAuth();
+  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [message, setMessage] = useState("");
+  const [conversations, setConversations] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock data - replace with API call
-  const conversations = [
-    {
-      id: "1",
-      name: "Jane Doe",
-      avatar: "",
-      role: "Buyer",
-      lastMessage: "I'm interested in the property in Lekki Phase 1",
-      time: "2m ago",
-      unread: 1,
-      online: true,
-    },
-    {
-      id: "2",
-      name: "Emeka Okafor",
-      avatar: "",
-      role: "Landlord",
-      lastMessage: "The property is still available for viewing",
-      time: "1h ago",
-      unread: 0,
-      online: false,
-    },
-    {
-      id: "3",
-      name: "Chioma Nwosu",
-      avatar: "",
-      role: "Developer",
-      lastMessage: "Let's discuss the commission rate for the new project",
-      time: "3h ago",
-      unread: 0,
-      online: false,
-    },
-  ];
+  useEffect(() => {
+    async function fetchMessages() {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await agentApi.messages();
+        setConversations(data);
+        if (data.length > 0) {
+          setSelectedConversation(data[0].id);
+        }
+      } catch (err) {
+        setError("Failed to load messages. Please try again.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
 
-  const messages = [
-    {
-      id: "1",
-      sender: "them",
-      text: "Hello! I saw your listing for the 4-bedroom duplex in Lekki.",
-      time: "10:30 AM",
-    },
-    {
-      id: "2",
-      sender: "me",
-      text: "Hi Jane! Yes, that property is still available. Would you like to schedule a viewing?",
-      time: "10:32 AM",
-    },
-    {
-      id: "3",
-      sender: "them",
-      text: "Yes, I'm interested in the property in Lekki Phase 1. What's the asking price?",
-      time: "10:35 AM",
-    },
-    {
-      id: "4",
-      sender: "me",
-      text: "The property is listed at ₦85,000,000. It's a newly built duplex with modern amenities.",
-      time: "10:36 AM",
-    },
-    {
-      id: "5",
-      sender: "them",
-      text: "That sounds good. Can we schedule a viewing for this weekend?",
-      time: "10:40 AM",
-    },
-  ];
+    fetchMessages();
+  }, []);
 
   const selectedChat = conversations.find((c) => c.id === selectedConversation);
+  const messages = selectedChat?.messages || [];
+
+  if (loading) {
+    return (
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
-    <DashboardLayout role="AGENT" userName="Tunde Adeyemi">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Messages</h2>
           <p className="text-muted-foreground">Communicate with buyers, landlords, and developers</p>
         </div>
 
-        <Card className="h-[600px]">
+        {error && (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <p className="text-red-500 mb-4">{error}</p>
+              <Button onClick={() => window.location.reload()}>Retry</Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {!error && (
+          <Card className="h-[600px]">
           <CardContent className="p-0 h-full">
             <div className="flex h-full">
               {/* Conversations List */}
@@ -237,6 +220,7 @@ function AgentMessages() {
             </div>
           </CardContent>
         </Card>
+        )}
       </div>
     </DashboardLayout>
   );

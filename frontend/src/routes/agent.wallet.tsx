@@ -6,12 +6,16 @@ import { Input } from "@/components/ui/input";
 import { Wallet, Plus, ArrowUpRight, ArrowDownLeft, CreditCard, Banknote, History, Briefcase, Calendar, CheckCircle, Clock } from "lucide-react";
 import { useState, useEffect } from "react";
 import { agentApi } from "@/lib/api/agent";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/agent/wallet")({
+  beforeLoad: createAuthGuard({ requiredRole: "AGENT" }),
   component: AgentWallet,
 });
 
 function AgentWallet() {
+  const { user, role } = useAuth();
   const [wallet, setWallet] = useState<any>(null);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -117,7 +121,7 @@ function AgentWallet() {
 
   if (loading) {
     return (
-      <DashboardLayout role="AGENT" userName="Tunde Adeyemi">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
@@ -126,7 +130,7 @@ function AgentWallet() {
   }
 
   return (
-    <DashboardLayout role="AGENT" userName="Tunde Adeyemi">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Wallet</h2>

@@ -6,12 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Bell, Check, Trash2, Calendar, Wrench, Wallet, MessageSquare, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { tenantApi } from "@/lib/api/tenant";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/tenant/notifications")({
+  beforeLoad: createAuthGuard({ requiredRole: "TENANT" }),
   component: TenantNotifications,
 });
 
 function TenantNotifications() {
+  const { user, role } = useAuth();
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -55,7 +59,7 @@ function TenantNotifications() {
   };
 
   return (
-    <DashboardLayout role="tenant" userName="Jane Doe">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

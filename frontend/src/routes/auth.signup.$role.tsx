@@ -57,7 +57,7 @@ function SignupPage() {
   const { role } = Route.useParams();
   const signupRole = role.toUpperCase() as RegistrationRole;
   const navigate = useNavigate();
-  const { setSession } = useAuth();
+  const { setUser } = useAuth();
 
   // Select the appropriate schema based on role
   const getSchema = () => {
@@ -113,8 +113,10 @@ function SignupPage() {
 
   const mutation = useMutation({
     mutationFn: (values: any) => authApi.register(values as any),
-    onSuccess: (session) => {
-      if (session?.accessToken) setSession(session);
+    onSuccess: (response) => {
+      // Backend sets httpOnly cookies automatically
+      // Store user data for immediate UI use
+      if (response?.user) setUser(response.user);
       toast.success("Account created. Let's verify your email.");
       navigate({ to: "/auth/verify-email", search: { email: form.getValues("email") } });
     },

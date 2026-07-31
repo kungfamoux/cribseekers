@@ -6,12 +6,16 @@ import { Input } from "@/components/ui/input";
 import { Wallet, Plus, ArrowUpRight, ArrowDownLeft, CreditCard, Banknote, History, Building, Calendar, CheckCircle, Clock } from "lucide-react";
 import { useState, useEffect } from "react";
 import { landlordApi } from "@/lib/api/landlord";
+import { createAuthGuard } from "@/lib/auth/route-guards";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export const Route = createFileRoute("/landlord/wallet")({
+  beforeLoad: createAuthGuard({ requiredRole: "LANDLORD" }),
   component: LandlordWallet,
 });
 
 function LandlordWallet() {
+  const { user, role } = useAuth();
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -23,42 +27,9 @@ function LandlordWallet() {
       try {
         setLoading(true);
         setError(null);
-        // Mock data - replace with actual API call
-        setBalance(4500000);
-        setTransactions([
-          {
-            id: "1",
-            type: "credit",
-            amount: 125000,
-            description: "Rent payment from Jane Doe",
-            date: "2026-07-30",
-            status: "completed",
-          },
-          {
-            id: "2",
-            type: "credit",
-            amount: 200000,
-            description: "Rent payment from Tunde Adeyemi",
-            date: "2026-07-29",
-            status: "completed",
-          },
-          {
-            id: "3",
-            type: "debit",
-            amount: 500000,
-            description: "Withdrawal to bank account",
-            date: "2026-07-28",
-            status: "completed",
-          },
-          {
-            id: "4",
-            type: "credit",
-            amount: 150000,
-            description: "Rent payment from Chioma Nwosu",
-            date: "2026-07-27",
-            status: "completed",
-          },
-        ]);
+        const walletData = await landlordApi.wallet();
+        setBalance(walletData.balance);
+        setTransactions(walletData.transactions || []);
       } catch (err) {
         setError("Failed to load wallet data. Please try again.");
         console.error(err);
@@ -112,7 +83,7 @@ function LandlordWallet() {
 
   if (loading) {
     return (
-      <DashboardLayout role="landlord" userName="Emeka Okafor">
+      <DashboardLayout role={role} userName={user?.firstName || "User"}>
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
@@ -121,7 +92,7 @@ function LandlordWallet() {
   }
 
   return (
-    <DashboardLayout role="landlord" userName="Emeka Okafor">
+    <DashboardLayout role={role} userName={user?.firstName || "User"}>
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Wallet</h2>
