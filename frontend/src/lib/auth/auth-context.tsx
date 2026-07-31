@@ -49,19 +49,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setStatus("authenticated");
     }
 
-    // Fetch fresh user data to verify authentication
-    authApi
-      .me()
-      .then((fresh) => {
-        if (cancelled) return;
-        setUser(fresh);
-        tokenStore.setUser(fresh);
-        setStatus("authenticated");
-      })
-      .catch(() => {
-        if (cancelled) return;
-        clearSession();
-      });
+    // Only fetch fresh user data if we have cached data
+    // This prevents unnecessary 401 errors on public pages
+    if (cached) {
+      authApi
+        .me()
+        .then((fresh) => {
+          if (cancelled) return;
+          setUser(fresh);
+          tokenStore.setUser(fresh);
+          setStatus("authenticated");
+        })
+        .catch(() => {
+          if (cancelled) return;
+          clearSession();
+        });
+    } else {
+      // No cached data, set status to unauthenticated immediately
+      setStatus("unauthenticated");
+    }
 
     return () => {
       cancelled = true;
