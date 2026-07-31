@@ -102,4 +102,28 @@ export const landlordApi = {
       auth: true,
       body: propertyData,
     }),
+
+  profile: async () => {
+    const payload = await apiFetch<unknown>("/landlord/profile", { auth: true });
+    return payload;
+  },
+
+  messages: async () => {
+    const payload = await apiFetch<unknown>("/landlord/messages", { auth: true });
+    const record = (payload ?? {}) as Record<string, unknown>;
+    const items = (record.items ?? record.data ?? []) as any[];
+    return Array.isArray(items) ? items : [];
+  },
+
+  notifications: async () => {
+    const payload = await apiFetch<unknown>("/landlord/notifications", { auth: true });
+    const record = (payload ?? {}) as Record<string, unknown>;
+    const items = (record.items ?? record.data ?? []) as any[];
+    return Array.isArray(items) ? items : [];
+  },
+
+  wallet: async () => {
+    const payload = await apiFetch<unknown>("/landlord/wallet", { auth: true });
+    return payload;
+  },
 };

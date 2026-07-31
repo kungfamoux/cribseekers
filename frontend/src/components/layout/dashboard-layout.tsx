@@ -1,6 +1,7 @@
 import { Link, Outlet, useLocation } from "@tanstack/react-router";
-import { Home, Search, Heart, ClipboardCheck, Wallet, Shield, MessageSquare, Bell, User, Settings, LogOut, Menu } from "lucide-react";
+import { Home, Search, Heart, ClipboardCheck, Wallet, Shield, MessageSquare, Bell, User, Settings, LogOut, Menu, Users, Calendar, Briefcase, Building, Layers, HardHat, TrendingUp, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useMemo } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -26,6 +27,60 @@ const buyerNavItems = [
   { to: "/buyer/settings" as any, icon: Settings, label: "Settings" },
 ];
 
+const tenantNavItems = [
+  { to: "/tenant/dashboard" as any, icon: Home, label: "Dashboard" },
+  { to: "/tenant/rentals" as any, icon: Home, label: "My Rentals" },
+  { to: "/tenant/maintenance" as any, icon: ClipboardCheck, label: "Maintenance" },
+  { to: "/tenant/payments" as any, icon: Wallet, label: "Payments" },
+  { to: "/tenant/wallet" as any, icon: Wallet, label: "Wallet" },
+  { to: "/tenant/messages" as any, icon: MessageSquare, label: "Messages" },
+  { to: "/tenant/notifications" as any, icon: Bell, label: "Notifications" },
+  { to: "/tenant/profile" as any, icon: User, label: "Profile" },
+  { to: "/tenant/settings" as any, icon: Settings, label: "Settings" },
+];
+
+const landlordNavItems = [
+  { to: "/landlord/dashboard" as any, icon: Home, label: "Dashboard" },
+  { to: "/landlord/properties" as any, icon: Home, label: "Properties" },
+  { to: "/landlord/tenants" as any, icon: Users, label: "Tenants" },
+  { to: "/landlord/payments" as any, icon: Wallet, label: "Payments" },
+  { to: "/landlord/wallet" as any, icon: Wallet, label: "Wallet" },
+  { to: "/landlord/messages" as any, icon: MessageSquare, label: "Messages" },
+  { to: "/landlord/notifications" as any, icon: Bell, label: "Notifications" },
+  { to: "/landlord/profile" as any, icon: User, label: "Profile" },
+  { to: "/landlord/settings" as any, icon: Settings, label: "Settings" },
+];
+
+const agentNavItems = [
+  { to: "/agent/dashboard" as any, icon: Home, label: "Dashboard" },
+  { to: "/agent/listings" as any, icon: Home, label: "Listings" },
+  { to: "/agent/leads" as any, icon: Users, label: "Leads" },
+  { to: "/agent/clients" as any, icon: Users, label: "Clients" },
+  { to: "/agent/appointments" as any, icon: Calendar, label: "Appointments" },
+  { to: "/agent/deals" as any, icon: Briefcase, label: "Deals" },
+  { to: "/agent/commissions" as any, icon: DollarSign, label: "Commissions" },
+  { to: "/agent/wallet" as any, icon: Wallet, label: "Wallet" },
+  { to: "/agent/messages" as any, icon: MessageSquare, label: "Messages" },
+  { to: "/agent/notifications" as any, icon: Bell, label: "Notifications" },
+  { to: "/agent/profile" as any, icon: User, label: "Profile" },
+  { to: "/agent/settings" as any, icon: Settings, label: "Settings" },
+];
+
+const developerNavItems = [
+  { to: "/developer/dashboard" as any, icon: Home, label: "Dashboard" },
+  { to: "/developer/projects" as any, icon: Building, label: "Projects" },
+  { to: "/developer/units" as any, icon: Layers, label: "Units" },
+  {to: "/developer/construction" as any, icon: HardHat, label: "Construction" },
+  { to: "/developer/reservations" as any, icon: Calendar, label: "Reservations" },
+  { to: "/developer/sales" as any, icon: DollarSign, label: "Sales" },
+  { to: "/developer/reports" as any, icon: TrendingUp, label: "Reports" },
+  { to: "/developer/wallet" as any, icon: Wallet, label: "Wallet" },
+  { to: "/developer/messages" as any, icon: MessageSquare, label: "Messages" },
+  { to: "/developer/notifications" as any, icon: Bell, label: "Notifications" },
+  { to: "/developer/profile" as any, icon: User, label: "Profile" },
+  { to: "/developer/settings" as any, icon: Settings, label: "Settings" },
+];
+
 interface DashboardLayoutProps {
   role: "BUYER" | "TENANT" | "LANDLORD" | "AGENT" | "DEVELOPER" | "ADMIN";
   userName?: string;
@@ -36,7 +91,15 @@ interface DashboardLayoutProps {
 export function DashboardLayout({ role, userName = "User", userAvatar }: DashboardLayoutProps) {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const navItems = buyerNavItems; // Will be dynamic based on role
+  const navItems = useMemo(() => {
+    switch (role) {
+      case "TENANT": return tenantNavItems;
+      case "LANDLORD": return landlordNavItems;
+      case "AGENT": return agentNavItems;
+      case "DEVELOPER": return developerNavItems;
+      default: return buyerNavItems;
+    }
+  }, [role]);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -139,10 +202,10 @@ export function DashboardLayout({ role, userName = "User", userAvatar }: Dashboa
               <DropdownMenuLabel>{userName}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link to="/buyer/profile" search={undefined}>Profile</Link>
+                <Link to={`/${role.toLowerCase()}/profile`} search={undefined}>Profile</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/buyer/settings" search={undefined}>Settings</Link>
+                <Link to={`/${role.toLowerCase()}/settings`} search={undefined}>Settings</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
@@ -176,10 +239,10 @@ export function DashboardLayout({ role, userName = "User", userAvatar }: Dashboa
               <DropdownMenuLabel>{userName}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link to="/buyer/profile" search={undefined}>Profile</Link>
+                <Link to={`/${role.toLowerCase()}/profile`} search={undefined}>Profile</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/buyer/settings" search={undefined}>Settings</Link>
+                <Link to={`/${role.toLowerCase()}/settings`} search={undefined}>Settings</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>

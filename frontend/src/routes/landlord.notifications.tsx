@@ -3,36 +3,61 @@ import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Bell, Check, Trash2, Calendar, Wrench, Wallet, MessageSquare, Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
-import { tenantApi } from "@/lib/api/tenant";
+import { Bell, Check, Trash2, Calendar, Wrench, Wallet, MessageSquare, Building, Users } from "lucide-react";
 
-export const Route = createFileRoute("/tenant/notifications")({
-  component: TenantNotifications,
+export const Route = createFileRoute("/landlord/notifications")({
+  component: LandlordNotifications,
 });
 
-function TenantNotifications() {
-  const [notifications, setNotifications] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchNotifications() {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await tenantApi.notifications();
-        setNotifications(data);
-      } catch (err) {
-        setError("Failed to load notifications. Please try again.");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchNotifications();
-  }, []);
+function LandlordNotifications() {
+  // Mock data - replace with API call
+  const notifications = [
+    {
+      id: "1",
+      type: "payment",
+      title: "Rent Payment Received",
+      message: "Jane Doe has paid ₦125,000 for property at 123 Adeola Odeku Street",
+      time: "2 hours ago",
+      read: false,
+      icon: Wallet,
+    },
+    {
+      id: "2",
+      type: "maintenance",
+      title: "Maintenance Request",
+      message: "New maintenance request from tenant in Lekki Phase 1 property",
+      time: "5 hours ago",
+      read: false,
+      icon: Wrench,
+    },
+    {
+      id: "3",
+      type: "property",
+      title: "Property Verified",
+      message: "Your property at 46 Awolowo Road has been successfully verified",
+      time: "1 day ago",
+      read: true,
+      icon: Building,
+    },
+    {
+      id: "4",
+      type: "tenant",
+      title: "New Lease Agreement",
+      message: "Tunde Adeyemi has signed a lease agreement for property in Ikeja",
+      time: "2 days ago",
+      read: true,
+      icon: Users,
+    },
+    {
+      id: "5",
+      type: "message",
+      title: "New Message",
+      message: "You have a new message from agent Tunde Adeyemi",
+      time: "3 days ago",
+      read: true,
+      icon: MessageSquare,
+    },
+  ];
 
   const getNotificationIcon = (icon: any) => {
     const Icon = icon;
@@ -42,25 +67,27 @@ function TenantNotifications() {
   const getNotificationColor = (type: string) => {
     switch (type) {
       case "payment":
-        return "bg-orange-500/10 text-orange-500";
-      case "maintenance":
-        return "bg-blue-500/10 text-blue-500";
-      case "wallet":
         return "bg-green-500/10 text-green-500";
-      case "message":
+      case "maintenance":
+        return "bg-orange-500/10 text-orange-500";
+      case "property":
+        return "bg-blue-500/10 text-blue-500";
+      case "tenant":
         return "bg-purple-500/10 text-purple-500";
+      case "message":
+        return "bg-pink-500/10 text-pink-500";
       default:
         return "bg-muted text-muted-foreground";
     }
   };
 
   return (
-    <DashboardLayout role="tenant" userName="Jane Doe">
+    <DashboardLayout role="landlord" userName="Emeka Okafor">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-3xl font-bold tracking-tight">Notifications</h2>
-            <p className="text-muted-foreground">Stay updated on your rental activities</p>
+            <p className="text-muted-foreground">Stay updated on your property activities</p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm">
@@ -72,25 +99,6 @@ function TenantNotifications() {
           </div>
         </div>
 
-        {loading && (
-          <Card>
-            <CardContent className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            </CardContent>
-          </Card>
-        )}
-
-        {error && (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <p className="text-red-500 mb-4">{error}</p>
-              <Button onClick={() => window.location.reload()}>Retry</Button>
-            </CardContent>
-          </Card>
-        )}
-
-        {!loading && !error && (
-          <>
         {/* Unread Notifications */}
         {notifications.filter((n) => !n.read).length > 0 && (
           <div>
@@ -177,8 +185,6 @@ function TenantNotifications() {
               </p>
             </CardContent>
           </Card>
-        )}
-          </>
         )}
       </div>
     </DashboardLayout>

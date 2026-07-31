@@ -16,6 +16,18 @@ import { Route as FaqRouteImport } from './routes/faq'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as LegalRouteImport } from './routes/legal'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as AgentAppointmentsRouteImport } from './routes/agent.appointments'
+import { Route as AgentClientsRouteImport } from './routes/agent.clients'
+import { Route as AgentCommissionsRouteImport } from './routes/agent.commissions'
+import { Route as AgentDashboardRouteImport } from './routes/agent.dashboard'
+import { Route as AgentDealsRouteImport } from './routes/agent.deals'
+import { Route as AgentLeadsRouteImport } from './routes/agent.leads'
+import { Route as AgentListingsRouteImport } from './routes/agent.listings'
+import { Route as AgentMessagesRouteImport } from './routes/agent.messages'
+import { Route as AgentNotificationsRouteImport } from './routes/agent.notifications'
+import { Route as AgentProfileRouteImport } from './routes/agent.profile'
+import { Route as AgentSettingsRouteImport } from './routes/agent.settings'
+import { Route as AgentWalletRouteImport } from './routes/agent.wallet'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
@@ -32,10 +44,27 @@ import { Route as BuyerSavedRouteImport } from './routes/buyer.saved'
 import { Route as BuyerSearchRouteImport } from './routes/buyer.search'
 import { Route as BuyerSettingsRouteImport } from './routes/buyer.settings'
 import { Route as BuyerWalletRouteImport } from './routes/buyer.wallet'
+import { Route as DeveloperConstructionRouteImport } from './routes/developer.construction'
+import { Route as DeveloperDashboardRouteImport } from './routes/developer.dashboard'
+import { Route as DeveloperMessagesRouteImport } from './routes/developer.messages'
+import { Route as DeveloperNotificationsRouteImport } from './routes/developer.notifications'
+import { Route as DeveloperProfileRouteImport } from './routes/developer.profile'
+import { Route as DeveloperProjectsRouteImport } from './routes/developer.projects'
+import { Route as DeveloperReportsRouteImport } from './routes/developer.reports'
+import { Route as DeveloperReservationsRouteImport } from './routes/developer.reservations'
+import { Route as DeveloperSalesRouteImport } from './routes/developer.sales'
+import { Route as DeveloperSettingsRouteImport } from './routes/developer.settings'
+import { Route as DeveloperUnitsRouteImport } from './routes/developer.units'
+import { Route as DeveloperWalletRouteImport } from './routes/developer.wallet'
 import { Route as LandlordDashboardRouteImport } from './routes/landlord.dashboard'
+import { Route as LandlordMessagesRouteImport } from './routes/landlord.messages'
+import { Route as LandlordNotificationsRouteImport } from './routes/landlord.notifications'
 import { Route as LandlordPaymentsRouteImport } from './routes/landlord.payments'
+import { Route as LandlordProfileRouteImport } from './routes/landlord.profile'
 import { Route as LandlordPropertiesRouteImport } from './routes/landlord.properties'
+import { Route as LandlordSettingsRouteImport } from './routes/landlord.settings'
 import { Route as LandlordTenantsRouteImport } from './routes/landlord.tenants'
+import { Route as LandlordWalletRouteImport } from './routes/landlord.wallet'
 import { Route as PropertyIdRouteImport } from './routes/property.$id'
 import { Route as TenantDashboardRouteImport } from './routes/tenant.dashboard'
 import { Route as TenantMaintenanceRouteImport } from './routes/tenant.maintenance'
@@ -81,6 +110,66 @@ const LegalRoute = LegalRouteImport.update({
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgentAppointmentsRoute = AgentAppointmentsRouteImport.update({
+  id: '/agent/appointments',
+  path: '/agent/appointments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgentClientsRoute = AgentClientsRouteImport.update({
+  id: '/agent/clients',
+  path: '/agent/clients',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgentCommissionsRoute = AgentCommissionsRouteImport.update({
+  id: '/agent/commissions',
+  path: '/agent/commissions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgentDashboardRoute = AgentDashboardRouteImport.update({
+  id: '/agent/dashboard',
+  path: '/agent/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgentDealsRoute = AgentDealsRouteImport.update({
+  id: '/agent/deals',
+  path: '/agent/deals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgentLeadsRoute = AgentLeadsRouteImport.update({
+  id: '/agent/leads',
+  path: '/agent/leads',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgentListingsRoute = AgentListingsRouteImport.update({
+  id: '/agent/listings',
+  path: '/agent/listings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgentMessagesRoute = AgentMessagesRouteImport.update({
+  id: '/agent/messages',
+  path: '/agent/messages',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgentNotificationsRoute = AgentNotificationsRouteImport.update({
+  id: '/agent/notifications',
+  path: '/agent/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgentProfileRoute = AgentProfileRouteImport.update({
+  id: '/agent/profile',
+  path: '/agent/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgentSettingsRoute = AgentSettingsRouteImport.update({
+  id: '/agent/settings',
+  path: '/agent/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgentWalletRoute = AgentWalletRouteImport.update({
+  id: '/agent/wallet',
+  path: '/agent/wallet',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
@@ -163,9 +252,79 @@ const BuyerWalletRoute = BuyerWalletRouteImport.update({
   path: '/buyer/wallet',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DeveloperConstructionRoute = DeveloperConstructionRouteImport.update({
+  id: '/developer/construction',
+  path: '/developer/construction',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeveloperDashboardRoute = DeveloperDashboardRouteImport.update({
+  id: '/developer/dashboard',
+  path: '/developer/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeveloperMessagesRoute = DeveloperMessagesRouteImport.update({
+  id: '/developer/messages',
+  path: '/developer/messages',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeveloperNotificationsRoute = DeveloperNotificationsRouteImport.update({
+  id: '/developer/notifications',
+  path: '/developer/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeveloperProfileRoute = DeveloperProfileRouteImport.update({
+  id: '/developer/profile',
+  path: '/developer/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeveloperProjectsRoute = DeveloperProjectsRouteImport.update({
+  id: '/developer/projects',
+  path: '/developer/projects',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeveloperReportsRoute = DeveloperReportsRouteImport.update({
+  id: '/developer/reports',
+  path: '/developer/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeveloperReservationsRoute = DeveloperReservationsRouteImport.update({
+  id: '/developer/reservations',
+  path: '/developer/reservations',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeveloperSalesRoute = DeveloperSalesRouteImport.update({
+  id: '/developer/sales',
+  path: '/developer/sales',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeveloperSettingsRoute = DeveloperSettingsRouteImport.update({
+  id: '/developer/settings',
+  path: '/developer/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeveloperUnitsRoute = DeveloperUnitsRouteImport.update({
+  id: '/developer/units',
+  path: '/developer/units',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeveloperWalletRoute = DeveloperWalletRouteImport.update({
+  id: '/developer/wallet',
+  path: '/developer/wallet',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LandlordDashboardRoute = LandlordDashboardRouteImport.update({
   id: '/landlord/dashboard',
   path: '/landlord/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LandlordMessagesRoute = LandlordMessagesRouteImport.update({
+  id: '/landlord/messages',
+  path: '/landlord/messages',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LandlordNotificationsRoute = LandlordNotificationsRouteImport.update({
+  id: '/landlord/notifications',
+  path: '/landlord/notifications',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LandlordPaymentsRoute = LandlordPaymentsRouteImport.update({
@@ -173,14 +332,29 @@ const LandlordPaymentsRoute = LandlordPaymentsRouteImport.update({
   path: '/landlord/payments',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LandlordProfileRoute = LandlordProfileRouteImport.update({
+  id: '/landlord/profile',
+  path: '/landlord/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LandlordPropertiesRoute = LandlordPropertiesRouteImport.update({
   id: '/landlord/properties',
   path: '/landlord/properties',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LandlordSettingsRoute = LandlordSettingsRouteImport.update({
+  id: '/landlord/settings',
+  path: '/landlord/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LandlordTenantsRoute = LandlordTenantsRouteImport.update({
   id: '/landlord/tenants',
   path: '/landlord/tenants',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LandlordWalletRoute = LandlordWalletRouteImport.update({
+  id: '/landlord/wallet',
+  path: '/landlord/wallet',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PropertyIdRoute = PropertyIdRouteImport.update({
@@ -247,6 +421,18 @@ export interface FileRoutesByFullPath {
   '/help': typeof HelpRoute
   '/legal': typeof LegalRoute
   '/search': typeof SearchRoute
+  '/agent/appointments': typeof AgentAppointmentsRoute
+  '/agent/clients': typeof AgentClientsRoute
+  '/agent/commissions': typeof AgentCommissionsRoute
+  '/agent/dashboard': typeof AgentDashboardRoute
+  '/agent/deals': typeof AgentDealsRoute
+  '/agent/leads': typeof AgentLeadsRoute
+  '/agent/listings': typeof AgentListingsRoute
+  '/agent/messages': typeof AgentMessagesRoute
+  '/agent/notifications': typeof AgentNotificationsRoute
+  '/agent/profile': typeof AgentProfileRoute
+  '/agent/settings': typeof AgentSettingsRoute
+  '/agent/wallet': typeof AgentWalletRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -263,10 +449,27 @@ export interface FileRoutesByFullPath {
   '/buyer/search': typeof BuyerSearchRoute
   '/buyer/settings': typeof BuyerSettingsRoute
   '/buyer/wallet': typeof BuyerWalletRoute
+  '/developer/construction': typeof DeveloperConstructionRoute
+  '/developer/dashboard': typeof DeveloperDashboardRoute
+  '/developer/messages': typeof DeveloperMessagesRoute
+  '/developer/notifications': typeof DeveloperNotificationsRoute
+  '/developer/profile': typeof DeveloperProfileRoute
+  '/developer/projects': typeof DeveloperProjectsRoute
+  '/developer/reports': typeof DeveloperReportsRoute
+  '/developer/reservations': typeof DeveloperReservationsRoute
+  '/developer/sales': typeof DeveloperSalesRoute
+  '/developer/settings': typeof DeveloperSettingsRoute
+  '/developer/units': typeof DeveloperUnitsRoute
+  '/developer/wallet': typeof DeveloperWalletRoute
   '/landlord/dashboard': typeof LandlordDashboardRoute
+  '/landlord/messages': typeof LandlordMessagesRoute
+  '/landlord/notifications': typeof LandlordNotificationsRoute
   '/landlord/payments': typeof LandlordPaymentsRoute
+  '/landlord/profile': typeof LandlordProfileRoute
   '/landlord/properties': typeof LandlordPropertiesRoute
+  '/landlord/settings': typeof LandlordSettingsRoute
   '/landlord/tenants': typeof LandlordTenantsRoute
+  '/landlord/wallet': typeof LandlordWalletRoute
   '/property/$id': typeof PropertyIdRoute
   '/tenant/dashboard': typeof TenantDashboardRoute
   '/tenant/maintenance': typeof TenantMaintenanceRoute
@@ -287,6 +490,18 @@ export interface FileRoutesByTo {
   '/help': typeof HelpRoute
   '/legal': typeof LegalRoute
   '/search': typeof SearchRoute
+  '/agent/appointments': typeof AgentAppointmentsRoute
+  '/agent/clients': typeof AgentClientsRoute
+  '/agent/commissions': typeof AgentCommissionsRoute
+  '/agent/dashboard': typeof AgentDashboardRoute
+  '/agent/deals': typeof AgentDealsRoute
+  '/agent/leads': typeof AgentLeadsRoute
+  '/agent/listings': typeof AgentListingsRoute
+  '/agent/messages': typeof AgentMessagesRoute
+  '/agent/notifications': typeof AgentNotificationsRoute
+  '/agent/profile': typeof AgentProfileRoute
+  '/agent/settings': typeof AgentSettingsRoute
+  '/agent/wallet': typeof AgentWalletRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -303,10 +518,27 @@ export interface FileRoutesByTo {
   '/buyer/search': typeof BuyerSearchRoute
   '/buyer/settings': typeof BuyerSettingsRoute
   '/buyer/wallet': typeof BuyerWalletRoute
+  '/developer/construction': typeof DeveloperConstructionRoute
+  '/developer/dashboard': typeof DeveloperDashboardRoute
+  '/developer/messages': typeof DeveloperMessagesRoute
+  '/developer/notifications': typeof DeveloperNotificationsRoute
+  '/developer/profile': typeof DeveloperProfileRoute
+  '/developer/projects': typeof DeveloperProjectsRoute
+  '/developer/reports': typeof DeveloperReportsRoute
+  '/developer/reservations': typeof DeveloperReservationsRoute
+  '/developer/sales': typeof DeveloperSalesRoute
+  '/developer/settings': typeof DeveloperSettingsRoute
+  '/developer/units': typeof DeveloperUnitsRoute
+  '/developer/wallet': typeof DeveloperWalletRoute
   '/landlord/dashboard': typeof LandlordDashboardRoute
+  '/landlord/messages': typeof LandlordMessagesRoute
+  '/landlord/notifications': typeof LandlordNotificationsRoute
   '/landlord/payments': typeof LandlordPaymentsRoute
+  '/landlord/profile': typeof LandlordProfileRoute
   '/landlord/properties': typeof LandlordPropertiesRoute
+  '/landlord/settings': typeof LandlordSettingsRoute
   '/landlord/tenants': typeof LandlordTenantsRoute
+  '/landlord/wallet': typeof LandlordWalletRoute
   '/property/$id': typeof PropertyIdRoute
   '/tenant/dashboard': typeof TenantDashboardRoute
   '/tenant/maintenance': typeof TenantMaintenanceRoute
@@ -328,6 +560,18 @@ export interface FileRoutesById {
   '/help': typeof HelpRoute
   '/legal': typeof LegalRoute
   '/search': typeof SearchRoute
+  '/agent/appointments': typeof AgentAppointmentsRoute
+  '/agent/clients': typeof AgentClientsRoute
+  '/agent/commissions': typeof AgentCommissionsRoute
+  '/agent/dashboard': typeof AgentDashboardRoute
+  '/agent/deals': typeof AgentDealsRoute
+  '/agent/leads': typeof AgentLeadsRoute
+  '/agent/listings': typeof AgentListingsRoute
+  '/agent/messages': typeof AgentMessagesRoute
+  '/agent/notifications': typeof AgentNotificationsRoute
+  '/agent/profile': typeof AgentProfileRoute
+  '/agent/settings': typeof AgentSettingsRoute
+  '/agent/wallet': typeof AgentWalletRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -344,10 +588,27 @@ export interface FileRoutesById {
   '/buyer/search': typeof BuyerSearchRoute
   '/buyer/settings': typeof BuyerSettingsRoute
   '/buyer/wallet': typeof BuyerWalletRoute
+  '/developer/construction': typeof DeveloperConstructionRoute
+  '/developer/dashboard': typeof DeveloperDashboardRoute
+  '/developer/messages': typeof DeveloperMessagesRoute
+  '/developer/notifications': typeof DeveloperNotificationsRoute
+  '/developer/profile': typeof DeveloperProfileRoute
+  '/developer/projects': typeof DeveloperProjectsRoute
+  '/developer/reports': typeof DeveloperReportsRoute
+  '/developer/reservations': typeof DeveloperReservationsRoute
+  '/developer/sales': typeof DeveloperSalesRoute
+  '/developer/settings': typeof DeveloperSettingsRoute
+  '/developer/units': typeof DeveloperUnitsRoute
+  '/developer/wallet': typeof DeveloperWalletRoute
   '/landlord/dashboard': typeof LandlordDashboardRoute
+  '/landlord/messages': typeof LandlordMessagesRoute
+  '/landlord/notifications': typeof LandlordNotificationsRoute
   '/landlord/payments': typeof LandlordPaymentsRoute
+  '/landlord/profile': typeof LandlordProfileRoute
   '/landlord/properties': typeof LandlordPropertiesRoute
+  '/landlord/settings': typeof LandlordSettingsRoute
   '/landlord/tenants': typeof LandlordTenantsRoute
+  '/landlord/wallet': typeof LandlordWalletRoute
   '/property/$id': typeof PropertyIdRoute
   '/tenant/dashboard': typeof TenantDashboardRoute
   '/tenant/maintenance': typeof TenantMaintenanceRoute
@@ -370,6 +631,18 @@ export interface FileRouteTypes {
     | '/help'
     | '/legal'
     | '/search'
+    | '/agent/appointments'
+    | '/agent/clients'
+    | '/agent/commissions'
+    | '/agent/dashboard'
+    | '/agent/deals'
+    | '/agent/leads'
+    | '/agent/listings'
+    | '/agent/messages'
+    | '/agent/notifications'
+    | '/agent/profile'
+    | '/agent/settings'
+    | '/agent/wallet'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
@@ -386,10 +659,27 @@ export interface FileRouteTypes {
     | '/buyer/search'
     | '/buyer/settings'
     | '/buyer/wallet'
+    | '/developer/construction'
+    | '/developer/dashboard'
+    | '/developer/messages'
+    | '/developer/notifications'
+    | '/developer/profile'
+    | '/developer/projects'
+    | '/developer/reports'
+    | '/developer/reservations'
+    | '/developer/sales'
+    | '/developer/settings'
+    | '/developer/units'
+    | '/developer/wallet'
     | '/landlord/dashboard'
+    | '/landlord/messages'
+    | '/landlord/notifications'
     | '/landlord/payments'
+    | '/landlord/profile'
     | '/landlord/properties'
+    | '/landlord/settings'
     | '/landlord/tenants'
+    | '/landlord/wallet'
     | '/property/$id'
     | '/tenant/dashboard'
     | '/tenant/maintenance'
@@ -410,6 +700,18 @@ export interface FileRouteTypes {
     | '/help'
     | '/legal'
     | '/search'
+    | '/agent/appointments'
+    | '/agent/clients'
+    | '/agent/commissions'
+    | '/agent/dashboard'
+    | '/agent/deals'
+    | '/agent/leads'
+    | '/agent/listings'
+    | '/agent/messages'
+    | '/agent/notifications'
+    | '/agent/profile'
+    | '/agent/settings'
+    | '/agent/wallet'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
@@ -426,10 +728,27 @@ export interface FileRouteTypes {
     | '/buyer/search'
     | '/buyer/settings'
     | '/buyer/wallet'
+    | '/developer/construction'
+    | '/developer/dashboard'
+    | '/developer/messages'
+    | '/developer/notifications'
+    | '/developer/profile'
+    | '/developer/projects'
+    | '/developer/reports'
+    | '/developer/reservations'
+    | '/developer/sales'
+    | '/developer/settings'
+    | '/developer/units'
+    | '/developer/wallet'
     | '/landlord/dashboard'
+    | '/landlord/messages'
+    | '/landlord/notifications'
     | '/landlord/payments'
+    | '/landlord/profile'
     | '/landlord/properties'
+    | '/landlord/settings'
     | '/landlord/tenants'
+    | '/landlord/wallet'
     | '/property/$id'
     | '/tenant/dashboard'
     | '/tenant/maintenance'
@@ -450,6 +769,18 @@ export interface FileRouteTypes {
     | '/help'
     | '/legal'
     | '/search'
+    | '/agent/appointments'
+    | '/agent/clients'
+    | '/agent/commissions'
+    | '/agent/dashboard'
+    | '/agent/deals'
+    | '/agent/leads'
+    | '/agent/listings'
+    | '/agent/messages'
+    | '/agent/notifications'
+    | '/agent/profile'
+    | '/agent/settings'
+    | '/agent/wallet'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
@@ -466,10 +797,27 @@ export interface FileRouteTypes {
     | '/buyer/search'
     | '/buyer/settings'
     | '/buyer/wallet'
+    | '/developer/construction'
+    | '/developer/dashboard'
+    | '/developer/messages'
+    | '/developer/notifications'
+    | '/developer/profile'
+    | '/developer/projects'
+    | '/developer/reports'
+    | '/developer/reservations'
+    | '/developer/sales'
+    | '/developer/settings'
+    | '/developer/units'
+    | '/developer/wallet'
     | '/landlord/dashboard'
+    | '/landlord/messages'
+    | '/landlord/notifications'
     | '/landlord/payments'
+    | '/landlord/profile'
     | '/landlord/properties'
+    | '/landlord/settings'
     | '/landlord/tenants'
+    | '/landlord/wallet'
     | '/property/$id'
     | '/tenant/dashboard'
     | '/tenant/maintenance'
@@ -491,6 +839,18 @@ export interface RootRouteChildren {
   HelpRoute: typeof HelpRoute
   LegalRoute: typeof LegalRoute
   SearchRoute: typeof SearchRoute
+  AgentAppointmentsRoute: typeof AgentAppointmentsRoute
+  AgentClientsRoute: typeof AgentClientsRoute
+  AgentCommissionsRoute: typeof AgentCommissionsRoute
+  AgentDashboardRoute: typeof AgentDashboardRoute
+  AgentDealsRoute: typeof AgentDealsRoute
+  AgentLeadsRoute: typeof AgentLeadsRoute
+  AgentListingsRoute: typeof AgentListingsRoute
+  AgentMessagesRoute: typeof AgentMessagesRoute
+  AgentNotificationsRoute: typeof AgentNotificationsRoute
+  AgentProfileRoute: typeof AgentProfileRoute
+  AgentSettingsRoute: typeof AgentSettingsRoute
+  AgentWalletRoute: typeof AgentWalletRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
@@ -507,10 +867,27 @@ export interface RootRouteChildren {
   BuyerSearchRoute: typeof BuyerSearchRoute
   BuyerSettingsRoute: typeof BuyerSettingsRoute
   BuyerWalletRoute: typeof BuyerWalletRoute
+  DeveloperConstructionRoute: typeof DeveloperConstructionRoute
+  DeveloperDashboardRoute: typeof DeveloperDashboardRoute
+  DeveloperMessagesRoute: typeof DeveloperMessagesRoute
+  DeveloperNotificationsRoute: typeof DeveloperNotificationsRoute
+  DeveloperProfileRoute: typeof DeveloperProfileRoute
+  DeveloperProjectsRoute: typeof DeveloperProjectsRoute
+  DeveloperReportsRoute: typeof DeveloperReportsRoute
+  DeveloperReservationsRoute: typeof DeveloperReservationsRoute
+  DeveloperSalesRoute: typeof DeveloperSalesRoute
+  DeveloperSettingsRoute: typeof DeveloperSettingsRoute
+  DeveloperUnitsRoute: typeof DeveloperUnitsRoute
+  DeveloperWalletRoute: typeof DeveloperWalletRoute
   LandlordDashboardRoute: typeof LandlordDashboardRoute
+  LandlordMessagesRoute: typeof LandlordMessagesRoute
+  LandlordNotificationsRoute: typeof LandlordNotificationsRoute
   LandlordPaymentsRoute: typeof LandlordPaymentsRoute
+  LandlordProfileRoute: typeof LandlordProfileRoute
   LandlordPropertiesRoute: typeof LandlordPropertiesRoute
+  LandlordSettingsRoute: typeof LandlordSettingsRoute
   LandlordTenantsRoute: typeof LandlordTenantsRoute
+  LandlordWalletRoute: typeof LandlordWalletRoute
   PropertyIdRoute: typeof PropertyIdRoute
   TenantDashboardRoute: typeof TenantDashboardRoute
   TenantMaintenanceRoute: typeof TenantMaintenanceRoute
@@ -573,6 +950,90 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agent/appointments': {
+      id: '/agent/appointments'
+      path: '/agent/appointments'
+      fullPath: '/agent/appointments'
+      preLoaderRoute: typeof AgentAppointmentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agent/clients': {
+      id: '/agent/clients'
+      path: '/agent/clients'
+      fullPath: '/agent/clients'
+      preLoaderRoute: typeof AgentClientsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agent/commissions': {
+      id: '/agent/commissions'
+      path: '/agent/commissions'
+      fullPath: '/agent/commissions'
+      preLoaderRoute: typeof AgentCommissionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agent/dashboard': {
+      id: '/agent/dashboard'
+      path: '/agent/dashboard'
+      fullPath: '/agent/dashboard'
+      preLoaderRoute: typeof AgentDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agent/deals': {
+      id: '/agent/deals'
+      path: '/agent/deals'
+      fullPath: '/agent/deals'
+      preLoaderRoute: typeof AgentDealsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agent/leads': {
+      id: '/agent/leads'
+      path: '/agent/leads'
+      fullPath: '/agent/leads'
+      preLoaderRoute: typeof AgentLeadsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agent/listings': {
+      id: '/agent/listings'
+      path: '/agent/listings'
+      fullPath: '/agent/listings'
+      preLoaderRoute: typeof AgentListingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agent/messages': {
+      id: '/agent/messages'
+      path: '/agent/messages'
+      fullPath: '/agent/messages'
+      preLoaderRoute: typeof AgentMessagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agent/notifications': {
+      id: '/agent/notifications'
+      path: '/agent/notifications'
+      fullPath: '/agent/notifications'
+      preLoaderRoute: typeof AgentNotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agent/profile': {
+      id: '/agent/profile'
+      path: '/agent/profile'
+      fullPath: '/agent/profile'
+      preLoaderRoute: typeof AgentProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agent/settings': {
+      id: '/agent/settings'
+      path: '/agent/settings'
+      fullPath: '/agent/settings'
+      preLoaderRoute: typeof AgentSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agent/wallet': {
+      id: '/agent/wallet'
+      path: '/agent/wallet'
+      fullPath: '/agent/wallet'
+      preLoaderRoute: typeof AgentWalletRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/forgot-password': {
@@ -687,11 +1148,109 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BuyerWalletRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/developer/construction': {
+      id: '/developer/construction'
+      path: '/developer/construction'
+      fullPath: '/developer/construction'
+      preLoaderRoute: typeof DeveloperConstructionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/developer/dashboard': {
+      id: '/developer/dashboard'
+      path: '/developer/dashboard'
+      fullPath: '/developer/dashboard'
+      preLoaderRoute: typeof DeveloperDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/developer/messages': {
+      id: '/developer/messages'
+      path: '/developer/messages'
+      fullPath: '/developer/messages'
+      preLoaderRoute: typeof DeveloperMessagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/developer/notifications': {
+      id: '/developer/notifications'
+      path: '/developer/notifications'
+      fullPath: '/developer/notifications'
+      preLoaderRoute: typeof DeveloperNotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/developer/profile': {
+      id: '/developer/profile'
+      path: '/developer/profile'
+      fullPath: '/developer/profile'
+      preLoaderRoute: typeof DeveloperProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/developer/projects': {
+      id: '/developer/projects'
+      path: '/developer/projects'
+      fullPath: '/developer/projects'
+      preLoaderRoute: typeof DeveloperProjectsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/developer/reports': {
+      id: '/developer/reports'
+      path: '/developer/reports'
+      fullPath: '/developer/reports'
+      preLoaderRoute: typeof DeveloperReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/developer/reservations': {
+      id: '/developer/reservations'
+      path: '/developer/reservations'
+      fullPath: '/developer/reservations'
+      preLoaderRoute: typeof DeveloperReservationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/developer/sales': {
+      id: '/developer/sales'
+      path: '/developer/sales'
+      fullPath: '/developer/sales'
+      preLoaderRoute: typeof DeveloperSalesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/developer/settings': {
+      id: '/developer/settings'
+      path: '/developer/settings'
+      fullPath: '/developer/settings'
+      preLoaderRoute: typeof DeveloperSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/developer/units': {
+      id: '/developer/units'
+      path: '/developer/units'
+      fullPath: '/developer/units'
+      preLoaderRoute: typeof DeveloperUnitsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/developer/wallet': {
+      id: '/developer/wallet'
+      path: '/developer/wallet'
+      fullPath: '/developer/wallet'
+      preLoaderRoute: typeof DeveloperWalletRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/landlord/dashboard': {
       id: '/landlord/dashboard'
       path: '/landlord/dashboard'
       fullPath: '/landlord/dashboard'
       preLoaderRoute: typeof LandlordDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/landlord/messages': {
+      id: '/landlord/messages'
+      path: '/landlord/messages'
+      fullPath: '/landlord/messages'
+      preLoaderRoute: typeof LandlordMessagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/landlord/notifications': {
+      id: '/landlord/notifications'
+      path: '/landlord/notifications'
+      fullPath: '/landlord/notifications'
+      preLoaderRoute: typeof LandlordNotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/landlord/payments': {
@@ -701,6 +1260,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LandlordPaymentsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/landlord/profile': {
+      id: '/landlord/profile'
+      path: '/landlord/profile'
+      fullPath: '/landlord/profile'
+      preLoaderRoute: typeof LandlordProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/landlord/properties': {
       id: '/landlord/properties'
       path: '/landlord/properties'
@@ -708,11 +1274,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LandlordPropertiesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/landlord/settings': {
+      id: '/landlord/settings'
+      path: '/landlord/settings'
+      fullPath: '/landlord/settings'
+      preLoaderRoute: typeof LandlordSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/landlord/tenants': {
       id: '/landlord/tenants'
       path: '/landlord/tenants'
       fullPath: '/landlord/tenants'
       preLoaderRoute: typeof LandlordTenantsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/landlord/wallet': {
+      id: '/landlord/wallet'
+      path: '/landlord/wallet'
+      fullPath: '/landlord/wallet'
+      preLoaderRoute: typeof LandlordWalletRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/property/$id': {
@@ -803,6 +1383,18 @@ const rootRouteChildren: RootRouteChildren = {
   HelpRoute: HelpRoute,
   LegalRoute: LegalRoute,
   SearchRoute: SearchRoute,
+  AgentAppointmentsRoute: AgentAppointmentsRoute,
+  AgentClientsRoute: AgentClientsRoute,
+  AgentCommissionsRoute: AgentCommissionsRoute,
+  AgentDashboardRoute: AgentDashboardRoute,
+  AgentDealsRoute: AgentDealsRoute,
+  AgentLeadsRoute: AgentLeadsRoute,
+  AgentListingsRoute: AgentListingsRoute,
+  AgentMessagesRoute: AgentMessagesRoute,
+  AgentNotificationsRoute: AgentNotificationsRoute,
+  AgentProfileRoute: AgentProfileRoute,
+  AgentSettingsRoute: AgentSettingsRoute,
+  AgentWalletRoute: AgentWalletRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
@@ -819,10 +1411,27 @@ const rootRouteChildren: RootRouteChildren = {
   BuyerSearchRoute: BuyerSearchRoute,
   BuyerSettingsRoute: BuyerSettingsRoute,
   BuyerWalletRoute: BuyerWalletRoute,
+  DeveloperConstructionRoute: DeveloperConstructionRoute,
+  DeveloperDashboardRoute: DeveloperDashboardRoute,
+  DeveloperMessagesRoute: DeveloperMessagesRoute,
+  DeveloperNotificationsRoute: DeveloperNotificationsRoute,
+  DeveloperProfileRoute: DeveloperProfileRoute,
+  DeveloperProjectsRoute: DeveloperProjectsRoute,
+  DeveloperReportsRoute: DeveloperReportsRoute,
+  DeveloperReservationsRoute: DeveloperReservationsRoute,
+  DeveloperSalesRoute: DeveloperSalesRoute,
+  DeveloperSettingsRoute: DeveloperSettingsRoute,
+  DeveloperUnitsRoute: DeveloperUnitsRoute,
+  DeveloperWalletRoute: DeveloperWalletRoute,
   LandlordDashboardRoute: LandlordDashboardRoute,
+  LandlordMessagesRoute: LandlordMessagesRoute,
+  LandlordNotificationsRoute: LandlordNotificationsRoute,
   LandlordPaymentsRoute: LandlordPaymentsRoute,
+  LandlordProfileRoute: LandlordProfileRoute,
   LandlordPropertiesRoute: LandlordPropertiesRoute,
+  LandlordSettingsRoute: LandlordSettingsRoute,
   LandlordTenantsRoute: LandlordTenantsRoute,
+  LandlordWalletRoute: LandlordWalletRoute,
   PropertyIdRoute: PropertyIdRoute,
   TenantDashboardRoute: TenantDashboardRoute,
   TenantMaintenanceRoute: TenantMaintenanceRoute,

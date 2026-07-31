@@ -104,4 +104,23 @@ export const buyerApi = {
 
   initiateEscrow: async (propertyId: string, amount: number) =>
     apiFetch<EscrowTransaction>("/buyer/escrow", { method: "POST", auth: true, body: { propertyId, amount } }),
+
+  profile: async () => {
+    const payload = await apiFetch<unknown>("/buyer/profile", { auth: true });
+    return payload;
+  },
+
+  messages: async () => {
+    const payload = await apiFetch<unknown>("/buyer/messages", { auth: true });
+    const record = (payload ?? {}) as Record<string, unknown>;
+    const items = (record.items ?? record.data ?? []) as any[];
+    return Array.isArray(items) ? items : [];
+  },
+
+  notifications: async () => {
+    const payload = await apiFetch<unknown>("/buyer/notifications", { auth: true });
+    const record = (payload ?? {}) as Record<string, unknown>;
+    const items = (record.items ?? record.data ?? []) as any[];
+    return Array.isArray(items) ? items : [];
+  },
 };

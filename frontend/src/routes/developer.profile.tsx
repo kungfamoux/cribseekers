@@ -7,15 +7,15 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { User, Mail, Phone, MapPin, Calendar, Camera, Save, Loader2 } from "lucide-react";
+import { User, Mail, Phone, MapPin, Calendar, Camera, Save, Building, Briefcase, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { buyerApi } from "@/lib/api/buyer";
+import { developerApi } from "@/lib/api/developer";
 
-export const Route = createFileRoute("/buyer/profile")({
-  component: BuyerProfile,
+export const Route = createFileRoute("/developer/profile")({
+  component: DeveloperProfile,
 });
 
-function BuyerProfile() {
+function DeveloperProfile() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +25,7 @@ function BuyerProfile() {
       try {
         setLoading(true);
         setError(null);
-        const result = await buyerApi.profile();
+        const result = await developerApi.profile();
         setUser(result);
       } catch (err) {
         setError("Failed to load profile. Please try again.");
@@ -40,7 +40,7 @@ function BuyerProfile() {
 
   if (loading) {
     return (
-      <DashboardLayout role="BUYER" userName="User">
+      <DashboardLayout role="DEVELOPER" userName="Chike Nwosu">
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -49,7 +49,7 @@ function BuyerProfile() {
   }
 
   return (
-    <DashboardLayout role="BUYER" userName={user?.name || "User"}>
+    <DashboardLayout role="DEVELOPER" userName={user?.name || "Chike Nwosu"}>
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Profile</h2>
@@ -75,7 +75,7 @@ function BuyerProfile() {
                     <div className="relative">
                       <Avatar className="h-24 w-24 mb-4">
                         <AvatarImage src={user.avatar} alt={user.name} />
-                        <AvatarFallback className="text-2xl">{user.name?.charAt(0) || "U"}</AvatarFallback>
+                        <AvatarFallback className="text-2xl">{user.name?.charAt(0) || "C"}</AvatarFallback>
                       </Avatar>
                       <Button size="icon" variant="ghost" className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-background border">
                         <Camera className="h-4 w-4" />
@@ -83,7 +83,7 @@ function BuyerProfile() {
                     </div>
                     <h3 className="text-xl font-semibold">{user.name}</h3>
                     {user.verified && (
-                      <Badge className="mt-2 bg-green-500">Verified Buyer</Badge>
+                      <Badge className="mt-2 bg-green-500">Verified Developer</Badge>
                     )}
                     <p className="text-sm text-muted-foreground mt-2">{user.email}</p>
                     <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
@@ -137,7 +137,7 @@ function BuyerProfile() {
                       <Textarea
                         id="bio"
                         placeholder="Tell us about yourself..."
-                        defaultValue={user.bio}
+                    defaultValue={user.bio}
                         rows={4}
                       />
                     </div>
@@ -150,6 +150,38 @@ function BuyerProfile() {
               </Card>
             </div>
 
+            {/* Company Information */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Building className="h-5 w-5" />
+                  Company Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form className="space-y-4">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="companyName">Company Name</Label>
+                      <div className="relative">
+                        <Building className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input id="companyName" defaultValue={user.companyName} className="pl-10" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="rcNumber">RC Number</Label>
+                      <Input id="rcNumber" defaultValue={user.rcNumber} />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="officeAddress">Office Address</Label>
+                    <Input id="officeAddress" defaultValue={user.officeAddress} />
+                  </div>
+                  <Button>Update Company Info</Button>
+                </form>
+              </CardContent>
+            </Card>
+
             {/* Account Statistics */}
             <Card>
               <CardHeader>
@@ -158,69 +190,20 @@ function BuyerProfile() {
               <CardContent>
                 <div className="grid gap-4 md:grid-cols-4">
                   <div className="text-center">
-                    <p className="text-2xl font-bold">{user.savedProperties || 0}</p>
-                    <p className="text-sm text-muted-foreground">Saved Properties</p>
+                    <p className="text-2xl font-bold">{user.totalProjects || 0}</p>
+                    <p className="text-sm text-muted-foreground">Total Projects</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-2xl font-bold">{user.inspections || 0}</p>
-                    <p className="text-sm text-muted-foreground">Inspections</p>
+                    <p className="text-2xl font-bold">{user.totalUnits || 0}</p>
+                    <p className="text-sm text-muted-foreground">Total Units</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-2xl font-bold">{user.escrowTransactions || 0}</p>
-                    <p className="text-sm text-muted-foreground">Escrow Transactions</p>
+                    <p className="text-2xl font-bold">{user.unitsSold || 0}</p>
+                    <p className="text-sm text-muted-foreground">Units Sold</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-2xl font-bold">₦{(user.totalSpent || 0).toLocaleString()}</p>
-                    <p className="text-sm text-muted-foreground">Total Spent</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Verification Status */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Verification Status</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 rounded-lg bg-muted">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-green-500/10 flex items-center justify-center">
-                        <Mail className="h-5 w-5 text-green-500" />
-                      </div>
-                      <div>
-                        <p className="font-medium">Email Verified</p>
-                        <p className="text-sm text-muted-foreground">{user.email}</p>
-                      </div>
-                    </div>
-                    <Badge className="bg-green-500">Verified</Badge>
-                  </div>
-                  <div className="flex items-center justify-between p-4 rounded-lg bg-muted">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-green-500/10 flex items-center justify-center">
-                        <Phone className="h-5 w-5 text-green-500" />
-                      </div>
-                      <div>
-                        <p className="font-medium">Phone Verified</p>
-                        <p className="text-sm text-muted-foreground">{user.phone}</p>
-                      </div>
-                    </div>
-                    <Badge className="bg-green-500">Verified</Badge>
-                  </div>
-                  <div className="flex items-center justify-between p-4 rounded-lg bg-muted">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-orange-500/10 flex items-center justify-center">
-                        <User className="h-5 w-5 text-orange-500" />
-                      </div>
-                      <div>
-                        <p className="font-medium">Identity Verification</p>
-                        <p className="text-sm text-muted-foreground">Upload government ID</p>
-                      </div>
-                    </div>
-                    <Button size="sm" variant="outline">
-                      Verify Now
-                    </Button>
+                    <p className="text-2xl font-bold">₦{(user.totalRevenue || 0).toLocaleString()}</p>
+                    <p className="text-sm text-muted-foreground">Total Revenue</p>
                   </div>
                 </div>
               </CardContent>

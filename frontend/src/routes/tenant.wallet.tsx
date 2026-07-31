@@ -3,22 +3,52 @@ import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Wallet, Plus, ArrowUpRight, ArrowDownLeft, CreditCard, Banknote, History } from "lucide-react";
+import { Wallet, Plus, ArrowUpRight, ArrowDownLeft, CreditCard, Banknote, History, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { tenantApi } from "@/lib/api/tenant";
 
 export const Route = createFileRoute("/tenant/wallet")({
   component: TenantWallet,
 });
 
 function TenantWallet() {
-  // Mock data - replace with API call
-  const balance = 150000;
-  const transactions = [
-    { id: "1", type: "credit", amount: 100000, description: "Wallet Funding", date: "2024-01-18" },
-    { id: "2", type: "debit", amount: 125000, description: "Rent Payment - 2-Bedroom Apartment", date: "2024-01-17" },
-    { id: "3", type: "credit", amount: 200000, description: "Wallet Funding", date: "2024-01-15" },
-    { id: "4", type: "debit", amount: 250000, description: "Rent Payment - 3-Bedroom Flat", date: "2024-01-14" },
-    { id: "5", type: "credit", amount: 75000, description: "Refund", date: "2024-01-12" },
-  ];
+  const [wallet, setWallet] = useState<any>(null);
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [fundAmount, setFundAmount] = useState("");
+
+  useEffect(() => {
+    async function fetchWalletData() {
+      try {
+        setLoading(true);
+        setError(null);
+        const walletData = await tenantApi.wallet();
+        setWallet(walletData);
+        // Note: Add transactions API call when available
+        setTransactions([]);
+      } catch (err) {
+        setError("Failed to load wallet data. Please try again.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchWalletData();
+  }, []);
+
+  const handleFundWallet = async () => {
+    const amount = parseInt(fundAmount);
+    if (!amount || amount <= 0) return;
+
+    try {
+      // Add fund wallet API call when available
+      setFundAmount("");
+    } catch (err) {
+      console.error("Failed to fund wallet:", err);
+    }
+  };
 
   const formatAmount = (amount: number) => {
     return new Intl.NumberFormat("en-NG", {
@@ -36,6 +66,29 @@ function TenantWallet() {
     });
   };
 
+  if (loading) {
+    return (
+      <DashboardLayout role="tenant" userName="Jane Doe">
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <DashboardLayout role="tenant" userName="Jane Doe">
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <p className="text-red-500 mb-4">{error}</p>
+            <Button onClick={() => window.location.reload()}>Retry</Button>
+          </CardContent>
+        </Card>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout role="tenant" userName="Jane Doe">
       <div className="space-y-6">
@@ -50,7 +103,7 @@ function TenantWallet() {
             <CardTitle className="text-primary-foreground/80">Available Balance</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold mb-4">{formatAmount(balance)}</div>
+            <div className="text-4xl font-bold mb-4">{formatAmount(wallet?.balance || 0)}</div>
             <div className="flex gap-3">
               <Button className="bg-background text-foreground hover:bg-background/90">
                 <Plus className="mr-2 h-4 w-4" />
@@ -102,8 +155,8 @@ function TenantWallet() {
           </CardHeader>
           <CardContent>
             <div className="flex gap-3">
-              <Input type="number" placeholder="Enter amount (₦)" className="flex-1" />
-              <Button>Add Funds</Button>
+              <Input type="number" placeholder="Enter amount (₦)" className="flex-1" value={fundAmount} onChange={(e) => setFundAmount(e.target.value)} />
+              <Button onClick={handleFundWallet}>Add Funds</Button>
             </div>
             <div className="flex gap-2 mt-4">
               <Button variant="outline" size="sm">₦10,000</Button>

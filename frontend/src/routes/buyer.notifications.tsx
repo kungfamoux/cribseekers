@@ -3,61 +3,36 @@ import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Bell, Check, Trash2, Calendar, Shield, Heart, MessageSquare, Wallet } from "lucide-react";
+import { Bell, Check, Trash2, Calendar, Shield, Heart, MessageSquare, Wallet, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { buyerApi } from "@/lib/api/buyer";
 
 export const Route = createFileRoute("/buyer/notifications")({
   component: BuyerNotifications,
 });
 
 function BuyerNotifications() {
-  // Mock data - replace with API call
-  const notifications = [
-    {
-      id: "1",
-      type: "inspection",
-      title: "Inspection Reminder",
-      message: "Your property inspection is scheduled for tomorrow at 2:00 PM",
-      time: "2 hours ago",
-      read: false,
-      icon: Calendar,
-    },
-    {
-      id: "2",
-      type: "escrow",
-      title: "Escrow Update",
-      message: "Your escrow payment has been successfully released to the seller",
-      time: "5 hours ago",
-      read: false,
-      icon: Shield,
-    },
-    {
-      id: "3",
-      type: "property",
-      title: "Price Drop Alert",
-      message: "A property you saved has dropped in price by ₦5,000,000",
-      time: "1 day ago",
-      read: true,
-      icon: Heart,
-    },
-    {
-      id: "4",
-      type: "message",
-      title: "New Message",
-      message: "You have a new message from Tunde Adeyemi",
-      time: "2 days ago",
-      read: true,
-      icon: MessageSquare,
-    },
-    {
-      id: "5",
-      type: "wallet",
-      title: "Wallet Funded",
-      message: "Your wallet has been credited with ₦100,000",
-      time: "3 days ago",
-      read: true,
-      icon: Wallet,
-    },
-  ];
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchNotifications() {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await buyerApi.notifications();
+        setNotifications(data);
+      } catch (err) {
+        setError("Failed to load notifications. Please try again.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchNotifications();
+  }, []);
 
   const getNotificationIcon = (icon: any) => {
     const Icon = icon;
@@ -99,6 +74,25 @@ function BuyerNotifications() {
           </div>
         </div>
 
+        {loading && (
+          <Card>
+            <CardContent className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </CardContent>
+          </Card>
+        )}
+
+        {error && (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <p className="text-red-500 mb-4">{error}</p>
+              <Button onClick={() => window.location.reload()}>Retry</Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {!loading && !error && (
+          <>
         {/* Unread Notifications */}
         {notifications.filter((n) => !n.read).length > 0 && (
           <div>
@@ -185,6 +179,8 @@ function BuyerNotifications() {
               </p>
             </CardContent>
           </Card>
+        )}
+          </>
         )}
       </div>
     </DashboardLayout>

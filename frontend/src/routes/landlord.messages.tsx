@@ -5,72 +5,101 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Search, Send, MoreVertical, Phone, Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
-import { tenantApi } from "@/lib/api/tenant";
+import { Search, Send, MoreVertical, Phone, Video } from "lucide-react";
+import { useState } from "react";
 
-export const Route = createFileRoute("/tenant/messages")({
-  component: TenantMessages,
+export const Route = createFileRoute("/landlord/messages")({
+  component: LandlordMessages,
 });
 
-function TenantMessages() {
-  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
+function LandlordMessages() {
+  const [selectedConversation, setSelectedConversation] = useState<string | null>("1");
   const [message, setMessage] = useState("");
-  const [conversations, setConversations] = useState<any[]>([]);
-  const [messages, setMessages] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchMessages() {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await tenantApi.messages();
-        setConversations(data);
-        if (data.length > 0) {
-          setSelectedConversation(data[0].id);
-        }
-      } catch (err) {
-        setError("Failed to load messages. Please try again.");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
+  // Mock data - replace with API call
+  const conversations = [
+    {
+      id: "1",
+      name: "Jane Doe",
+      avatar: "",
+      role: "Tenant",
+      lastMessage: "The maintenance request has been scheduled for tomorrow",
+      time: "2m ago",
+      unread: 1,
+      online: true,
+    },
+    {
+      id: "2",
+      name: "Tunde Adeyemi",
+      avatar: "",
+      role: "Agent",
+      lastMessage: "I have a potential buyer interested in your property in Lekki",
+      time: "1h ago",
+      unread: 0,
+      online: false,
+    },
+    {
+      id: "3",
+      name: "CribSeekers Support",
+      avatar: "",
+      role: "Support",
+      lastMessage: "Your property verification has been completed successfully",
+      time: "3h ago",
+      unread: 0,
+      online: false,
+    },
+  ];
 
-    fetchMessages();
-  }, []);
+  const messages = [
+    {
+      id: "1",
+      sender: "them",
+      text: "Hello! I wanted to report a maintenance issue in my apartment.",
+      time: "10:30 AM",
+    },
+    {
+      id: "2",
+      sender: "me",
+      text: "Hi Jane, what seems to be the problem?",
+      time: "10:32 AM",
+    },
+    {
+      id: "3",
+      sender: "them",
+      text: "The kitchen faucet has been leaking for 2 days now.",
+      time: "10:35 AM",
+    },
+    {
+      id: "4",
+      sender: "me",
+      text: "I understand. I'll schedule a plumber to come fix it tomorrow.",
+      time: "10:36 AM",
+    },
+    {
+      id: "5",
+      sender: "them",
+      text: "Thank you so much! What time should I expect them?",
+      time: "10:38 AM",
+    },
+    {
+      id: "6",
+      sender: "me",
+      text: "The maintenance request has been scheduled for tomorrow between 9 AM and 12 PM.",
+      time: "10:40 AM",
+    },
+  ];
 
   const selectedChat = conversations.find((c) => c.id === selectedConversation);
 
   return (
-    <DashboardLayout role="TENANT" userName="Jane Doe">
+    <DashboardLayout role="LANDLORD" userName="Emeka Okafor">
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Messages</h2>
-          <p className="text-muted-foreground">Communicate with landlords and support</p>
+          <p className="text-muted-foreground">Communicate with tenants, agents, and support</p>
         </div>
 
-        {loading && (
-          <Card>
-            <CardContent className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            </CardContent>
-          </Card>
-        )}
-
-        {error && (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <p className="text-red-500 mb-4">{error}</p>
-              <Button onClick={() => window.location.reload()}>Retry</Button>
-            </CardContent>
-          </Card>
-        )}
-
-        {!loading && !error && (
-          <Card className="h-[600px]">
+        <Card className="h-[600px]">
           <CardContent className="p-0 h-full">
             <div className="flex h-full">
               {/* Conversations List */}
@@ -146,6 +175,9 @@ function TenantMessages() {
                           <Phone className="h-4 w-4" />
                         </Button>
                         <Button size="icon" variant="ghost">
+                          <Video className="h-4 w-4" />
+                        </Button>
+                        <Button size="icon" variant="ghost">
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </div>
@@ -189,8 +221,9 @@ function TenantMessages() {
                           placeholder="Type a message..."
                           value={message}
                           onChange={(e) => setMessage(e.target.value)}
-                          onKeyPress={(e) => {
-                            if (e.key === "Enter") {
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" && message.trim()) {
+                              // Handle send message
                               setMessage("");
                             }
                           }}
@@ -203,14 +236,13 @@ function TenantMessages() {
                   </>
                 ) : (
                   <div className="flex-1 flex items-center justify-center">
-                    <p className="text-muted-foreground">Select a conversation to start chatting</p>
+                    <p className="text-muted-foreground">Select a conversation to start messaging</p>
                   </div>
                 )}
               </div>
             </div>
           </CardContent>
         </Card>
-        )}
       </div>
     </DashboardLayout>
   );

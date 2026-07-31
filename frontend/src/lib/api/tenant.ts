@@ -77,4 +77,28 @@ export const tenantApi = {
       auth: true,
       body: { rentalId, issue, description, priority },
     }),
+
+  profile: async () => {
+    const payload = await apiFetch<unknown>("/tenant/profile", { auth: true });
+    return payload;
+  },
+
+  messages: async () => {
+    const payload = await apiFetch<unknown>("/tenant/messages", { auth: true });
+    const record = (payload ?? {}) as Record<string, unknown>;
+    const items = (record.items ?? record.data ?? []) as any[];
+    return Array.isArray(items) ? items : [];
+  },
+
+  notifications: async () => {
+    const payload = await apiFetch<unknown>("/tenant/notifications", { auth: true });
+    const record = (payload ?? {}) as Record<string, unknown>;
+    const items = (record.items ?? record.data ?? []) as any[];
+    return Array.isArray(items) ? items : [];
+  },
+
+  wallet: async () => {
+    const payload = await apiFetch<unknown>("/tenant/wallet", { auth: true });
+    return payload;
+  },
 };

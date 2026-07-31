@@ -5,87 +5,42 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Search, Send, MoreVertical, Phone, Video } from "lucide-react";
-import { useState } from "react";
+import { Search, Send, MoreVertical, Phone, Video, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { buyerApi } from "@/lib/api/buyer";
 
 export const Route = createFileRoute("/buyer/messages")({
   component: BuyerMessages,
 });
 
 function BuyerMessages() {
-  const [selectedConversation, setSelectedConversation] = useState<string | null>("1");
+  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [message, setMessage] = useState("");
+  const [conversations, setConversations] = useState<any[]>([]);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock data - replace with API call
-  const conversations = [
-    {
-      id: "1",
-      name: "Tunde Adeyemi",
-      avatar: "",
-      role: "Agent",
-      lastMessage: "The property is still available for inspection. When would you like to schedule?",
-      time: "2m ago",
-      unread: 2,
-      online: true,
-    },
-    {
-      id: "2",
-      name: "Chioma Nwosu",
-      avatar: "",
-      role: "Agent",
-      lastMessage: "I've sent you the inspection report. Please review and let me know if you have any questions.",
-      time: "1h ago",
-      unread: 0,
-      online: false,
-    },
-    {
-      id: "3",
-      name: "Emeka Okafor",
-      avatar: "",
-      role: "Landlord",
-      lastMessage: "Thank you for your interest. The rent is ₦2.5M per annum.",
-      time: "3h ago",
-      unread: 1,
-      online: true,
-    },
-    {
-      id: "4",
-      name: "CribSeekers Support",
-      avatar: "",
-      role: "Support",
-      lastMessage: "Your escrow transaction has been successfully initiated.",
-      time: "1d ago",
-      unread: 0,
-      online: false,
-    },
-  ];
+  useEffect(() => {
+    async function fetchMessages() {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await buyerApi.messages();
+        setConversations(data);
+        if (data.length > 0) {
+          setSelectedConversation(data[0].id);
+        }
+      } catch (err) {
+        setError("Failed to load messages. Please try again.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
 
-  const messages = [
-    {
-      id: "1",
-      sender: "them",
-      text: "Hello! I saw you're interested in the 4-bedroom duplex in Ikeja.",
-      time: "10:30 AM",
-    },
-    {
-      id: "2",
-      sender: "me",
-      text: "Yes, I am. Is it still available?",
-      time: "10:32 AM",
-    },
-    {
-      id: "3",
-      sender: "them",
-      text: "The property is still available for inspection. When would you like to schedule?",
-      time: "10:35 AM",
-    },
-    {
-      id: "4",
-      sender: "them",
-      text: "I can show you the property this weekend if you're available.",
-      time: "10:36 AM",
-    },
-  ];
+    fetchMessages();
+  }, []);
 
   const selectedChat = conversations.find((c) => c.id === selectedConversation);
 
@@ -97,7 +52,25 @@ function BuyerMessages() {
           <p className="text-muted-foreground">Communicate with agents, landlords, and support</p>
         </div>
 
-        <Card className="h-[600px]">
+        {loading && (
+          <Card>
+            <CardContent className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </CardContent>
+          </Card>
+        )}
+
+        {error && (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <p className="text-red-500 mb-4">{error}</p>
+              <Button onClick={() => window.location.reload()}>Retry</Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {!loading && !error && (
+          <Card className="h-[600px]">
           <CardContent className="p-0 h-full">
             <div className="flex h-full">
               {/* Conversations List */}
@@ -241,6 +214,7 @@ function BuyerMessages() {
             </div>
           </CardContent>
         </Card>
+        )}
       </div>
     </DashboardLayout>
   );
