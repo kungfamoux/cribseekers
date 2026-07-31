@@ -70,7 +70,7 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
-      forbidNonWhitelisted: true,
+      forbidNonWhitelisted: false, // Allow unknown fields to prevent registration errors
       transform: true,
       transformOptions: {
         enableImplicitConversion: true,

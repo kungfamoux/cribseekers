@@ -113,18 +113,43 @@ function SignupPage() {
 
   const mutation = useMutation({
     mutationFn: (values: any) => {
-      // Convert empty strings to undefined for optional fields
-      const cleanedValues = {
-        ...values,
-        phoneNumber: values.phoneNumber || undefined,
-        businessName: values.businessName || undefined,
-        taxNumber: values.taxNumber || undefined,
-        licenseNumber: values.licenseNumber || undefined,
-        commissionRate: values.commissionRate || undefined,
-        cacNumber: values.cacNumber || undefined,
-        website: values.website || undefined,
+      // Filter fields based on role to match backend DTO structure
+      const baseFields = {
+        email: values.email,
+        password: values.password,
+        firstName: values.firstName,
+        lastName: values.lastName,
+        role: values.role,
       };
-      return authApi.register(cleanedValues as any);
+      
+      // Add optional fields only if they have values
+      if (values.phoneNumber) baseFields.phoneNumber = values.phoneNumber;
+      
+      // Role-specific fields
+      switch (signupRole) {
+        case "BUYER":
+        case "TENANT":
+          if (values.businessName) baseFields.businessName = values.businessName;
+          break;
+        case "LANDLORD":
+          if (values.businessName) baseFields.businessName = values.businessName;
+          if (values.taxNumber) baseFields.taxNumber = values.taxNumber;
+          break;
+        case "AGENT":
+          baseFields.agencyName = values.agencyName;
+          baseFields.officeAddress = values.officeAddress;
+          if (values.licenseNumber) baseFields.licenseNumber = values.licenseNumber;
+          if (values.commissionRate) baseFields.commissionRate = values.commissionRate;
+          break;
+        case "DEVELOPER":
+          baseFields.companyName = values.companyName;
+          baseFields.officeAddress = values.officeAddress;
+          if (values.cacNumber) baseFields.cacNumber = values.cacNumber;
+          if (values.website) baseFields.website = values.website;
+          break;
+      }
+      
+      return authApi.register(baseFields as any);
     },
     onSuccess: (response) => {
       // Backend sets httpOnly cookies automatically
@@ -132,7 +157,11 @@ function SignupPage() {
       if (response?.user) setUser(response.user);
       toast.success("Account created. Let's verify your email.");
       const email = form.getValues("email");
-      navigate({ to: "/auth/verify-email", search: email ? { email } : undefined });
+      if (email) {
+        navigate({ to: "/auth/verify-email", search: { email } });
+      } else {
+        navigate({ to: "/auth/verify-email" });
+      }
     },
     onError: (error) => {
       if (error instanceof ApiError) {
@@ -158,7 +187,7 @@ function SignupPage() {
       footer={
         <p>
           Already have an account?{" "}
-          <Link to="/auth/login" search={undefined} className="font-medium text-primary underline underline-offset-4">
+          <Link to="/auth/login" className="font-medium text-primary underline underline-offset-4">
             Log in
           </Link>
           {" · "}
