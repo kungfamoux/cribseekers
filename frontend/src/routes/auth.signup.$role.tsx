@@ -112,7 +112,20 @@ function SignupPage() {
   const password = form.watch("password");
 
   const mutation = useMutation({
-    mutationFn: (values: any) => authApi.register(values as any),
+    mutationFn: (values: any) => {
+      // Convert empty strings to undefined for optional fields
+      const cleanedValues = {
+        ...values,
+        phoneNumber: values.phoneNumber || undefined,
+        businessName: values.businessName || undefined,
+        taxNumber: values.taxNumber || undefined,
+        licenseNumber: values.licenseNumber || undefined,
+        commissionRate: values.commissionRate || undefined,
+        cacNumber: values.cacNumber || undefined,
+        website: values.website || undefined,
+      };
+      return authApi.register(cleanedValues as any);
+    },
     onSuccess: (response) => {
       // Backend sets httpOnly cookies automatically
       // Store user data for immediate UI use
@@ -178,7 +191,13 @@ function SignupPage() {
           htmlFor="phoneNumber"
           hint="International format, e.g. +2348012345678"
         >
-          <Input id="phoneNumber" type="tel" autoComplete="tel" {...form.register("phoneNumber")} />
+          <Input 
+            id="phoneNumber" 
+            type="tel" 
+            autoComplete="tel" 
+            {...form.register("phoneNumber")} 
+            defaultValue=""
+          />
         </Field>
 
         {signupRole === "AGENT" && (
