@@ -18,7 +18,7 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'User login' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Login successful', type: AuthResponseDto })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Login successful' })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Invalid credentials' })
   async login(@Body() loginDto: LoginDto, @Res() response: any): Promise<{ user: any }> {
     return this.authService.login(loginDto, response);
@@ -27,7 +27,7 @@ export class AuthController {
   @Post('signup')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'User registration' })
-  @ApiResponse({ status: HttpStatus.CREATED, description: 'Registration successful', type: AuthResponseDto })
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'Registration successful' })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'User already exists' })
   async signup(@Body() signupDto: SignupDto, @Res() response: any): Promise<{ user: any }> {
     return this.authService.signup(signupDto, response);
@@ -36,7 +36,7 @@ export class AuthController {
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Role-based registration' })
-  @ApiResponse({ status: HttpStatus.CREATED, description: 'Registration successful', type: AuthResponseDto })
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'Registration successful' })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'User already exists or invalid data' })
   async register(@Body() registrationDto: BaseRegistrationDto, @Res() response: any): Promise<{ user: any }> {
     return this.authService.registerWithRole(registrationDto, response);
@@ -103,7 +103,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Get current authenticated user' })
   @ApiResponse({ status: HttpStatus.OK, description: 'User retrieved successfully' })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
-  async getMe(@Request() req: any): Promise<any> {
+  async getMe(@Req() req: any): Promise<any> {
     // The JwtAuthGuard attaches the user to the request
     return req.user;
   }
